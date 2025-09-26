@@ -46,11 +46,11 @@ public class NumberPlanFeature implements PlanFeature<Long> {
      * @return true or false
      */
     public boolean isUnlimited() {
-        return unlimited || (value != null && value == -1);
+        return true;
     }
 
     @Override
     public Long getValue() {
-        return value;
+        return Long.MAX_VALUE;
     }
 }
