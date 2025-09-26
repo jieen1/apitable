@@ -32,8 +32,8 @@ DEVENV_PROJECT_NAME := apitable-devenv
 export DEVENV_PROJECT_NAME
 endif
 
-_DATAENV := docker compose --env-file $$ENV_FILE -p $$DEVENV_PROJECT_NAME -f docker-compose.yaml -f docker-compose.dataenv.yaml
-_DEVENV := docker compose --env-file $$ENV_FILE -p $$DEVENV_PROJECT_NAME -f docker-compose.devenv.yaml
+_DATAENV := docker-compose --env-file $$ENV_FILE -p $$DEVENV_PROJECT_NAME -f docker-compose.yaml -f docker-compose.dataenv.yaml
+_DEVENV := docker-compose --env-file $$ENV_FILE -p $$DEVENV_PROJECT_NAME -f docker-compose.devenv.yaml
 
 OS_NAME := $(shell uname -s | tr A-Z a-z)
 ifeq ($(OS_NAME), darwin)

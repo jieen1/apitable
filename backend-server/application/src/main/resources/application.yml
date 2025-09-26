@@ -24,7 +24,7 @@ spring:
     redis:
       host: ${REDIS_HOST:127.0.0.1}
       username: ${REDIS_USERNAME:}
-      password: ${REDIS_PASSWORD:}
+      password: ${REDIS_PASSWORD:apitable@com}
       port: ${REDIS_PORT:6379}
       database: ${REDIS_DB:0}
       timeout: ${REDIS_TIMEOUT:30000}
@@ -67,7 +67,7 @@ cookie:
   secure: ${COOKIES_SECURE:false}
   same-site: ${COOKIES_SAME_SITE:}
 const:
-  language-tag: ${DEFAULT_LOCALE:en-US}
+  language-tag: ${DEFAULT_LOCALE:zh-CN}
   server-domain: ${SERVER_DOMAIN:}
   callback-domain: ${CALLBACK_DOMAIN:}
   oss-image-audit-creatable: ${OSS_IMAGE_AUDIT_CREATABLE:false}
@@ -197,7 +197,7 @@ springdoc:
     enabled: ${API_DOCS_ENABLED:false}
 
 system:
-  default-time-zone: ${DEFAULT_TIME_ZONE:UTC}
+  default-time-zone: ${DEFAULT_TIME_ZONE:UTC+8}
   test-enabled: ${TEST_ENABLED:false}
 
 databus:
