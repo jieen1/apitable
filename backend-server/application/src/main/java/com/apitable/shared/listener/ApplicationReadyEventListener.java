@@ -54,7 +54,7 @@ public class ApplicationReadyEventListener implements
      */
     @Override
     public void onApplicationEvent(@NotNull final ApplicationReadyEvent event) {
-        TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC));
+        TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.systemDefault()));
         Locale.setDefault(LanguageManager.me().getDefaultLanguage());
         log.info("========== Server Setting Info ==========");
         log.info("Locale: {}", Locale.getDefault());

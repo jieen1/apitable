@@ -24,7 +24,7 @@ spring:
     redis:
       host: ${REDIS_HOST:127.0.0.1}
       username: ${REDIS_USERNAME:}
-      password: ${REDIS_PASSWORD:apitable@com}
+      password: ${REDIS_PASSWORD:}
       port: ${REDIS_PORT:6379}
       database: ${REDIS_DB:0}
       timeout: ${REDIS_TIMEOUT:30000}
