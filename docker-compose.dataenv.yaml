@@ -13,6 +13,7 @@ services:
   mysql:
     ports:
       - "3306:3306"
+    privileged: true
 
   rabbitmq:
     ports:
