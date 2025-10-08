@@ -63,8 +63,6 @@ import { RecommendWidgetPanel } from '../recommend_widget_panel';
 import { TabBar } from '../tab_bar';
 import { createWidgetByExistWidgetId } from '../utils';
 import { DASHBOARD_PANEL_ID } from './id';
-// @ts-ignore
-import { isDingtalkSkuPage } from 'enterprise/home/social_platform/utils';
 import styles from './style.module.less';
 import { useAppSelector } from 'pc/store/react-redux';
 export { DASHBOARD_PANEL_ID };
@@ -109,8 +107,6 @@ export const Dashboard = () => {
   const readonly = isMobile || !editable || hideReadonlyEmbedItem || disabledDraggle;
   const connect = dashboardPack?.connected;
   const hasOpenRecommend = useRef(false);
-  const purchaseToken = query.get('purchaseToken') || '';
-  const isSkuPage = isDingtalkSkuPage?.(purchaseToken);
 
   const installedWidgetInDashboard = Boolean(dashboardLayout && dashboardLayout.length);
 
@@ -488,7 +484,7 @@ export const Dashboard = () => {
                   setDragging(true);
                   setAllowChangeLayout(true);
                 }}
-                style={{ pointerEvents: isSkuPage ? 'none' : 'auto' }}
+                style={{ pointerEvents: 'auto' }}
                 onDragStop={() => setDragging(false)}
                 onResizeStop={() => setDragging(false)}
               >

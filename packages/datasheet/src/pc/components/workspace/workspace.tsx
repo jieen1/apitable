@@ -46,10 +46,6 @@ import { ComponentDisplay, ScreenSize } from '../common/component_display';
 import { CommonSide } from '../common_side';
 import { usePaymentReminder } from './hooks/usePaymentReminder';
 // @ts-ignore
-import { subscribeUsageCheck } from 'enterprise/billing/subscribe_usage_check';
-// @ts-ignore
-import { SubscribeUsageTipType, triggerUsageAlert } from 'enterprise/billing/trigger_usage_alert';
-// @ts-ignore
 import { showOrderModal } from 'enterprise/subscribe_system/order_modal/pay_order_success';
 import styles from './style.module.less';
 
@@ -137,10 +133,7 @@ export const Workspace: React.FC<React.PropsWithChildren<unknown>> = () => {
   useEffect(() => {
     if (getEnvVariables().IS_APITABLE) return;
     if (document.querySelector('#VIKA_USAGE_WARN_MODAL')) return;
-    if (!SubscribeUsageTipType || !triggerUsageAlert || !subscribeUsageCheck || !spaceInfo) return;
-    if (subscribeUsageCheck.shouldAlertToUser('maxSeats', spaceInfo?.seats, true)) {
-      triggerUsageAlert('maxSeats', { usage: spaceInfo?.seats, alwaysAlert: true }, SubscribeUsageTipType.Alert);
-    }
+    if (!spaceInfo) return;
   }, [nodeId, spaceInfo]);
 
   useMount(() => {

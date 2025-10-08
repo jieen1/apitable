@@ -18,8 +18,6 @@ import { ListWithFooter } from '../components/list_with_footer';
 import { automationPanelAtom, PanelName } from '../controller/atoms';
 import { useAutomationResourcePermission } from '../controller/use_automation_permission';
 import { Side } from './side';
-// @ts-ignore
-import { goToUpgrade } from 'enterprise/subscribe_system/upgrade_method';
 import styles from './styles.module.less';
 
 export const ConstAutomationContentLeft = 'automation-content-left';
@@ -137,15 +135,6 @@ export const AutomationPanelContent: FunctionComponent<{}> = memo(() => {
                           <InfoCircleOutlined color={colors.textDangerDefault} />
                           <Typography variant={'body3'} color={colors.textDangerDefault} style={{ marginLeft: 4 }}>
                             {t(Strings.automation_run_failure_tip)}
-                          </Typography>
-                          <Typography
-                            className={'vk-cursor-pointer\t'}
-                            onClick={goToUpgrade}
-                            variant={'body3'}
-                            color={colors.textDangerDefault}
-                            style={{ marginLeft: 8, textDecoration: 'underline' }}
-                          >
-                            {t(Strings.upgrade_now)}
                           </Typography>
                         </Box>
                       )}

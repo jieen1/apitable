@@ -307,7 +307,7 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, SpaceEntity>
             .fileSharable(true).invitable(true)
             .joinable(false).nodeExportable(true)
             .allowCopyDataToExternal(true)
-            .allowDownloadAttachment(true).mobileShowable(false)
+            .allowDownloadAttachment(true).mobileShowable(true)
             .watermarkEnable(false).build()).toString();
         SpaceEntity space = SpaceEntity.builder()
             .spaceId(spaceId).name(spaceName)

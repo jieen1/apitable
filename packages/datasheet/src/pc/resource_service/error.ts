@@ -24,8 +24,6 @@ import { Message } from 'pc/components/common/message';
 import { Modal } from 'pc/components/common/modal/modal/modal';
 import { getModalConfig } from 'pc/components/common/modal/qr_code_modal_content';
 import { Router } from 'pc/components/route_manager/router';
-// @ts-ignore
-import { triggerUsageAlertForDatasheet } from 'enterprise/billing/trigger_usage_alert';
 
 export const onError: IServiceError = (error, type) => {
   const { isShowQrcode, title, code, message: errorMessage } = error;
@@ -86,12 +84,6 @@ export const onError: IServiceError = (error, type) => {
 
   if (type === 'message') {
     Message.warning({ content: errorMessage });
-    return;
-  }
-
-  if (type === 'subscribeUsage' && errorMessage) {
-    const { key, specification, usage } = JSON.parse(errorMessage);
-    triggerUsageAlertForDatasheet?.(t(Strings[key], { specification, usage }));
     return;
   }
 };

@@ -29,9 +29,7 @@ import { useAppSelector } from 'pc/store/react-redux';
 import { generateUserInfo } from 'pc/utils';
 import { PermissionCard } from '../permission_card';
 // @ts-ignore
-import { SubscribeUsageTipType, triggerUsageAlert } from 'enterprise/billing/trigger_usage_alert';
-// @ts-ignore
-import { getSocialWecomUnitName } from 'enterprise/home/social_platform/utils';
+// import { getSocialWecomUnitName } from 'enterprise/home/social_platform/utils';
 import styles from './style.module.less';
 
 const modalTitle = {
@@ -89,12 +87,6 @@ export const AddAdminModal: FC<React.PropsWithChildren<IModalProps>> = ({ cancel
   const modalConfirm = () => {
     if (source === ModalType.Add) {
       const memberIds = selectedMembers.map((item) => (item as IMember).memberId);
-      const result = triggerUsageAlert(
-        'maxAdminNums',
-        { usage: memberIds.length + existSubAdminNum, alwaysAlert: true },
-        SubscribeUsageTipType.Alert,
-      );
-      if (result) return;
       setSubmitBtnLoading(true);
       addSubAdminAndNotice(memberIds, resourceCodes, handCancel);
       return;
@@ -141,11 +133,13 @@ export const AddAdminModal: FC<React.PropsWithChildren<IModalProps>> = ({ cancel
   };
   const title =
     source !== ModalType.Add && editOrReadSubMainInfo
-      ? getSocialWecomUnitName?.({
-        name: editOrReadSubMainInfo?.memberName,
-        isModified: editOrReadSubMainInfo?.isMemberNameModified,
-        spaceInfo,
-      }) || editOrReadSubMainInfo?.memberName
+      ? 
+      // getSocialWecomUnitName?.({
+      //   name: editOrReadSubMainInfo?.memberName,
+      //   isModified: editOrReadSubMainInfo?.isMemberNameModified,
+      //   spaceInfo,
+      // }) || 
+      editOrReadSubMainInfo?.memberName
       : '';
   return (
     <>
@@ -184,11 +178,12 @@ export const AddAdminModal: FC<React.PropsWithChildren<IModalProps>> = ({ cancel
                 selectedMembers.map((item) => {
                   const userInfo = generateUserInfo(item);
                   const title =
-                    getSocialWecomUnitName({
-                      name: (item as IMember)?.originName,
-                      isModified: (item as IMember)?.isMemberNameModified,
-                      spaceInfo,
-                    }) || (item as IMember)?.originName;
+                    // getSocialWecomUnitName({
+                    //   name: (item as IMember)?.originName,
+                    //   isModified: (item as IMember)?.isMemberNameModified,
+                    //   spaceInfo,
+                    // }) || 
+                    (item as IMember)?.originName;
                   return (
                     <UnitTag
                       key={item.unitId}

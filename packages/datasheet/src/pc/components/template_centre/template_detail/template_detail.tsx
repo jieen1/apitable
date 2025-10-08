@@ -40,8 +40,6 @@ import { useAppDispatch } from 'pc/hooks/use_app_dispatch';
 import { useAppSelector } from 'pc/store/react-redux';
 import { getEnvVariables } from 'pc/utils/env';
 import { AutomationPanel } from '../../automation/panel';
-// @ts-ignore
-import { isDingtalkSkuPage } from 'enterprise/home/social_platform/utils';
 import styles from './style.module.less';
 
 const _SplitPane: any = SplitPane;
@@ -64,14 +62,12 @@ export const TemplateDetail: FC<React.PropsWithChildren<unknown>> = () => {
   const appId = query.get('appId') || '';
   const corpId = query.get('corpId') || '';
   const purchaseToken = query.get('purchaseToken') || '';
-  const isSkuPage = isDingtalkSkuPage?.(purchaseToken);
-  const sideBarVisible = !isSkuPage && _sideBarVisible;
+  const sideBarVisible = _sideBarVisible;
   const { screenIsAtMost } = useResponsive();
   const isMobile = screenIsAtMost(ScreenSize.md);
 
   useMount(() => {
     Player.doTrigger(Events.template_detail_shown);
-    openSku();
   });
 
   useUnmount(() => {
@@ -152,38 +148,6 @@ export const TemplateDetail: FC<React.PropsWithChildren<unknown>> = () => {
   let defaultSize = localSize ? parseInt(localSize, 10) : 280;
   defaultSize = templateId ? 320 : defaultSize;
 
-  // In the Dingtalk, open the trial pop-up window, open it and jump to the home page to try
-  const openSku = () => {
-    if (!isSkuPage || !corpId || !purchaseToken) return;
-
-    openTryoutSku({
-      corpId,
-      appId: appId ? Number(appId) : undefined,
-      token: purchaseToken,
-    })
-      .then((res: any) => {
-        const { action, corpId } = res;
-
-        if (action === 'ok') {
-          const url = new URL(window.location.origin);
-
-          url.pathname = '/user/dingtalk/social_bind_space';
-          url.searchParams.set('corpId', corpId);
-          url.searchParams.set('suiteId', '19704002');
-          url.searchParams.set('ddtab', 'true');
-
-          if (isMobile) {
-            dd.biz.util.openLink({ url: url.href }).then(() => dd.biz.navigation.close({}));
-          } else {
-            window.location.href = url.href;
-          }
-        }
-      })
-      .catch((err) => {
-        console.warn(err);
-      });
-  };
-
   const MainComponent = () => {
     if (!templateDirectory) {
       return <Loading />;
@@ -211,7 +175,7 @@ export const TemplateDetail: FC<React.PropsWithChildren<unknown>> = () => {
           allowResize={sideBarVisible}
           resizerStyle={{ backgroundColor: colors.blackBlue[900] }}
         >
-          {isSkuPage ? <div /> : <CommonSide />}
+          <CommonSide />
           {MainComponent()}
         </_SplitPane>
       </ComponentDisplay>

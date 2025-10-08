@@ -32,8 +32,6 @@ import { useAppSelector } from 'pc/store/react-redux';
 import { dispatch } from 'pc/worker/store';
 import { IMemberList } from '../catalog/permission_settings_plus/permission/permission';
 import { PermissionInfoSetting } from '../catalog/permission_settings_plus/permission/permission_info_setting';
-// @ts-ignore
-import { SubscribeUsageTipType, triggerUsageAlert } from 'enterprise/billing';
 
 const defaultSetting = { formSheetAccessible: false };
 
@@ -107,12 +105,6 @@ export const EnableFieldPermissionPlus: React.FC<React.PropsWithChildren<IEnable
   const openFieldPermission = async () => {
     if (enabledFieldPermission) {
       return true;
-    }
-    if (spaceInfo) {
-      const result = triggerUsageAlert('fieldPermissionNums', { usage: spaceInfo.fieldRoleNums + 1, alwaysAlert: true }, SubscribeUsageTipType.Alert);
-      if (result) {
-        return false;
-      }
     }
 
     const res = await DatasheetApi.setFieldPermissionStatus(datasheetId, field.id, true, true);

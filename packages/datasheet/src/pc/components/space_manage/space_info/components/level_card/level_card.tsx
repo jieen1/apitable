@@ -30,10 +30,6 @@ import { useAppSelector } from 'pc/store/react-redux';
 import { getEnvVariables, isMobileApp } from 'pc/utils/env';
 import { ISpaceLevelType, LevelType, Position } from '../../interface';
 import { isExclusiveLimitedProduct, useLevelInfo } from '../../utils';
-// @ts-ignore
-import { SubscribePageType } from 'enterprise/subscribe_system/config';
-// @ts-ignore
-import { showUpgradeContactUs } from 'enterprise/subscribe_system/order_modal/pay_order_success';
 import styles from './style.module.less';
 
 interface ILevelCard {
@@ -90,21 +86,6 @@ export const LevelCard: FC<React.PropsWithChildren<ILevelCard>> = ({ type, minHe
     if (type === LevelType.PrivateCloud || type === LevelType.Atlas || appType === 2 || isMobileApp() || isMobile) {
       return null;
     }
-    if (appType === 1) {
-      // Self-built applications do not allow subscriptions, renewals and upgrades, unified contact customer service
-      return (
-        <Button
-          onClick={() => {
-            showUpgradeContactUs?.();
-          }}
-          color={colors.black[50]}
-          size="small"
-          style={{ color: upgradeBtnColor || titleColor || strokeColor, fontSize: 12, opacity: 0.8 }}
-        >
-          {t(Strings.contact_us)}
-        </Button>
-      );
-    }
     if (type === LevelType.Bronze || type === LevelType.Enterprise) {
       return (
         <Button
@@ -113,7 +94,6 @@ export const LevelCard: FC<React.PropsWithChildren<ILevelCard>> = ({ type, minHe
               Router.push(Navigation.SPACE_MANAGE, { params: { pathInSpace: 'upgrade' } });
               return;
             }
-            type === LevelType.Bronze ? window.open(`/space/${space.activeId}/upgrade`, '_blank', 'noopener,noreferrer') : showUpgradeContactUs?.();
           }}
           color={colors.black[50]}
           size="small"
@@ -145,27 +125,6 @@ export const LevelCard: FC<React.PropsWithChildren<ILevelCard>> = ({ type, minHe
     return (
       <ButtonGroup withSeparate>
         <React.Fragment key=".0">
-          <Button
-            style={{ ...commonStyle, borderRadius: '16px 0px 0px 16px' }}
-            size="small"
-            color={colors.black[50]}
-            onClick={() => {
-              window.open(`/space/${space.activeId}/upgrade?pageType=${SubscribePageType?.Renewal}`, '_blank', 'noopener,noreferrer');
-            }}
-          >
-            {t(Strings.renewal)}
-          </Button>
-          <Button
-            style={{ ...commonStyle, borderRadius: '0px 16px 16px 0px', marginLeft: 0 }}
-            size="small"
-            className={styles.beforeBg}
-            color={colors.black[50]}
-            onClick={() => {
-              window.open(`/space/${space.activeId}/upgrade?pageType=${SubscribePageType?.Upgrade}`, '_blank', 'noopener,noreferrer');
-            }}
-          >
-            {t(Strings.upgrade)}
-          </Button>
         </React.Fragment>
       </ButtonGroup>
     );

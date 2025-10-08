@@ -84,8 +84,6 @@ import { FormFieldContainer } from './form_field_container';
 import { FormPropContainer } from './form_prop_container';
 import { query2formData, string2Query } from './util';
 // @ts-ignore
-import { triggerUsageAlert, SubscribeUsageTipType } from 'enterprise/billing/trigger_usage_alert';
-// @ts-ignore
 import { PreFillPanel } from 'enterprise/pre_fill_panel/pre_fill_panel';
 import styles from './style.module.less';
 
@@ -441,15 +439,6 @@ export const FormContainer: React.FC<
   const handleAddRecordError = (code: number, errMsg: any) => {
     let str = t(Strings.form_error_tip);
     if (code === StatusCode.SPACE_CAPACITY_OVER_LIMIT) str = t(Strings.form_space_capacity_over_limit);
-    if ([OVER_LIMIT_PER_SHEET_RECORDS, OVER_LIMIT_SPACE_RECORDS].includes(String(code))) {
-      const { usage } = JSON.parse(errMsg);
-      triggerUsageAlert(
-        OVER_LIMIT_PER_SHEET_RECORDS === String(code) ? 'maxRowsPerSheet' : 'maxRowsInSpace',
-        { usage: usage, alwaysAlert: true },
-        SubscribeUsageTipType.Alert,
-      );
-      return;
-    }
     warningTip(str);
   };
 

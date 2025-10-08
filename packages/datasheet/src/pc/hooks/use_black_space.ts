@@ -20,8 +20,6 @@ import { useEffect } from 'react';
 import { Strings, t } from '@apitable/core';
 import { showBannerAlert } from 'pc/components/notification/banner_alert';
 import { useAppSelector } from 'pc/store/react-redux';
-// @ts-ignore
-import { goToUpgrade } from 'enterprise/subscribe_system/upgrade_method';
 
 const BLACK_SPACE_BANNER_ALERT = 'BLACK_SPACE_BANNER_ALERT';
 
@@ -30,7 +28,6 @@ const _showBannerAlert = (destroyPrev = false) => {
     content: t(Strings.black_space_alert),
     upgrade: true,
     destroyPrev,
-    onBtnClick: goToUpgrade,
     id: BLACK_SPACE_BANNER_ALERT,
   });
 };

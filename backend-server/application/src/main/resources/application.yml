@@ -197,7 +197,7 @@ springdoc:
     enabled: ${API_DOCS_ENABLED:false}
 
 system:
-  default-time-zone: ${DEFAULT_TIME_ZONE:UTC+8}
+  default-time-zone: ${DEFAULT_TIME_ZONE:Asia/Shanghai}
   test-enabled: ${TEST_ENABLED:false}
 
 databus:

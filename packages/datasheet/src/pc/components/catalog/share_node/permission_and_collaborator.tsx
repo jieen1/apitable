@@ -33,8 +33,6 @@ import { IMemberList } from '../permission_settings_plus/permission';
 import { MembersDetail } from '../permission_settings_plus/permission/members_detail';
 import { IShareContentProps } from './interface';
 // @ts-ignore
-import { SubscribeUsageTipType, triggerUsageAlert } from 'enterprise/billing/trigger_usage_alert';
-// @ts-ignore
 import { isSocialPlatformEnabled } from 'enterprise/home/social_platform/utils';
 import styles from './style.module.less';
 
@@ -89,11 +87,6 @@ export const PermissionAndCollaborator: React.FC<IShareContentProps> = ({ data }
   // Select member submission events
   const onSubmit = async (unitInfos: IUnitValue[], permission: IOption) => {
     if (!unitInfos.length) {
-      return;
-    }
-
-    const result = triggerUsageAlert('nodePermissionNums', { usage: spaceInfo!.nodeRoleNums + 1, alwaysAlert: true }, SubscribeUsageTipType.Alert);
-    if (result) {
       return;
     }
 

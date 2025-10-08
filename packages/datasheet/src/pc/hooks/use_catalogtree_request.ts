@@ -40,8 +40,6 @@ import { Router } from 'pc/components/route_manager/router';
 import { useAppDispatch } from 'pc/hooks/use_app_dispatch';
 import { resourceService } from 'pc/resource_service';
 import { useAppSelector } from 'pc/store/react-redux';
-// @ts-ignore
-import { SubscribeUsageTipType, triggerUsageAlert } from 'enterprise/billing/trigger_usage_alert';
 
 export const useCatalogTreeRequest = () => {
   const dispatch = useAppDispatch();
@@ -67,47 +65,6 @@ export const useCatalogTreeRequest = () => {
   const userUnitId = useAppSelector((state) => state.user.info?.unitId);
 
   const checkNodeNumberLimit = (nodeType: ConfigConstant.NodeType) => {
-    // First check that the total number of nodes is as required
-    // Folders are not the type of node that needs to be counted
-    if (nodeType !== ConfigConstant.NodeType.FOLDER) {
-      const result1 = triggerUsageAlert?.(
-        'maxSheetNums',
-        {
-          usage: spaceInfo!.sheetNums + 1,
-          alwaysAlert: true,
-        },
-        SubscribeUsageTipType.Alert,
-      );
-      if (result1) {
-        return true;
-      }
-    }
-    if (nodeType === ConfigConstant.NodeType.FORM) {
-      // Next, check that the number of forms or mirrors meets the requirements according to the node type
-      const result1 = triggerUsageAlert?.(
-        'maxFormViewsInSpace',
-        { usage: spaceInfo!.formViewNums + 1, alwaysAlert: true },
-        SubscribeUsageTipType.Alert,
-      );
-      if (result1) {
-        return true;
-      }
-    }
-    if (nodeType === ConfigConstant.NodeType.MIRROR) {
-      // Next, check that the number of forms or mirrors meets the requirements according to the node type
-      const result1 = triggerUsageAlert?.('maxMirrorNums', { usage: spaceInfo!.mirrorNums + 1, alwaysAlert: true }, SubscribeUsageTipType.Alert);
-      if (result1) {
-        return true;
-      }
-    }
-    // if (nodeType === ConfigConstant.NodeType.AI) {
-    //   // Next, check that the number of forms or mirrors meets the requirements according to the node type
-    //   const result1 = triggerUsageAlert?.('maxSeats',
-    //     { usage: spaceInfo!.seats + 1, alwaysAlert: true }, SubscribeUsageTipType.Alert);
-    //   if (result1) {
-    //     return true;
-    //   }
-    // }
     return false;
   };
 

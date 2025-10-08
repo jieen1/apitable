@@ -21,8 +21,6 @@ import { useEffect } from 'react';
 import { shallowEqual } from 'react-redux';
 import { getCustomConfig, Strings, t } from '@apitable/core';
 import { useAppSelector } from 'pc/store/react-redux';
-// @ts-ignore
-import { isDingtalkSkuPage } from 'enterprise/home/social_platform/utils';
 import { useQuery } from './';
 
 const contacts = /(\/)?org(\/)?/; // Directory
@@ -52,7 +50,6 @@ export const useNavigatorName = () => {
   const nodeId = mirrorId || datasheetId || folderId || formId || dashboardId;
   const query = useQuery();
   const purchaseToken = query.get('purchaseToken') || '';
-  const isSkuPage = isDingtalkSkuPage?.(purchaseToken);
 
   useEffect(() => {
     const pathname = router.asPath;
@@ -71,7 +68,7 @@ export const useNavigatorName = () => {
       }
 
       if (categoryId || isMatchTemplate) {
-        name = isSkuPage ? t(Strings.system_configuration_product_name) : t(Strings.nav_templates);
+        name = t(Strings.nav_templates);
       }
 
       if (isMatchContacts) {
@@ -90,5 +87,5 @@ export const useNavigatorName = () => {
     getEmojiNativeByName(nodeIcon).then((icon) => {
       document.title = combineEmojiAndName(icon, name);
     });
-  }, [treeNodesMap, nodeId, categoryId, router.asPath, isSkuPage, router.query]);
+  }, [treeNodesMap, nodeId, categoryId, router.asPath, router.query]);
 };

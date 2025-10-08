@@ -88,14 +88,6 @@ export const RobotTriggerCreateForm = ({ robotId, triggerTypes, preTriggerId }: 
     return getNodeTypeOptions(list);
   }, [state?.scenario, triggerTypes]);
 
-  // TODO temporary solution, need to be removed
-  useEffect(() => {
-    // TriggerCommands.open_guide_wizard?.(ConfigConstant.WizardIdConstant.AUTOMATION_TRIGGER);
-    // setTimeout(() => {
-    //   TriggerCommands.open_guide_wizard?.(ConfigConstant.WizardIdConstant.AUTOMATION_TRIGGER);
-    //   Player.doTrigger(Events.guide_use_automation_first_time);
-    // }, 3000);
-  }, []);
 
   const createRobotTrigger = useCallback(async (triggerTypeId: string) => {
     const triggerType = triggerTypes.find((item) => item.triggerTypeId === triggerTypeId);
@@ -160,10 +152,6 @@ export const RobotTriggerCreateForm = ({ robotId, triggerTypes, preTriggerId }: 
   }
 
   const handleCreateFormChange = (triggerTypeId: string) => {
-    if (triggerTypeId === timeScheduleTriggerType?.triggerTypeId && !IS_ENTERPRISE) {
-      window.open('https://aitable.ai/pricing/');
-      return;
-    }
 
     if (triggerTypeId) {
       debouncedCreateTrigger(triggerTypeId);

@@ -31,8 +31,6 @@ import { useAppSelector } from 'pc/store/react-redux';
 import { getEnvVariables } from 'pc/utils/env';
 import { AddAdminModal, ModalType } from './add_admin_modal';
 // @ts-ignore
-import { SubscribeUsageTipType, triggerUsageAlert } from 'enterprise/billing/trigger_usage_alert';
-// @ts-ignore
 import { getSocialWecomUnitName } from 'enterprise/home/social_platform/utils';
 import styles from './style.module.less';
 
@@ -85,8 +83,6 @@ export const SubAdmin: FC<React.PropsWithChildren<unknown>> = () => {
     return i18nStrings.join(' & ');
   };
   const addAdminBtnClick = () => {
-    const result = triggerUsageAlert?.('maxAdminNums', { usage: subAdminList.length, alwaysAlert: true }, SubscribeUsageTipType?.Alert);
-    if (result) return;
     setModalType(ModalType.Add);
   };
   const editBtnClick = (record: ISubAdminList) => {

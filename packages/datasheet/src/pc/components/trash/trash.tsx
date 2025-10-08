@@ -37,8 +37,6 @@ import { ComponentDisplay, ScreenSize } from '../common/component_display';
 import { TComponent } from '../common/t_component';
 import { TrashContextMenu } from './trash_context_menu';
 // @ts-ignore
-import { SubscribeUsageTipType, triggerUsageAlert } from 'enterprise/billing/trigger_usage_alert';
-// @ts-ignore
 import { getSocialWecomUnitName } from 'enterprise/home/social_platform/utils';
 // @ts-ignore
 import { SubscribeGrade } from 'enterprise/subscribe_system/subscribe_label/subscribe_label';
@@ -114,28 +112,6 @@ const Trash: FC<React.PropsWithChildren<unknown>> = () => {
     if (recoverLoading) {
       return;
     }
-    const result = triggerUsageAlert?.('maxSheetNums', { usage: spaceInfo!.sheetNums + 1, alwaysAlert: true }, SubscribeUsageTipType?.Alert);
-    if (result) {
-      return;
-    }
-
-    if (formIdReg.test(`/${nodeId}`)) {
-      const result = triggerUsageAlert?.(
-        'maxFormViewsInSpace',
-        { usage: spaceInfo!.formViewNums + 1, alwaysAlert: true },
-        SubscribeUsageTipType?.Alert,
-      );
-      if (result) {
-        return;
-      }
-    }
-
-    if (mirrorIdReg.test(`/${nodeId}`)) {
-      const result = triggerUsageAlert?.('maxMirrorNums', { usage: spaceInfo!.mirrorNums + 1, alwaysAlert: true }, SubscribeUsageTipType?.Alert);
-      if (result) {
-        return;
-      }
-    }
 
     const res = await trashRecover(nodeId);
     const { success, data } = res.data;
@@ -164,13 +140,6 @@ const Trash: FC<React.PropsWithChildren<unknown>> = () => {
       loadMore();
       return;
     }
-    triggerUsageAlert?.(
-      'maxRemainTrashDays',
-      // Here maxRemainTrashDays is obtained as the value in billing,
-      // which is actually the maximum allowed, so in order to trigger the popup, you need +1.
-      { usage: maxRemainTrashDays + 1, alwaysAlert: true },
-      SubscribeUsageTipType?.Alert,
-    );
   };
 
   return (

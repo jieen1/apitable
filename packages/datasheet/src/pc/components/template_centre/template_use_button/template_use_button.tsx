@@ -28,8 +28,6 @@ import { useRequest, useUserRequest } from 'pc/hooks';
 import { useAppSelector } from 'pc/store/react-redux';
 import { UsingTemplateModal } from '../using_template_modal';
 // @ts-ignore
-import { SubscribeUsageTipType, triggerUsageAlert } from 'enterprise/billing/trigger_usage_alert';
-// @ts-ignore
 import { LoginModal } from 'enterprise/home/login_modal/login_modal';
 import styles from './style.module.less';
 
@@ -92,10 +90,6 @@ export const TemplateUseButton: React.FC<React.PropsWithChildren<ITemplateUseBut
     // Current user is logged in
     if (!spaceId && templateId) {
       Router.push(Navigation.TEMPLATE, { params: { categoryId, templateId, spaceId: userInfo!.spaceId } });
-      return;
-    }
-    const result = triggerUsageAlert?.('maxSheetNums', { usage: spaceInfo!.sheetNums + nodeNumber, alwaysAlert: true }, SubscribeUsageTipType?.Alert);
-    if (result) {
       return;
     }
     setOpenTemplateModal(templateId!);

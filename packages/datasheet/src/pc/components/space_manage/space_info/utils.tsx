@@ -417,7 +417,7 @@ export const SpaceLevelInfo: ISpaceLevelInfo = {
 export const useLevelInfo = (level: ISpaceLevelType, expiration?: string | null) => {
   return useMemo(() => {
     const _level = level.toLocaleLowerCase();
-    const info = SpaceLevelInfo[_level] || SpaceLevelInfo.bronze;
+    const info = SpaceLevelInfo[_level] || SpaceLevelInfo['exclusive limited tier 5'];
     info.levelCard.expiration = expiration || -1;
     return info;
   }, [level, expiration]);

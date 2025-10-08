@@ -27,8 +27,6 @@ import { store } from 'pc/store';
 import { byte2Mb } from 'pc/utils/dom';
 import { execNoTraceVerification } from 'pc/utils/no_trace_verification';
 import { getEnvVariables } from './env';
-// @ts-ignore
-import { SubscribeUsageTipType, triggerUsageAlert } from 'enterprise/billing/trigger_usage_alert';
 
 interface IUploadMap {
   [key: string]: IUploadMapItem;
@@ -217,13 +215,7 @@ export class UploadManager {
         return resolve(null);
       }
       Api.searchSpaceSize().then((res) => {
-        const { usedCapacity } = res.data.data;
-        const result = triggerUsageAlert?.(
-          'maxCapacitySizeInBytes',
-          { usage: usedCapacity, alwaysAlert: true, reload: true },
-          SubscribeUsageTipType?.Alert,
-        );
-        !result && resolve(null);
+        resolve(null);
       });
     });
   }

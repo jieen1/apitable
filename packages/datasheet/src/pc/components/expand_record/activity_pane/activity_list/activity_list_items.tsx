@@ -57,8 +57,6 @@ import IconNoListLight from 'static/icon/datasheet/activity/activity_empty_light
 import { ActivityContext, ICommentReplyMap } from '../activity_context';
 import { ChangesetItem } from '../activity_item';
 import { IActivityPaneProps, IChooseComment } from '../interface';
-// @ts-ignore
-import { SubscribeUsageTipType, triggerUsageAlert } from 'enterprise/billing';
 import styles from './style.module.less';
 
 const PAGE_SIZE = 10;
@@ -138,10 +136,6 @@ export const ActivityListItems: FC<
   const [end, setEnd] = useState(false);
 
   const loadOverLimitData = () => {
-    const result = triggerUsageAlert('maxRemainRecordActivityDays', { usage: MAX_LIMIT_DAY, alwaysAlert: true }, SubscribeUsageTipType.Alert);
-    if (result) {
-      return;
-    }
     setEnd(false);
     setMaxRemainRecordActivityDays(MAX_LIMIT_DAY);
   };

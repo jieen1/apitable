@@ -32,8 +32,6 @@ import { Modal } from '../mobile/modal';
 import { ColorGroup } from './color_group';
 import { OptionSetting } from './enum';
 // @ts-ignore
-import { SubscribeUsageTipType, triggerUsageAlert } from 'enterprise/billing/trigger_usage_alert';
-// @ts-ignore
 import { SubscribeGrade, SubscribeLabel } from 'enterprise/subscribe_system/subscribe_label/subscribe_label';
 import styles from './style.module.less';
 
@@ -78,10 +76,6 @@ export const ColorPickerPane: React.FC<React.PropsWithChildren<IColorPickerPane>
         colorGroup={colorGroup}
         option={option}
         onChange={(type: OptionSetting, id: string, value: string | number) => {
-          if (title === t(Strings.option_configuration_advance_palette)) {
-            const result = triggerUsageAlert?.('rainbowLabel', { alwaysAlert: true }, SubscribeUsageTipType.Alert);
-            if (result) return;
-          }
           onChange?.(type, id, value);
           onClose();
         }}

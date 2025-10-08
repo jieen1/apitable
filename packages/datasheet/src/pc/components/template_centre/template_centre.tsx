@@ -26,8 +26,6 @@ import { usePageParams, useQuery, useRequest, useUserRequest } from 'pc/hooks';
 import { useAppSelector } from 'pc/store/react-redux';
 import { ComponentDisplay, ScreenSize } from '../common/component_display';
 import { MobileSideBar } from '../mobile_side_bar';
-// @ts-ignore
-import { isDingtalkSkuPage } from 'enterprise/home/social_platform/utils';
 //  @ts-ignore
 import { WecomContactWrapper } from 'enterprise/wecom/wecom_contact_wrapper/wecom_contact_wrapper.tsx';
 import styles from './style.module.less';
@@ -38,7 +36,6 @@ const TemplateCentre: FC<React.PropsWithChildren<unknown>> = (props) => {
   const { run: getLoginStatus, loading } = useRequest(getLoginStatusReq, { manual: true });
   const query = useQuery();
   const purchaseToken = query.get('purchaseToken') || '';
-  const isSkuPage = isDingtalkSkuPage?.(purchaseToken);
   const posthog = usePostHog();
   usePageParams();
 
@@ -61,11 +58,6 @@ const TemplateCentre: FC<React.PropsWithChildren<unknown>> = (props) => {
     </SideWrapper>
   ) : (
     <>
-      {!isSkuPage && (
-        <ComponentDisplay maxWidthCompatible={ScreenSize.md}>
-          <MobileSideBar />
-        </ComponentDisplay>
-      )}
       <div className={styles.templateCentre}>{props.children}</div>
     </>
   );

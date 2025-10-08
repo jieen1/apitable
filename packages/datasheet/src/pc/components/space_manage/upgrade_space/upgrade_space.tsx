@@ -21,10 +21,6 @@ import { Skeleton } from '@apitable/components';
 import { Api, Strings, t } from '@apitable/core';
 import { useAppSelector } from 'pc/store/react-redux';
 import { getEnvVariables } from 'pc/utils/env';
-// @ts-ignore
-import { Trial } from 'enterprise/log/trial';
-// @ts-ignore
-import { showUpgradeContactUs } from 'enterprise/subscribe_system/order_modal/pay_order_success';
 import styles from './style.module.less';
 
 // const upperCaseFirstWord = (str: string) => {
@@ -114,10 +110,6 @@ const UpgradeSpace: React.FC<IUpgradeSpaceProps> = ({ hideDetail }) => {
         return;
       }
 
-      if (msg === 'contactUs') {
-        showUpgradeContactUs();
-      }
-
       if (pageType) {
         window.open(`/space/${spaceId}/upgrade?pageType=${pageType}`, '_blank', 'noopener,noreferrer');
       }
@@ -130,10 +122,6 @@ const UpgradeSpace: React.FC<IUpgradeSpaceProps> = ({ hideDetail }) => {
     };
     // eslint-disable-next-line
   }, [spaceId, product]);
-
-  if (showTrialModal) {
-    return Trial && <Trial setShowTrialModal={setShowTrialModal} title={t(Strings.upgrade_space)} />;
-  }
 
   const iframeSrc = location.origin + `/pricing/?upgradeSpace=true&currentProduct=${product}&hideDetail=${hideDetail}`;
   // const iframeSrc = 'http://localhost:3002' + `/pricing/?upgradeSpace=true&currentProduct=${product}&hideDetail=${hideDetail}`;

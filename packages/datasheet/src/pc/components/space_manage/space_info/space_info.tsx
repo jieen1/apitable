@@ -31,10 +31,6 @@ import { ISpaceLevelType, LevelType } from './interface';
 import { Lg, Md, Sm, Xs } from './layout';
 import { DELETE_SPACE_CONTEXT_MENU_ID } from './utils';
 // @ts-ignore
-import { subscribeUsageCheck } from 'enterprise/billing/subscribe_usage_check';
-// @ts-ignore
-import { SubscribeUsageTipType, triggerUsageAlert } from 'enterprise/billing/trigger_usage_alert';
-// @ts-ignore
 import { isSocialPlatformEnabled } from 'enterprise/home/social_platform/utils';
 
 export const SpaceInfo = () => {
@@ -51,77 +47,21 @@ export const SpaceInfo = () => {
   const [isDelConfirmModal, setIsDelConfirmModal] = useState(false);
   const [isDelSpaceModal, setIsDelSpaceModal] = useState(false);
   const [isDelSuccessModal, setIsDelSuccessModal] = useState(false);
-  const level = (subscription ? subscription.product.toLowerCase() : LevelType.Bronze) as ISpaceLevelType;
+  const level = (subscription ? subscription.product.toLowerCase() : LevelType.Enterprise) as ISpaceLevelType;
   const dispatch = useDispatch();
   useMount(() => {
     spaceId && dispatch(StoreActions.getSpaceInfo(spaceId));
     Player.doTrigger(Events.space_setting_overview_shown);
   });
 
-  useMount(() => {
-    setTimeout(() => {
-      if (!SubscribeUsageTipType || !triggerUsageAlert || !subscribeUsageCheck) return;
-      if (subscribeUsageCheck.shouldAlertToUser('maxSheetNums', spaceInfo?.sheetNums, true)) {
-        triggerUsageAlert('maxSheetNums', { usage: spaceInfo?.sheetNums }, SubscribeUsageTipType.Alert);
-        return;
-      }
-      if (subscribeUsageCheck.shouldAlertToUser('maxRowsInSpace', spaceInfo?.recordNums, true)) {
-        triggerUsageAlert('maxRowsInSpace', { usage: spaceInfo?.recordNums }, SubscribeUsageTipType.Alert);
-        return;
-      }
-      if (subscribeUsageCheck.shouldAlertToUser('maxGanttViewsInSpace', spaceInfo?.ganttViewNums, true)) {
-        triggerUsageAlert('maxGanttViewsInSpace', { usage: spaceInfo?.ganttViewNums }, SubscribeUsageTipType.Alert);
-        return;
-      }
-      if (subscribeUsageCheck.shouldAlertToUser('maxGalleryViewsInSpace', spaceInfo?.galleryViewNums, true)) {
-        triggerUsageAlert('maxGalleryViewsInSpace', { usage: spaceInfo?.galleryViewNums }, SubscribeUsageTipType.Alert);
-        return;
-      }
-      if (subscribeUsageCheck.shouldAlertToUser('maxCalendarViewsInSpace', spaceInfo?.calendarViewNums, true)) {
-        triggerUsageAlert('maxCalendarViewsInSpace', { usage: spaceInfo?.calendarViewNums }, SubscribeUsageTipType.Alert);
-        return;
-      }
-      if (subscribeUsageCheck.shouldAlertToUser('maxKanbanViewsInSpace', spaceInfo?.kanbanViewNums, true)) {
-        triggerUsageAlert('maxKanbanViewsInSpace', { usage: spaceInfo?.kanbanViewNums }, SubscribeUsageTipType.Alert);
-        return;
-      }
-      if (subscribeUsageCheck.shouldAlertToUser('maxFormViewsInSpace', spaceInfo?.formViewNums, true)) {
-        triggerUsageAlert('maxFormViewsInSpace', { usage: spaceInfo?.formViewNums }, SubscribeUsageTipType.Alert);
-        return;
-      }
-      if (subscribeUsageCheck.shouldAlertToUser('maxCapacitySizeInBytes', spaceInfo?.capacityUsedSizes, true)) {
-        triggerUsageAlert('maxCapacitySizeInBytes', { usage: spaceInfo?.capacityUsedSizes }, SubscribeUsageTipType.Alert);
-        return;
-      }
-    }, 0);
-  });
-
   const { clientWidth, screenIsAtMost } = useResponsive();
-  // const [adData, setAd] = useState<IApi.IAdData | null>(null);
   const isMobile = screenIsAtMost(ScreenSize.md);
-
-  // useEffect(() => {
-  //   Api.getSpaceAdList().then((res: any) => {
-  //     const data = res;
-  //     const lang = getLanguage();
-  //     const isZh = /^zh/i.test(lang);
-  //     if (!isZh) {
-  //       data.desc = data.descEn || data.desc;
-  //       data.linkText = data.linkTextEn || data.linkText;
-  //     }
-  //     setAd(data);
-  //   });
-  // }, []);
 
   useEffect(() => {
     if (isMobile) {
       setSideBarVisible(false);
     }
   }, [isMobile, setSideBarVisible]);
-
-  // const contextValue = useMemo(() => {
-  //   return { adData };
-  // }, [adData]);
 
   const Layout = useMemo(() => {
     if (clientWidth < ScreenWidth.sm) {
