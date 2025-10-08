@@ -407,6 +407,32 @@ export const RobotTriggerBase = memo((props: IRobotTriggerBase) => {
 
   const mergedUiSchema = useMemo(() => {
     const uiSchemaWithRule = produce(uiSchema, (draft) => {
+
+      // @ts-ignore
+      draft.scheduleType = {
+        'ui:widget': ({ value, onChange }: any) => {
+          return (
+            <DropdownSelect
+              disabled={false}
+              triggerStyle={{
+                minWidth: '64px',
+              }}
+              openSearch
+              value={value.value}
+              options={[
+                {label: "Hour", value: "hour"},
+                {label: "Day", value: "day"},
+                {label: "Week", value: "week"},
+                {label: "Month", value: "month"},
+              ]}
+              onSelected={(node) => {
+                onChange(literal2Operand(node.value));
+              }}
+            />
+          );
+        },
+      }
+
       // @ts-ignore
       draft.timeZone = {
         'ui:widget': ({ _, onChange }: any) => {
@@ -501,7 +527,7 @@ export const RobotTriggerBase = memo((props: IRobotTriggerBase) => {
         }
       }
     }
-
+    console.log("uiSchemaWithRule::", uiSchemaWithRule)
     return {
       ...uiSchemaWithRule,
       formId: {

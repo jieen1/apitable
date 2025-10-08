@@ -105,7 +105,7 @@ cte-sql:
 starter:
   socketio:
     client:
-      url: ${SOCKET_URL:http://127.0.0.1:3002}
+      url: ${SOCKET_URL:http://room-server:3002}
       path: ${SOCKET_PATH:/notification}
       reconnection-attempts: ${SOCKET_RECONNECTION_ATTEMPTS:2}
       reconnection-delay: ${SOCKET_RECONNECTION_DELAY:1000}
@@ -207,3 +207,11 @@ databus:
 notification:
   callback-url: ${NOTIFICATION_CALLBACK_URL:}
   template-ids: ${NOTIFICATION_TEMPLATE_IDS:single_record_member_mention,single_record_comment_mentioned,task_reminder}
+
+automation:
+  scheduler:
+    enabled: ${AUTOMATION_SCHEDULER_ENABLED:true}
+
+room:
+  server:
+    url: ${ROOM_SERVER_URL:http://localhost:3002}

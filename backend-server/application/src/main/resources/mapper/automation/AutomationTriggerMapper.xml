@@ -110,4 +110,11 @@
         </foreach>
         AND is_deleted = 0
     </select>
+
+    <select id="selectByTriggerTypeId" resultType="com.apitable.automation.entity.AutomationTriggerEntity">
+        SELECT id, trigger_type_id, trigger_id, robot_id, prev_trigger_id, resource_id, `input`
+        FROM ${tablePrefix}automation_trigger
+        WHERE trigger_type_id = #{triggerTypeId}
+        AND is_deleted = 0
+    </select>
 </mapper>

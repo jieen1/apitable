@@ -84,7 +84,19 @@ export const SideWrapper = (props: { children: any }) => {
 
   const childComponent = (
     <div className={'layout-row f-g-1 ' + styles.spaceContainer} onScroll={scrollFix}>
+      {(
+        <>
+          <ComponentDisplay minWidthCompatible={ScreenSize.md}>{!isWorkbench && <Navigation />}</ComponentDisplay>
+
+          <ComponentDisplay maxWidthCompatible={ScreenSize.md}>
+            <MobileSideBar />
+          </ComponentDisplay>
+        </>
+      )}
+
       {props.children}
+
+      {shortcutKeyPanelVisible && <ShortcutsPanel />}
     </div>
   );
 
