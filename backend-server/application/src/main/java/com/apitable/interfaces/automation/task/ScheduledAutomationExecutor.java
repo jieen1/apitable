@@ -45,7 +45,7 @@ public class ScheduledAutomationExecutor {
     /**
      * Room server base URL.
      */
-    @Value("${room.server.url:http://localhost:3002}")
+    @Value("${room.server.url:http://localhost:3001}")
     private String roomServerUrl;
 
     /**

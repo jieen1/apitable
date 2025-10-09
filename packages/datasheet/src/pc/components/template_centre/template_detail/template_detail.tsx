@@ -17,8 +17,6 @@
  */
 
 import { useMount, useRequest, useUnmount } from 'ahooks';
-import { openTryoutSku } from 'dingtalk-design-libs';
-import dd from 'dingtalk-jsapi';
 import { get } from 'lodash';
 import { useRouter } from 'next/router';
 import { FC, useEffect } from 'react';
@@ -35,7 +33,7 @@ import { FolderShowcase } from 'pc/components/folder_showcase';
 import { FormPanel } from 'pc/components/form_panel';
 import { MirrorRoute } from 'pc/components/mirror/mirror_route';
 import { Router } from 'pc/components/route_manager/router';
-import { useQuery, useResponsive, useSideBarVisible, useTemplateRequest } from 'pc/hooks';
+import { useSideBarVisible, useTemplateRequest } from 'pc/hooks';
 import { useAppDispatch } from 'pc/hooks/use_app_dispatch';
 import { useAppSelector } from 'pc/store/react-redux';
 import { getEnvVariables } from 'pc/utils/env';
@@ -58,13 +56,7 @@ export const TemplateDetail: FC<React.PropsWithChildren<unknown>> = () => {
   const { run: getTemplateDirectory } = useRequest<ITemplateDirectory, any[]>(getTemplateDirectoryReq, { manual: true });
   const templateDirectory = useAppSelector((state) => state.templateCentre.directory);
   const dispatch = useAppDispatch();
-  const query = useQuery();
-  const appId = query.get('appId') || '';
-  const corpId = query.get('corpId') || '';
-  const purchaseToken = query.get('purchaseToken') || '';
   const sideBarVisible = _sideBarVisible;
-  const { screenIsAtMost } = useResponsive();
-  const isMobile = screenIsAtMost(ScreenSize.md);
 
   useMount(() => {
     Player.doTrigger(Events.template_detail_shown);
@@ -154,8 +146,8 @@ export const TemplateDetail: FC<React.PropsWithChildren<unknown>> = () => {
     }
 
     return (
-      <div className={styles.right} style={{ borderLeft: !sideBarVisible ? `16px solid ${colors.blackBlue[900]}` : '' }} onClick={openSku}>
-        <div className={styles.content} style={{ pointerEvents: isSkuPage ? 'none' : 'auto' }}>
+      <div className={styles.right} style={{ borderLeft: !sideBarVisible ? `16px solid ${colors.blackBlue[900]}` : '' }}>
+        <div className={styles.content} style={{ pointerEvents: 'auto' }}>
           {templateDirectory && getComponent()}
         </div>
       </div>

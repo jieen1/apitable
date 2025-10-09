@@ -29,7 +29,7 @@ import { NetworkStatus } from 'pc/components/network_status';
 import { CollaboratorStatus } from 'pc/components/tab_bar/collaboration_status';
 import { expandWidgetCenter, InstallPosition } from 'pc/components/widget/widget_center';
 import { WrapperTooltip } from 'pc/components/widget/widget_panel/widget_panel_header';
-import { usePrevious, useQuery, useSideBarVisible } from 'pc/hooks';
+import { usePrevious, useSideBarVisible } from 'pc/hooks';
 import { useNetwork } from 'pc/hooks/use_network';
 import { useAppSelector } from 'pc/store/react-redux';
 import styles from './style.module.less';
@@ -137,8 +137,6 @@ export const TabBar: React.FC<React.PropsWithChildren<ITabBarProps>> = (props) =
   const toolbarRef = useRef(null);
   const size = useSize(toolbarRef);
   const linkId = templateId || shareId;
-  const query = useQuery();
-  const purchaseToken = query.get('purchaseToken') || '';
 
   useEffect(() => {
     setIsFullScreen(isFullscreen);

@@ -26,19 +26,14 @@ import { MobileSideBar } from 'pc/components/mobile_side_bar';
 import { Navigation } from 'pc/components/navigation';
 import styles from 'pc/components/route_manager/style.module.less';
 import { ShortcutsPanel } from 'pc/components/shortcuts_panel';
-import { useQuery } from 'pc/hooks';
 import { useAppDispatch } from 'pc/hooks/use_app_dispatch';
 import { useAppSelector } from 'pc/store/react-redux';
 import { useWxTitleMap } from '../konva_grid';
-// @ts-ignore
-import { WecomContactWrapper } from 'enterprise/wecom/wecom_contact_wrapper/wecom_contact_wrapper';
 
 export const SideWrapper = (props: { children: any }) => {
   const spaceId = useAppSelector((state: IReduxState) => state.space.activeId);
   const dispatch = useAppDispatch();
   const shortcutKeyPanelVisible = useAppSelector((state: IReduxState) => state.space.shortcutKeyPanelVisible);
-  const query = useQuery();
-  const purchaseToken = query.get('purchaseToken') || '';
   const user = useAppSelector((state: IReduxState) => state.user.info);
   const { unitTitleMap } = useWxTitleMap({
     userNames: user
@@ -50,7 +45,6 @@ export const SideWrapper = (props: { children: any }) => {
       ]
       : undefined,
   });
-  const unitTitle = values(unitTitleMap)[0];
 
   useEffect(() => {
     if (!spaceId) return;

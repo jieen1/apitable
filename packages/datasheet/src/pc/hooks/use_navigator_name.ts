@@ -21,7 +21,6 @@ import { useEffect } from 'react';
 import { shallowEqual } from 'react-redux';
 import { getCustomConfig, Strings, t } from '@apitable/core';
 import { useAppSelector } from 'pc/store/react-redux';
-import { useQuery } from './';
 
 const contacts = /(\/)?org(\/)?/; // Directory
 const template = /(\/)?template(\/)?/; // Template Centre
@@ -48,8 +47,6 @@ export const useNavigatorName = () => {
   const treeNodesMap = useAppSelector((state) => state.catalogTree.treeNodesMap)!;
   const router = useRouter();
   const nodeId = mirrorId || datasheetId || folderId || formId || dashboardId;
-  const query = useQuery();
-  const purchaseToken = query.get('purchaseToken') || '';
 
   useEffect(() => {
     const pathname = router.asPath;
