@@ -28,8 +28,8 @@ import { RobotActionTypeController } from './controller/action.type.controller';
 import { RobotController } from './controller/robot.controller';
 import { RobotRunHistoryController } from './controller/run.history.controller';
 import { RobotTriggerController } from './controller/trigger.controller';
-import { AutomationExecuteController } from './controller/automation.execute.controller';
 import { RobotTriggerTypeController } from './controller/trigger.type.controller';
+import { ScheduledAutomationController } from './controller/scheduled.controller';
 import { TriggerEventHelper } from './events/helpers/trigger.event.helper';
 import { FormSubmittedListener } from './events/listeners/form.submitted.listener';
 import { RecordCreatedListener } from './events/listeners/record.created.listener';
@@ -71,7 +71,7 @@ import { RobotTriggerTypeService } from './services/robot.trigger.type.service';
     RobotTriggerTypeController,
     RobotActionController,
     RobotTriggerController,
-    AutomationExecuteController,
+    ScheduledAutomationController,
   ],
   providers: [
     AutomationService,

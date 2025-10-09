@@ -21,8 +21,10 @@ package com.apitable.interfaces.automation.facede;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.apitable.automation.entity.AutomationRobotEntity;
 import com.apitable.automation.entity.AutomationTriggerEntity;
 import com.apitable.automation.enums.AutomationTriggerType;
+import com.apitable.automation.mapper.AutomationRobotMapper;
 import com.apitable.automation.mapper.AutomationTriggerMapper;
 import com.apitable.automation.model.TriggerRO;
 import com.apitable.automation.service.IAutomationTriggerTypeService;
@@ -35,6 +37,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -80,6 +83,9 @@ public class ScheduledAutomationServiceFacadeImpl implements AutomationServiceFa
 
     @Resource
     private ScheduledAutomationExecutor scheduledAutomationExecutor;
+
+    @Resource
+    private AutomationRobotMapper automationRobotMapper;
 
     /**
      * Scan interval in seconds (default: 60 seconds).
@@ -175,8 +181,42 @@ public class ScheduledAutomationServiceFacadeImpl implements AutomationServiceFa
             List<AutomationTriggerEntity> triggers = automationTriggerMapper
                     .selectByTriggerTypeId(scheduleTriggerTypeId);
 
+            if (triggers.isEmpty()) {
+                log.info("No scheduled triggers found");
+                return;
+            }
+
+            // Batch query all robots by robotIds
+            List<String> robotIds = triggers.stream()
+                    .map(AutomationTriggerEntity::getRobotId)
+                    .distinct()
+                    .toList();
+
+            List<AutomationRobotEntity> robots = automationRobotMapper.selectList(
+                    new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<AutomationRobotEntity>()
+                            .in("robot_id", robotIds)
+                            .eq("is_deleted", false)
+                            .eq("is_active", true)
+            );
+
+            // Build robotId -> robot map for quick lookup
+            Map<String, AutomationRobotEntity> robotMap = robots.stream()
+                    .collect(java.util.stream.Collectors.toMap(
+                            AutomationRobotEntity::getRobotId,
+                            robot -> robot
+                    ));
+
+            // Filter and load triggers
             for (AutomationTriggerEntity trigger : triggers) {
                 try {
+                    AutomationRobotEntity robot = robotMap.get(trigger.getRobotId());
+
+                    if (robot == null) {
+                        log.debug("Robot not found or not active for trigger: triggerId={}, robotId={}",
+                                trigger.getTriggerId(), trigger.getRobotId());
+                        continue;
+                    }
+
                     TriggerRO.TriggerScheduleConfig config = parseScheduleConfig(trigger.getInput());
                     if (config != null && isValidScheduleConfig(config)) {
                         scheduleConfigMap.put(trigger.getTriggerId(), config);
@@ -195,6 +235,9 @@ public class ScheduledAutomationServiceFacadeImpl implements AutomationServiceFa
                             trigger.getTriggerId(), e);
                 }
             }
+
+            log.info("Loaded {} active scheduled tasks from {} triggers",
+                    scheduleTaskMap.size(), triggers.size());
         } catch (Exception e) {
             log.error("Failed to load scheduled triggers from database", e);
         }
@@ -207,12 +250,44 @@ public class ScheduledAutomationServiceFacadeImpl implements AutomationServiceFa
         try {
             ZonedDateTime now = ZonedDateTime.now();
 
+            if (scheduleTaskMap.isEmpty()) {
+                return;
+            }
+
+            // Batch query all robots to check active status
+            List<String> robotIds = scheduleTaskMap.values().stream()
+                    .map(AutomationScheduleTask::getRobotId)
+                    .distinct()
+                    .toList();
+
+            List<AutomationRobotEntity> activeRobots = automationRobotMapper.selectList(
+                    new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<AutomationRobotEntity>()
+                            .in("robot_id", robotIds)
+                            .eq("is_deleted", false)
+                            .eq("is_active", true)
+            );
+
+            // Build active robot set for quick lookup
+            Set<String> activeRobotIds = activeRobots.stream()
+                    .map(AutomationRobotEntity::getRobotId)
+                    .collect(java.util.stream.Collectors.toSet());
+
+            // Iterate and check execution
             for (Map.Entry<String, AutomationScheduleTask> entry : scheduleTaskMap.entrySet()) {
                 String triggerId = entry.getKey();
                 AutomationScheduleTask task = entry.getValue();
                 TriggerRO.TriggerScheduleConfig config = task.getScheduleConfig();
 
                 try {
+                    // Check if robot is still active
+                    if (!activeRobotIds.contains(task.getRobotId())) {
+                        log.debug("Robot is not active, removing from schedule: triggerId={}, robotId={}",
+                                triggerId, task.getRobotId());
+                        scheduleConfigMap.remove(triggerId);
+                        scheduleTaskMap.remove(triggerId);
+                        continue;
+                    }
+
                     if (shouldExecuteNow(config, now)) {
                         // Check if already executed in this minute
                         if (task.canExecute(now)) {
@@ -252,7 +327,6 @@ public class ScheduledAutomationServiceFacadeImpl implements AutomationServiceFa
     private boolean shouldExecuteNow(TriggerRO.TriggerScheduleConfig config, ZonedDateTime now) {
         try {
             ZonedDateTime taskTime = now.withZoneSameInstant(ZoneId.of(config.getTimeZone()));
-
             return matchesCronField(config.getMinute(), taskTime.getMinute())
                     && matchesCronField(config.getHour(), taskTime.getHour())
                     && matchesCronField(config.getDayOfMonth(), taskTime.getDayOfMonth())
@@ -312,6 +386,17 @@ public class ScheduledAutomationServiceFacadeImpl implements AutomationServiceFa
 
     /**
      * Parse schedule config from trigger input JSON.
+     * The input is in Expression format from frontend:
+     * {
+     *   "type": "Expression",
+     *   "value": {
+     *     "operator": "newObject",
+     *     "operands": [
+     *       "scheduleRule", { "type": "Expression", "value": { "operator": "newObject", "operands": [...] } },
+     *       "timeZone", { "type": "Literal", "value": "Asia/Shanghai" }
+     *     ]
+     *   }
+     * }
      */
     private TriggerRO.TriggerScheduleConfig parseScheduleConfig(String inputJson) {
         try {
@@ -321,17 +406,146 @@ public class ScheduledAutomationServiceFacadeImpl implements AutomationServiceFa
 
             JSONObject json = JSONUtil.parseObj(inputJson);
 
+            if (json.isEmpty()) {
+                return null;
+            }
+
+            // Get the timeZone from root level
+            String timeZone = getDataParameter(json, "timeZone");
+            if (StrUtil.isBlank(timeZone)) {
+                timeZone = "Asia/Shanghai";
+            }
+
+            // Get the scheduleRule nested object
+            JSONObject scheduleRule = getDataSlot(json, "scheduleRule");
+            if (scheduleRule == null) {
+                log.warn("scheduleRule not found in input: {}", inputJson);
+                return null;
+            }
+
+            // Extract cron fields from scheduleRule
             TriggerRO.TriggerScheduleConfig config = new TriggerRO.TriggerScheduleConfig();
-            config.setSecond(json.getStr("second", "0"));
-            config.setMinute(json.getStr("minute", "*"));
-            config.setHour(json.getStr("hour", "*"));
-            config.setMonth(json.getStr("month", "*"));
-            config.setDayOfMonth(json.getStr("dayOfMonth", "*"));
-            config.setDayOfWeek(json.getStr("dayOfWeek", "*"));
-            config.setTimeZone(json.getStr("timeZone", "UTC"));
+            config.setSecond(getDataParameter(scheduleRule, "second"));
+            config.setMinute(getDataParameter(scheduleRule, "minute"));
+            config.setHour(getDataParameter(scheduleRule, "hour"));
+            config.setMonth(getDataParameter(scheduleRule, "month"));
+            config.setDayOfMonth(getDataParameter(scheduleRule, "dayOfMonth"));
+            config.setDayOfWeek(getDataParameter(scheduleRule, "dayOfWeek"));
+            config.setTimeZone(timeZone);
+
+            // Set default values if not present
+            if (StrUtil.isBlank(config.getSecond())) {
+                config.setSecond("0");
+            }
+            if (StrUtil.isBlank(config.getMinute())) {
+                config.setMinute("*");
+            }
+            if (StrUtil.isBlank(config.getHour())) {
+                config.setHour("*");
+            }
+            if (StrUtil.isBlank(config.getMonth())) {
+                config.setMonth("*");
+            }
+            if (StrUtil.isBlank(config.getDayOfMonth())) {
+                config.setDayOfMonth("*");
+            }
+            if (StrUtil.isBlank(config.getDayOfWeek())) {
+                config.setDayOfWeek("*");
+            }
+
+            log.info("Parsed schedule config: {}", config);
             return config;
         } catch (Exception e) {
             log.error("Failed to parse schedule config from input: {}", inputJson, e);
+            return null;
+        }
+    }
+
+    /**
+     * Get parameter value from Expression operands.
+     * Equivalent to frontend's getDataParameter function.
+     * 
+     * @param expression Expression object
+     * @param fieldName  Field name to extract
+     * @return Field value or null
+     */
+    private String getDataParameter(JSONObject expression, String fieldName) {
+        try {
+            if (expression == null || !"Expression".equals(expression.getStr("type"))) {
+                return null;
+            }
+
+            JSONObject value = expression.getJSONObject("value");
+            if (value == null) {
+                return null;
+            }
+
+            cn.hutool.json.JSONArray operands = value.getJSONArray("operands");
+            if (operands == null || operands.isEmpty()) {
+                return null;
+            }
+
+            // Find the field name in operands array
+            for (int i = 0; i < operands.size(); i++) {
+                Object item = operands.get(i);
+                if (fieldName.equals(item)) {
+                    // Next item is the value object
+                    if (i + 1 < operands.size()) {
+                        JSONObject valueObj = operands.getJSONObject(i + 1);
+                        if (valueObj != null && "Literal".equals(valueObj.getStr("type"))) {
+                            return valueObj.getStr("value");
+                        }
+                    }
+                    break;
+                }
+            }
+
+            return null;
+        } catch (Exception e) {
+            log.error("Failed to get data parameter: fieldName={}", fieldName, e);
+            return null;
+        }
+    }
+
+    /**
+     * Get nested Expression object from operands.
+     * Equivalent to frontend's getDataSlot function.
+     * 
+     * @param expression Expression object
+     * @param fieldName  Field name to extract
+     * @return Nested Expression object or null
+     */
+    private JSONObject getDataSlot(JSONObject expression, String fieldName) {
+        try {
+            if (expression == null || !"Expression".equals(expression.getStr("type"))) {
+                return null;
+            }
+
+            JSONObject value = expression.getJSONObject("value");
+            if (value == null) {
+                return null;
+            }
+
+            cn.hutool.json.JSONArray operands = value.getJSONArray("operands");
+            if (operands == null || operands.isEmpty()) {
+                return null;
+            }
+
+            // Find the field name in operands array
+            for (int i = 0; i < operands.size(); i++) {
+                Object item = operands.get(i);
+                if (fieldName.equals(item)) {
+                    // Next item is the nested Expression object
+                    if (i + 1 < operands.size()) {
+                        return operands.getJSONObject(i + 1);
+                    }
+                    break;
+                }
+            }
+
+            return null;
+        } catch (Exception e) {
+            log.error("Failed to get data slot: fieldName={}", fieldName, e);
             return null;
         }
     }

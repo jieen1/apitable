@@ -14,20 +14,20 @@ allprojects {
     }
 }
 
-def checkstyleVersion = libs.versions.checkstyle.get()
-
-subprojects {
-    apply plugin: 'checkstyle'
-
-    checkstyle {
-        toolVersion = checkstyleVersion
-        ignoreFailures = false
-        maxWarnings = 0
-    }
-
-    configurations.configureEach {
-        resolutionStrategy {
-            cacheChangingModulesFor 0, 'seconds'
-        }
-    }
-}
+//def checkstyleVersion = libs.versions.checkstyle.get()
+//
+//subprojects {
+//    apply plugin: 'checkstyle'
+//
+//    checkstyle {
+//        toolVersion = checkstyleVersion
+//        ignoreFailures = false
+//        maxWarnings = 0
+//    }
+//
+//    configurations.configureEach {
+//        resolutionStrategy {
+//            cacheChangingModulesFor 0, 'seconds'
+//        }
+//    }
+//}

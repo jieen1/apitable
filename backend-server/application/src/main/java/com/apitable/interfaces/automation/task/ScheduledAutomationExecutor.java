@@ -18,12 +18,10 @@
 
 package com.apitable.interfaces.automation.task;
 
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.apitable.automation.entity.AutomationTriggerEntity;
 import com.apitable.automation.mapper.AutomationTriggerMapper;
 import com.apitable.automation.model.TriggerRO;
 import jakarta.annotation.Resource;
@@ -66,28 +64,14 @@ public class ScheduledAutomationExecutor {
         log.info("Executing scheduled task: robotId={}, triggerId={}", robotId, triggerId);
 
         try {
-            // Get trigger details
-            AutomationTriggerEntity trigger = automationTriggerMapper.selectByTriggerId(triggerId);
-            if (trigger == null) {
-                log.error("Trigger not found: triggerId={}", triggerId);
-                return;
-            }
-
-            // Prepare trigger input and output
-            JSONObject triggerInput = parseTriggerInput(trigger.getInput());
-            JSONObject triggerOutput = new JSONObject();
-
             // Build request payload
             JSONObject payload = new JSONObject();
             payload.set("robotId", robotId);
-            payload.set("trigger", new JSONObject()
-                .set("triggerId", triggerId)
-                .set("input", triggerInput)
-                .set("output", triggerOutput)
-            );
+            payload.set("triggerId", triggerId);
+            payload.set("scheduleConfig", config);
 
             // Call room-server API
-            String apiUrl = buildRoomServerApiUrl("/nest/v1/automation/execute");
+            String apiUrl = buildRoomServerApiUrl("/nest/v1/automation/scheduled/trigger");
             
             log.debug("Calling room-server API: url={}, payload={}", apiUrl, payload);
             
@@ -98,33 +82,25 @@ public class ScheduledAutomationExecutor {
                 .execute();
 
             if (response.isOk()) {
-                log.info("Scheduled task executed successfully: robotId={}, triggerId={}, response={}", 
-                        robotId, triggerId, response.body());
+                String responseBody = response.body();
+                JSONObject result = JSONUtil.parseObj(responseBody);
+                
+                if (result.getBool("success", false)) {
+                    String taskId = result.getByPath("data.taskId", String.class);
+                    log.info("Scheduled task executed successfully: robotId={}, triggerId={}, taskId={}", 
+                            robotId, triggerId, taskId);
+                } else {
+                    log.error("Scheduled task execution failed: robotId={}, triggerId={}, message={}", 
+                            robotId, triggerId, result.getStr("message"));
+                }
             } else {
-                log.error("Failed to execute scheduled task: robotId={}, triggerId={}, status={}, response={}", 
+                log.error("Failed to call room-server API: robotId={}, triggerId={}, status={}, response={}", 
                         robotId, triggerId, response.getStatus(), response.body());
             }
         } catch (Exception e) {
             log.error("Error executing scheduled task: robotId={}, triggerId={}", 
                     robotId, triggerId, e);
         }
-    }
-
-    /**
-     * Parse trigger input from JSON string.
-     *
-     * @param inputJson input JSON string
-     * @return parsed JSON object
-     */
-    private JSONObject parseTriggerInput(String inputJson) {
-        try {
-            if (StrUtil.isNotBlank(inputJson)) {
-                return JSONUtil.parseObj(inputJson);
-            }
-        } catch (Exception e) {
-            log.error("Failed to parse trigger input: {}", inputJson, e);
-        }
-        return new JSONObject();
     }
 
     /**
