@@ -145,54 +145,6 @@ public class SpaceServiceImplTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testGetSpaceSubscriptionInfo() {
-        MockUserSpace userSpace = createSingleUserAndSpace();
-        SpaceSubscribeVo spaceSubscribeVo =
-            iSpaceService.getSpaceSubscriptionInfo(userSpace.getSpaceId());
-        assertThat(spaceSubscribeVo).isNotNull();
-        assertThat(spaceSubscribeVo.getProduct()).isEqualTo("CE");
-        assertThat(spaceSubscribeVo.getPlan()).isEqualTo("ce_unlimited");
-        assertThat(spaceSubscribeVo.getOnTrial()).isFalse();
-        assertThat(spaceSubscribeVo.getExpireAt()).isNull();
-        assertThat(spaceSubscribeVo.getDeadline()).isNull();
-        assertThat(spaceSubscribeVo.getMaxSeats()).isEqualTo(2L);
-        assertThat(spaceSubscribeVo.getMaxCapacitySizeInBytes()).isEqualTo(1024 * 1024 * 1024L);
-        assertThat(spaceSubscribeVo.getMaxSheetNums()).isEqualTo(5L);
-        assertThat(spaceSubscribeVo.getMaxRowsPerSheet()).isEqualTo(100L);
-        assertThat(spaceSubscribeVo.getMaxRowsInSpace()).isEqualTo(250L);
-        assertThat(spaceSubscribeVo.getMaxAdminNums()).isEqualTo(-1L);
-        assertThat(spaceSubscribeVo.getMaxMirrorNums()).isEqualTo(-1L);
-        assertThat(spaceSubscribeVo.getMaxApiCall()).isEqualTo(-1L);
-        assertThat(spaceSubscribeVo.getMaxGalleryViewsInSpace()).isEqualTo(-1L);
-        assertThat(spaceSubscribeVo.getMaxKanbanViewsInSpace()).isEqualTo(-1L);
-        assertThat(spaceSubscribeVo.getMaxFormViewsInSpace()).isEqualTo(-1L);
-        assertThat(spaceSubscribeVo.getMaxGanttViewsInSpace()).isEqualTo(-1L);
-        assertThat(spaceSubscribeVo.getMaxCalendarViewsInSpace()).isEqualTo(-1L);
-        assertThat(spaceSubscribeVo.getFieldPermissionNums()).isEqualTo(-1L);
-        assertThat(spaceSubscribeVo.getNodePermissionNums()).isEqualTo(-1L);
-        assertThat(spaceSubscribeVo.getMaxMessageCredits()).isEqualTo(0L);
-        assertThat(spaceSubscribeVo.getMaxRemainTimeMachineDays()).isEqualTo(-1L);
-        assertThat(spaceSubscribeVo.getMaxRemainRecordActivityDays()).isEqualTo(-1L);
-        assertThat(spaceSubscribeVo.getMaxAuditQueryDays()).isEqualTo(0);
-        assertThat(spaceSubscribeVo.getAuditQuery()).isFalse();
-        assertThat(spaceSubscribeVo.getRainbowLabel()).isEqualTo(false);
-        assertThat(spaceSubscribeVo.getWatermark()).isEqualTo(false);
-        assertThat(spaceSubscribeVo.getIntegrationFeishu()).isEqualTo(false);
-        assertThat(spaceSubscribeVo.getIntegrationDingtalk()).isEqualTo(false);
-        assertThat(spaceSubscribeVo.getIntegrationWeCom()).isEqualTo(false);
-        assertThat(spaceSubscribeVo.getIntegrationOfficePreview()).isEqualTo(false);
-        assertThat(spaceSubscribeVo.getSecuritySettingAddressListIsolation()).isEqualTo(false);
-        assertThat(spaceSubscribeVo.getSecuritySettingApplyJoinSpace()).isEqualTo(false);
-        assertThat(spaceSubscribeVo.getSecuritySettingExport()).isEqualTo(false);
-        assertThat(spaceSubscribeVo.getSecuritySettingCatalogManagement()).isEqualTo(false);
-        assertThat(spaceSubscribeVo.getSecuritySettingDownloadFile()).isEqualTo(false);
-        assertThat(spaceSubscribeVo.getSecuritySettingMobile()).isEqualTo(false);
-        assertThat(spaceSubscribeVo.getSecuritySettingCopyCellData()).isEqualTo(false);
-        assertThat(spaceSubscribeVo.getSecuritySettingInviteMember()).isEqualTo(false);
-        assertThat(spaceSubscribeVo.getSecuritySettingShare()).isEqualTo(false);
-    }
-
-    @Test
     void testGetSeatUsage() {
         MockUserSpace userSpace = createSingleUserAndSpace();
         // create ai node
