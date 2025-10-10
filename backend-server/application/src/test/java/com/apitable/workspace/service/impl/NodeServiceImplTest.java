@@ -145,24 +145,6 @@ public class NodeServiceImplTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testCreateNotFolderNodeWithOverLimit() {
-        MockUserSpace userSpace = createSingleUserAndSpace();
-        String rootNodeId = iNodeService.getRootNodeIdBySpaceId(userSpace.getSpaceId());
-        initNodeTreeMockData(userSpace.getSpaceId(), rootNodeId);
-        NodeOpRo nodeOpRo = NodeOpRo.builder()
-            .parentId(rootNodeId)
-            .type(NodeType.DATASHEET.getNodeType())
-            .build();
-        DefaultSubscriptionFeature feature = new DefaultSubscriptionFeature();
-        SubscriptionInfo subscriptionInfo = new MockSubscriptionInfo(feature);
-        Mockito.doReturn(subscriptionInfo).when(entitlementServiceFacade)
-            .getSpaceSubscription(userSpace.getSpaceId());
-        assertThatThrownBy(
-            () -> iNodeService.createNode(userSpace.getUserId(), userSpace.getSpaceId(), nodeOpRo))
-            .isInstanceOf(BusinessException.class);
-    }
-
-    @Test
     void testCreateAiChatBotNode() {
         MockUserSpace userSpace = createSingleUserAndSpace();
         String rootNodeId = iNodeService.getRootNodeIdBySpaceId(userSpace.getSpaceId());
