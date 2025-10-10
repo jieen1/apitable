@@ -51,6 +51,6 @@ public class NumberPlanFeature implements PlanFeature<Long> {
 
     @Override
     public Long getValue() {
-        return 9999999L;
+        return -1L;
     }
 }
