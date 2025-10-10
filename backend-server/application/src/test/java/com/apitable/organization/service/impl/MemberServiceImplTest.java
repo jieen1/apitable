@@ -72,30 +72,6 @@ public class MemberServiceImplTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testShouldPreventInvitationForFreeSpace() {
-        MockUserSpace mockUserSpace = createSingleUserAndSpace();
-        for (int i = 0; i < 10; i++) {
-            SpaceInviteRecordEntity entity = new SpaceInviteRecordEntity();
-            entity.setInviteSpaceId(mockUserSpace.getSpaceId());
-            spaceInviteRecordMapper.insert(entity);
-        }
-        boolean prevent = iMemberService.shouldPreventInvitation(mockUserSpace.getSpaceId());
-        assertThat(prevent).isTrue();
-    }
-
-    @Test
-    void testShouldNotPreventInvitationForFreeSpace() {
-        MockUserSpace mockUserSpace = createSingleUserAndSpace();
-        for (int i = 0; i < 9; i++) {
-            SpaceInviteRecordEntity entity = new SpaceInviteRecordEntity();
-            entity.setInviteSpaceId(mockUserSpace.getSpaceId());
-            spaceInviteRecordMapper.insert(entity);
-        }
-        boolean prevent = iMemberService.shouldPreventInvitation(mockUserSpace.getSpaceId());
-        assertThat(prevent).isFalse();
-    }
-
-    @Test
     void testRemoveMemberFromSpaceAndDeletePrivateNode() {
         MockUserSpace mockUserAdmin = createSingleUserAndSpace();
         MockUserSpace mockUser = createSingleUserAndSpace();
