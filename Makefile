@@ -242,7 +242,7 @@ test-init-db-docker:
 	@echo "${GREEN}finished testing, clean up images...${RESET}"
 
 buildpush-docker: ## build all and push all to hub.docker.io registry
-	echo $$APITABLE_DOCKER_HUB_TOKEN | docker login -u jieen1 --password-stdin || true;\
+	echo $$APITABLE_DOCKER_HUB_TOKEN | docker login -u jieen1 --password-stdin;\
 	$(BUILDER) $(target) --push
 
 .PHONY: build
