@@ -1,9 +1,9 @@
 ARG IMAGE_TAG=latest
 
-FROM apitable/backend-server:${IMAGE_TAG} as backend-server
-FROM apitable/room-server:${IMAGE_TAG} as room-server
-FROM apitable/web-server:${IMAGE_TAG} as web-server
-FROM apitable/init-db:${IMAGE_TAG} as init-db
+FROM jieen1/backend-server:${IMAGE_TAG} as backend-server
+FROM jieen1/room-server:${IMAGE_TAG} as room-server
+FROM jieen1/web-server:${IMAGE_TAG} as web-server
+FROM jieen1/init-db:${IMAGE_TAG} as init-db
 
 FROM apitable/databus-server:latest as databus-server
 FROM apitable/init-appdata:latest as init-appdata
