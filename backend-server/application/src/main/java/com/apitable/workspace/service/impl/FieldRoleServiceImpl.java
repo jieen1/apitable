@@ -405,12 +405,16 @@ public class FieldRoleServiceImpl implements IFieldRoleService {
     public void enableFieldRole(Long userId, String dstId, String fldId, boolean includeExtend) {
         ControlId controlId = ControlIdBuilder.fieldId(dstId, fldId);
         String spaceId = iNodeService.getSpaceIdByNodeId(dstId);
-        iControlService.create(userId, spaceId, controlId.toString(), controlId.getControlType());
-        // initialize field permission settings
-        iControlSettingService.create(userId, controlId.toString());
-        if (includeExtend) {
-            addExtendFieldRole(userId, dstId, fldId);
+        ControlEntity existEntity = iControlService.getByControlId(controlId.toString());
+        if (existEntity == null) {
+            iControlService.create(userId, spaceId, controlId.toString(), controlId.getControlType());
+            // initialize field permission settings
+            iControlSettingService.create(userId, controlId.toString());
+            if (includeExtend) {
+                addExtendFieldRole(userId, dstId, fldId);
+            }
         }
+
     }
 
     @Override

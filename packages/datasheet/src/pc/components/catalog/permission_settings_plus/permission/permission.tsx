@@ -43,8 +43,6 @@ import { dispatch } from 'pc/worker/store';
 import { MembersDetail } from './members_detail';
 import { PermissionInfoSetting } from './permission_info_setting';
 import { UnitList } from './unit_list';
-// @ts-ignore
-import { SubscribeUsageTipType, triggerUsageAlert } from 'enterprise/billing/trigger_usage_alert';
 import styles from './style.module.less';
 
 export interface IPermissionSettingProps {
@@ -122,10 +120,6 @@ export const Permission: FC<React.PropsWithChildren<IPermissionSettingProps>> = 
       return true;
     }
 
-    const result = triggerUsageAlert('nodePermissionNums', { usage: spaceInfo!.nodeRoleNums + 1, alwaysAlert: true }, SubscribeUsageTipType.Alert);
-    if (result) {
-      return false;
-    }
     const res = await Api.disableRoleExtend(data.nodeId, true);
     const { success, message } = res.data;
     if (!success) {

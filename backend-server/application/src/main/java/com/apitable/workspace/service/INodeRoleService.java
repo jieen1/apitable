@@ -239,4 +239,9 @@ public interface INodeRoleService {
     List<String> getMinimumRequiredRole(List<Integer> nodePermissions);
 
     NodeCollaboratorsVo listRole(String nodeId);
+
+    void disableRoleExtend(String nodeId);
+
+    void enableRoleExtend(String nodeId);
+
 }

@@ -42,8 +42,8 @@ export const EnableFieldPermissionPlus: React.FC<React.PropsWithChildren<IEnable
   const [setting, setSetting] = useState<{ formSheetAccessible: boolean }>();
   const datasheetId = useAppSelector((state) => state.pageParams.datasheetId)!;
   const [isMemberDetail, { toggle: toggleIsMemberDetail }] = useToggle(false);
-  const fieldPermission = useAppSelector(Selectors.getFieldPermissionMap)!;
-  const readonly = fieldPermission[field.id] && !fieldPermission[field.id].manageable;
+  const fieldPermission = useAppSelector(Selectors.getFieldPermissionMap);
+  const readonly = fieldPermission?.[field.id] && !fieldPermission?.[field.id]?.manageable;
   const [enabledFieldPermission, setEnabledFieldPermission] = useState<boolean>();
   const spaceInfo = useAppSelector((state) => state.space.curSpaceInfo);
   const spaceId = useAppSelector((state) => state.space.activeId);

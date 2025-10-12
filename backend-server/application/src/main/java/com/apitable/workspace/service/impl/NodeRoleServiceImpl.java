@@ -65,11 +65,7 @@ import com.apitable.shared.util.page.PageHelper;
 import com.apitable.shared.util.page.PageInfo;
 import com.apitable.space.enums.AuditSpaceAction;
 import com.apitable.space.service.ISpaceRoleService;
-import com.apitable.workspace.dto.ControlMemberDTO;
-import com.apitable.workspace.dto.ControlRoleInfo;
-import com.apitable.workspace.dto.ControlRoleUnitDTO;
-import com.apitable.workspace.dto.NodeBaseInfoDTO;
-import com.apitable.workspace.dto.SimpleNodeInfo;
+import com.apitable.workspace.dto.*;
 import com.apitable.workspace.enums.NodePermissionEnum;
 import com.apitable.workspace.enums.NodeType;
 import com.apitable.workspace.enums.PermissionException;
@@ -82,16 +78,10 @@ import com.apitable.workspace.vo.NodeRoleMemberVo;
 import com.apitable.workspace.vo.NodeRoleUnit;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -674,6 +664,10 @@ public class NodeRoleServiceImpl implements INodeRoleService {
                 iNodeService.checkNodeIfExist(null, nodeId);
 
         List<NodeRoleUnit> nodeRoleUnitList = getNodeRoleUnitList(nodeId);
+        NodeRoleUnit rootNodeRoleUnit = getRootNodeRoleUnit(nodeSpaceId);
+        if (nodeRoleUnitList.stream().noneMatch(roleUnit -> Objects.equals(roleUnit.getUnitId(), rootNodeRoleUnit.getUnitId()))) {
+            nodeRoleUnitList.add(rootNodeRoleUnit);
+        }
         nodeCollaboratorsVo.setRoleUnits(nodeRoleUnitList);
         UnitMemberVo nodeOwner = getNodeOwner(nodeId);
         nodeCollaboratorsVo.setOwner(nodeOwner);
@@ -692,6 +686,27 @@ public class NodeRoleServiceImpl implements INodeRoleService {
             nodeCollaboratorsVo.setExtendNodeName(iNodeService.getNodeNameByNodeId(nodeExtendNodeId));
         }
         return nodeCollaboratorsVo;
+    }
+
+    @Override
+    public void disableRoleExtend(String nodeId) {
+        SimpleNodeInfo node = nodeMapper.selectNodeInfoWithPermissionStatus(nodeId);
+        if (Boolean.TRUE.equals(node.getExtend())) {
+            // add control record
+            Long userId = SessionContext.getUserId();
+            String nodeSpaceId =
+                    iNodeService.checkNodeIfExist(null, nodeId);
+            iControlService.create(userId, nodeSpaceId, nodeId, ControlType.NODE);
+        }
+    }
+
+    @Override
+    public void enableRoleExtend(String nodeId) {
+        SimpleNodeInfo node = nodeMapper.selectNodeInfoWithPermissionStatus(nodeId);
+        if (!Boolean.TRUE.equals(node.getExtend())) {
+            Long userId = SessionContext.getUserId();
+            iControlService.removeControl(userId, Lists.newArrayList(nodeId), false);
+        }
     }
 
     private void addExtendNodeRole(Long userId, String spaceId, String nodeId) {
