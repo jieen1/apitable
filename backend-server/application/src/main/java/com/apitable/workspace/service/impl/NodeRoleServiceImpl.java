@@ -56,6 +56,7 @@ import com.apitable.organization.vo.UnitMemberVo;
 import com.apitable.organization.vo.UnitTeamVo;
 import com.apitable.shared.cache.service.UserSpaceCacheService;
 import com.apitable.shared.constants.AuditConstants;
+import com.apitable.shared.context.SessionContext;
 import com.apitable.shared.listener.event.AuditSpaceEvent;
 import com.apitable.shared.listener.event.AuditSpaceEvent.AuditSpaceArg;
 import com.apitable.shared.util.information.ClientOriginInfo;
@@ -76,6 +77,7 @@ import com.apitable.workspace.mapper.NodeMapper;
 import com.apitable.workspace.service.IControlMemberService;
 import com.apitable.workspace.service.INodeRoleService;
 import com.apitable.workspace.service.INodeService;
+import com.apitable.workspace.vo.NodeCollaboratorsVo;
 import com.apitable.workspace.vo.NodeRoleMemberVo;
 import com.apitable.workspace.vo.NodeRoleUnit;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -663,6 +665,33 @@ public class NodeRoleServiceImpl implements INodeRoleService {
                 return Node.READER;
             }
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public NodeCollaboratorsVo listRole(String nodeId) {
+        NodeCollaboratorsVo nodeCollaboratorsVo = new NodeCollaboratorsVo();
+        String nodeSpaceId =
+                iNodeService.checkNodeIfExist(null, nodeId);
+
+        List<NodeRoleUnit> nodeRoleUnitList = getNodeRoleUnitList(nodeId);
+        nodeCollaboratorsVo.setRoleUnits(nodeRoleUnitList);
+        UnitMemberVo nodeOwner = getNodeOwner(nodeId);
+        nodeCollaboratorsVo.setOwner(nodeOwner);
+        List<Long> admins = iSpaceRoleService.getSpaceAdminsWithWorkbenchManage(nodeSpaceId);
+        List<UnitMemberVo> unitMemberVos = iOrganizationService.findUnitMemberVo(admins);
+        nodeCollaboratorsVo.setAdmins(unitMemberVos);
+        Long userId = SessionContext.getUserId();
+        Long memberId = iMemberService.getMemberIdByUserIdAndSpaceId(userId, nodeSpaceId);
+        UnitMemberVo unitMemberVo = iOrganizationService.finUnitMemberVo(memberId);
+        nodeCollaboratorsVo.setSelf(unitMemberVo);
+        nodeCollaboratorsVo.setBelongRootFolder(iNodeService.isNodeBelongRootFolder(nodeSpaceId, nodeId));
+        SimpleNodeInfo node = nodeMapper.selectNodeInfoWithPermissionStatus(nodeId);
+        nodeCollaboratorsVo.setExtend(node.getExtend());
+        String nodeExtendNodeId = getNodeExtendNodeId(nodeId);
+        if (nodeExtendNodeId != null) {
+            nodeCollaboratorsVo.setExtendNodeName(iNodeService.getNodeNameByNodeId(nodeExtendNodeId));
+        }
+        return nodeCollaboratorsVo;
     }
 
     private void addExtendNodeRole(Long userId, String spaceId, String nodeId) {

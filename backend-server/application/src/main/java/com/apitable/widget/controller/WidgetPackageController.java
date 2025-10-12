@@ -90,13 +90,13 @@ public class WidgetPackageController {
             schema = @Schema(type = "string"), example = "Bearer uskaoeiu"),
         @Parameter(name = "packageId", in = ParameterIn.PATH,
             description = "widget package id", required = true,
-            schema = @Schema(type = "integer"), example = "wpkAbc"),
+            schema = @Schema(type = "string"), example = "wpkAbc"),
         @Parameter(name = PAGE_PARAM, in = ParameterIn.QUERY, description = "page",
             schema = @Schema(type = "string"), example = PAGE_SIMPLE_EXAMPLE)
     })
     @SuppressWarnings({"rawtypes", "unchecked"})
     public ResponseData<List<WidgetReleaseListVo>> releaseListWidget(
-        @PathVariable(name = "packageId") String packageId,
+        @PathVariable("packageId") String packageId,
         @PageObjectParam(required = false) Page page) {
         Long userId = SessionContext.getUserId();
         return ResponseData.success(

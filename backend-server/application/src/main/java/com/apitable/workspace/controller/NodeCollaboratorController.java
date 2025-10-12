@@ -19,6 +19,8 @@
 package com.apitable.workspace.controller;
 
 import static com.apitable.organization.enums.OrganizationException.NOT_EXIST_MEMBER;
+import static com.apitable.shared.constants.PageConstants.PAGE_PARAM;
+import static com.apitable.shared.constants.PageConstants.PAGE_SIMPLE_EXAMPLE;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.apitable.control.infrastructure.ControlTemplate;
@@ -32,10 +34,15 @@ import com.apitable.shared.component.scanner.annotation.GetResource;
 import com.apitable.shared.constants.ParamsConstants;
 import com.apitable.shared.context.LoginContext;
 import com.apitable.shared.holder.SpaceHolder;
+import com.apitable.shared.util.page.PageInfo;
+import com.apitable.shared.util.page.PageObjectParam;
 import com.apitable.space.service.ISpaceService;
 import com.apitable.space.vo.SpaceGlobalFeature;
 import com.apitable.user.service.IUserService;
+import com.apitable.workspace.service.INodeRoleService;
 import com.apitable.workspace.vo.NodeCollaboratorVO;
+import com.apitable.workspace.vo.NodeRoleMemberVo;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -65,6 +72,9 @@ public class NodeCollaboratorController {
 
     @Resource
     private ControlTemplate controlTemplate;
+
+    @Resource
+    private INodeRoleService iNodeRoleService;
 
     /**
      * get collaborator info.
@@ -106,5 +116,29 @@ public class NodeCollaboratorController {
             collaboratorVO.setRole(role.getRoleTag());
         }
         return ResponseData.success(collaboratorVO);
+    }
+
+    /**
+     * get collaborator info.
+     *
+     * @param page   page info
+     * @param nodeId node id
+     * @return collaborator info
+     */
+    @GetResource(path = "/collaborator/page")
+    @Operation(summary = "Get Collaborator page",
+            description = "Scene: Collaborator Card Information")
+    @Parameters({
+            @Parameter(name = "nodeId", in = ParameterIn.QUERY, required = true,
+                    schema = @Schema(type = "string"), example = "nodRTGSy43DJ9"),
+            @Parameter(name = PAGE_PARAM, in = ParameterIn.QUERY, description = "page",
+                    schema = @Schema(type = "string"), example = PAGE_SIMPLE_EXAMPLE)
+    })
+    public ResponseData<PageInfo<NodeRoleMemberVo>> getCollaboratorPage(
+            @RequestParam(name = "nodeId") String nodeId,
+            @PageObjectParam(required = false) Page<NodeRoleMemberVo> page
+    ) {
+        PageInfo<NodeRoleMemberVo> nodeRoleMembersPageInfo = iNodeRoleService.getNodeRoleMembersPageInfo(page, nodeId);
+        return ResponseData.success(nodeRoleMembersPageInfo);
     }
 }

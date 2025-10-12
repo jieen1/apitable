@@ -518,7 +518,7 @@ public class NodeServiceImpl extends ServiceImpl<NodeMapper, NodeEntity> impleme
         // When the space id is not empty, check whether the space is cross-space.
         ExceptionUtil.isTrue(StrUtil.isBlank(spaceId) || node.getSpaceId().equals(spaceId),
             SpaceException.NOT_IN_SPACE);
-        return node.getNodeId();
+        return node.getSpaceId();
     }
 
     @Override
