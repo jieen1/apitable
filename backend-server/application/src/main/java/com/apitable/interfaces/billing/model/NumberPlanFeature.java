@@ -51,6 +51,12 @@ public class NumberPlanFeature implements PlanFeature<Long> {
 
     @Override
     public Long getValue() {
+        if (this instanceof SubscriptionFeatures.SolidFeatures.RemainTrashDays
+                || this instanceof SubscriptionFeatures.SolidFeatures.RemainTimeMachineDays
+                || this instanceof SubscriptionFeatures.SolidFeatures.RemainRecordActivityDays
+                || this instanceof SubscriptionFeatures.SolidFeatures.AuditQueryDays) {
+            return 365 * 10L;
+        }
         return -1L;
     }
 }
