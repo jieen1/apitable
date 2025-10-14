@@ -650,8 +650,8 @@ export const getFilterConditionValue = (state: IReduxState, conditionId: string)
 };
 
 export const getKanbanGroupMapIds = createSelector(
-  [getFieldMap, getKanbanFieldId, getFieldPermissionMap],
-  (fieldMap, kanbanFieldId, fieldPermissionMap) => {
+  [getFieldMap, getKanbanFieldId, getFieldPermissionMap, getCurrentView],
+  (fieldMap, kanbanFieldId, fieldPermissionMap, currentView) => {
     if (!kanbanFieldId) {
       return [];
     }
@@ -663,6 +663,20 @@ export const getKanbanGroupMapIds = createSelector(
     if (!field) {
       return [];
     }
+
+    // 检查是否为自定义分组模式
+    const kanbanView = currentView as any;
+    const isCustomGroupMode = kanbanView?.style?.groupMode === 'custom' || 
+      (kanbanView?.style?.customGroupMap && Object.keys(kanbanView.style.customGroupMap).length > 0);
+    
+    if (isCustomGroupMode && kanbanView.style.customGroupMap) {
+      // 自定义分组模式：返回按order排序的自定义组ID列表
+      return Object.values(kanbanView.style.customGroupMap)
+        .sort((a: any, b: any) => a.order - b.order)
+        .map((group: any) => group.id);
+    }
+
+    // 默认模式：返回字段选项ID
     if (field.type === FieldType.SingleSelect) {
       return field.property.options.map((item) => item.id);
     }

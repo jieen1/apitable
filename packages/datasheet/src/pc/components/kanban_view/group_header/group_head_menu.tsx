@@ -86,8 +86,9 @@ export const GroupHeader: React.FC<React.PropsWithChildren<IGroupHeaderProps>> =
   const view = useAppSelector(Selectors.getCurrentView) as IKanbanViewProperty;
   
   // 🔑 判断是否为自定义分组模式
-  const isCustomGroupMode = Boolean(view.style.customGroupMap && Object.keys(view.style.customGroupMap).length > 0);
-  const customGroup = isCustomGroupMode ? view.style.customGroupMap![groupId] : null;
+  const isCustomGroupMode = view.style.groupMode === 'custom' || 
+    Boolean(view.style.customGroupMap && Object.keys(view.style.customGroupMap).length > 0);
+  const customGroup = isCustomGroupMode ? view.style.customGroupMap?.[groupId] : null;
   
   const cellValue = field.type === FieldType.Member ? [groupId] : groupId;
   const [editing, setEditing] = useState(false);
