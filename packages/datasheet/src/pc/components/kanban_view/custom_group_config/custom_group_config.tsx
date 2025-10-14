@@ -188,7 +188,6 @@ export const CustomGroupConfig: React.FC<ICustomGroupConfigProps> = ({ field, on
                 />
                 <Button
                   size="small"
-                  shape="circle"
                   onClick={() => handleDeleteGroup(group.id)}
                 >
                   <DeleteOutlined />
