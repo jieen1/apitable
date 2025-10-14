@@ -30,13 +30,130 @@ export class ViewDerivateKanban extends ViewDerivateBase {
     }, { [UN_GROUP]: [] });
   }
 
-  private getKanbanGroupMap(rows: IViewRow[], kanbanFieldId?: string | null) {
+  /**
+   * 判断是否为自定义分组模式
+   */
+  private isCustomGroupMode(view: IViewProperty): boolean {
+    if (view.type !== ViewType.Kanban) {
+      return false;
+    }
+    const kanbanView = view as any;
+    // 方式1：显式指定 groupMode
+    if (kanbanView.style.groupMode === 'custom') {
+      return true;
+    }
+    // 方式2：存在 customGroupMap 且非空
+    if (kanbanView.style.customGroupMap && Object.keys(kanbanView.style.customGroupMap).length > 0) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * 获取自定义分组的映射表
+   */
+  private getCustomGroupValueMap(customGroupMap: any): { [key: string]: IRecord[] } {
+    const groupMap: { [key: string]: IRecord[] } = { [UN_GROUP]: [] };
+    
+    // 为每个自定义组创建空数组
+    Object.keys(customGroupMap).forEach(customGroupId => {
+      groupMap[customGroupId] = [];
+    });
+    
+    return groupMap;
+  }
+
+  /**
+   * 创建选项ID到自定义组ID的映射
+   */
+  private buildOptionToCustomGroupMap(customGroupMap: any): Map<string, string> {
+    const optionMap = new Map<string, string>();
+    
+    Object.entries(customGroupMap).forEach(([customGroupId, group]: [string, any]) => {
+      if (group.optionIds && Array.isArray(group.optionIds)) {
+        group.optionIds.forEach((optionId: string) => {
+          optionMap.set(optionId, customGroupId);
+        });
+      }
+    });
+    
+    return optionMap;
+  }
+
+  /**
+   * 获取自定义看板分组映射
+   */
+  private getCustomKanbanGroupMap(rows: IViewRow[], kanbanFieldId: string, customGroupMap: any) {
     const snapshot = this.state.datasheetMap[this.datasheetId]!.datasheet!.snapshot;
-    const fieldPermissionMap = this.state.datasheetMap[this.datasheetId]?.fieldPermissionMap;
-    if (!kanbanFieldId || !snapshot) {
+    const recordMap = snapshot.recordMap;
+    const fieldMap = snapshot.meta.fieldMap;
+    const field = fieldMap[kanbanFieldId];
+    
+    if (!field) {
       return {};
     }
 
+    // 初始化自定义分组映射
+    const groupMap = this.getCustomGroupValueMap(customGroupMap);
+    
+    // 创建选项ID到自定义组ID的映射
+    const optionToGroupMap = this.buildOptionToCustomGroupMap(customGroupMap);
+
+    // 遍历记录，分配到对应的自定义组
+    for (const { recordId } of rows) {
+      const record = recordMap[recordId];
+      if (!record) {
+        console.warn('! ' + `${recordId} is not exist, check kanban data`);
+        continue;
+      }
+      
+      const fieldData = record.data[kanbanFieldId];
+
+      // 如果字段值为空，归入未分组
+      if (fieldData == null) {
+        groupMap[UN_GROUP]!.push(record);
+        continue;
+      }
+
+      try {
+        let optionId: string | null = null;
+
+        // 提取选项ID
+        if (field.type === FieldType.Member) {
+          const unitIds = polyfillOldData(fieldData as IUnitIds);
+          optionId = unitIds?.[0] || null;
+        } else {
+          optionId = fieldData as string;
+        }
+
+        // 查找该选项属于哪个自定义组
+        if (optionId) {
+          const customGroupId = optionToGroupMap.get(optionId);
+          if (customGroupId && groupMap[customGroupId]) {
+            groupMap[customGroupId]!.push(record);
+          } else {
+            // 选项未分配到任何自定义组，归入未分组
+            groupMap[UN_GROUP]!.push(record);
+          }
+        } else {
+          groupMap[UN_GROUP]!.push(record);
+        }
+      } catch (e) {
+        console.warn('! ' + `${fieldData} is not exist, check kanban data`);
+        groupMap[UN_GROUP]!.push(record);
+      }
+    }
+
+    return groupMap;
+  }
+
+  /**
+   * 获取默认看板分组映射（原有逻辑）
+   */
+  private getDefaultKanbanGroupMap(rows: IViewRow[], kanbanFieldId: string) {
+    const snapshot = this.state.datasheetMap[this.datasheetId]!.datasheet!.snapshot;
+    const fieldPermissionMap = this.state.datasheetMap[this.datasheetId]?.fieldPermissionMap;
+    
     const recordMap = snapshot.recordMap;
     const fieldRole = getFieldRoleByFieldId(fieldPermissionMap, kanbanFieldId);
 
@@ -82,6 +199,25 @@ export class ViewDerivateKanban extends ViewDerivateBase {
     return groupMap;
   }
 
+  private getKanbanGroupMap(rows: IViewRow[], kanbanFieldId?: string | null) {
+    const snapshot = this.state.datasheetMap[this.datasheetId]!.datasheet!.snapshot;
+    const fieldPermissionMap = this.state.datasheetMap[this.datasheetId]?.fieldPermissionMap;
+    if (!kanbanFieldId || !snapshot) {
+      return {};
+    }
+
+    const view = getCurrentView(this.state);
+    
+    // 🔑 关键：根据配置选择不同的分组逻辑
+    if (view && this.isCustomGroupMode(view)) {
+      const customGroupMap = (view as any).style.customGroupMap;
+      return this.getCustomKanbanGroupMap(rows, kanbanFieldId, customGroupMap);
+    }
+
+    // 默认逻辑：保持原有行为
+    return this.getDefaultKanbanGroupMap(rows, kanbanFieldId);
+  }
+
   // Sorting under Kanban view.
   private getSortRowsByKanbanGroup(view: IViewProperty, rows: IViewRow[], kanbanGroupMap: { [key: string]: IRecord[] } | undefined) {
     const snapshot = this.state.datasheetMap[this.datasheetId]?.datasheet!.snapshot;
@@ -110,12 +246,27 @@ export class ViewDerivateKanban extends ViewDerivateBase {
     if (!kanbanGroupMap) {
       return rows;
     }
-    const groupIds = field.type === FieldType.SingleSelect
-      ? field.property.options.map(item => item.id)
-      : (field as IMemberField).property.unitIds;
+
+    let groupIds: string[];
+    
+    // 🔑 关键：根据模式获取不同的 groupIds
+    if (this.isCustomGroupMode(view)) {
+      const customGroupMap = (view as any).style.customGroupMap;
+      // 自定义模式：按 order 排序获取自定义组ID
+      groupIds = Object.values(customGroupMap)
+        .sort((a: any, b: any) => a.order - b.order)
+        .map((group: any) => group.id);
+    } else {
+      // 默认模式：从字段获取选项ID
+      groupIds = field.type === FieldType.SingleSelect
+        ? field.property.options.map(item => item.id)
+        : (field as IMemberField).property.unitIds;
+    }
+    
     if (!Array.isArray(groupIds)) {
       return rows;
     }
+    
     const flatRows = [UN_GROUP, ...groupIds].map(groupId => {
       const kanbanGroup = kanbanGroupMap[groupId];
       if (!kanbanGroup) {

@@ -774,6 +774,35 @@ export type HiddenGroupMap = {
   [groupId: string]: boolean;
 };
 
+/**
+ * 自定义分组配置接口
+ */
+export interface ICustomGroup {
+  /** 组的唯一标识符 */
+  id: string;
+  /** 组的显示名称 */
+  name: string;
+  /** 包含的原始选项ID列表 */
+  optionIds: string[];
+  /** 显示顺序 */
+  order: number;
+  /** 组的颜色（可选） */
+  color?: string;
+  /** 是否折叠（可选） */
+  collapsed?: boolean;
+  /** 创建时间戳（可选） */
+  createdAt?: number;
+  /** 最后修改时间戳（可选） */
+  updatedAt?: number;
+}
+
+/**
+ * 自定义分组映射表
+ */
+export type CustomGroupMap = {
+  [customGroupId: string]: ICustomGroup;
+};
+
 export interface IKanbanViewProperty extends IViewPropertyBase {
   type: ViewType.Kanban;
   groupInfo?: IGroupInfo;
@@ -783,6 +812,10 @@ export interface IKanbanViewProperty extends IViewPropertyBase {
 export type IKanbanStyle = Pick<IGalleryViewStyle, 'coverFieldId' | 'isCoverFit' | 'isColNameVisible'> & {
   kanbanFieldId: string;
   hiddenGroupMap?: HiddenGroupMap;
+  /** 自定义分组映射（可选） */
+  customGroupMap?: CustomGroupMap;
+  /** 分组模式（可选） */
+  groupMode?: 'default' | 'custom';
 };
 
 export interface IOrgChartViewProperty extends IViewPropertyBase {

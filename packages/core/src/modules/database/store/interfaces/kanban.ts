@@ -17,7 +17,7 @@
  */
 
 import { KanbanStyleKey } from '../../../shared/store/constants';
-import { HiddenGroupMap } from './resource';
+import { HiddenGroupMap, CustomGroupMap } from './resource';
 
 interface ISetKanbanCoverFieldId {
   styleKey: KanbanStyleKey.CoverFieldId;
@@ -42,4 +42,14 @@ interface ISetBoardField {
   styleValue: string | null;
 }
 
-export type ISetKanbanStyleValue = ISetKanbanCoverFieldId | ISetKanbanIsCoverFit | ISetBoardField | ISetKanbanIsColNameVisible | ISetHiddenGroupMap;
+interface ISetCustomGroupMap {
+  styleKey: KanbanStyleKey.CustomGroupMap;
+  styleValue: CustomGroupMap | null;
+}
+
+interface ISetGroupMode {
+  styleKey: KanbanStyleKey.GroupMode;
+  styleValue: 'default' | 'custom' | null;
+}
+
+export type ISetKanbanStyleValue = ISetKanbanCoverFieldId | ISetKanbanIsCoverFit | ISetBoardField | ISetKanbanIsColNameVisible | ISetHiddenGroupMap | ISetCustomGroupMap | ISetGroupMode;

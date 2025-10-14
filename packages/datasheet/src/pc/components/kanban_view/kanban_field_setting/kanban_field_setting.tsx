@@ -39,12 +39,14 @@ import { useAppSelector } from 'pc/store/react-redux';
 import { useCommand } from '../hooks/use_command';
 import { KanbanMember } from './kanban_member';
 import { KanbanOption } from './kanban_option/kanban_option';
+import { CustomGroupConfig } from '../custom_group_config';
 import styles from './styles.module.less';
 
 enum KanbanRoute {
   Init,
   Member,
   Option,
+  CustomGroup,
 }
 
 interface IKanbanFieldSettingModalProps {
@@ -222,6 +224,17 @@ export const KanbanFieldSettingModal: React.FC<React.PropsWithChildren<IKanbanFi
                 </WrapperTooltip>
               </>
             )}
+            {groupFieldId && (
+              <WrapperTooltip wrapper={isViewLock} tip={t(Strings.view_lock_setting_desc)}>
+                <div 
+                  className={classNames(styles.fieldItem, { [styles.disabled]: isViewLock })} 
+                  onClick={() => !isViewLock && setRoute(KanbanRoute.CustomGroup)}
+                >
+                  <AddOutlined className={styles.addIcon} />
+                  配置自定义分组
+                </div>
+              </WrapperTooltip>
+            )}
             <Button
               color="primary"
               disabled={!onClose}
@@ -238,6 +251,24 @@ export const KanbanFieldSettingModal: React.FC<React.PropsWithChildren<IKanbanFi
             {route !== KanbanRoute.Init && <SettingHead route={route} setRoute={setRoute} />}
             {route === KanbanRoute.Option && <KanbanOption fieldMap={fieldMap!} command={commandHandle} onClose={onClose} />}
             {route === KanbanRoute.Member && <KanbanMember fieldMap={fieldMap!} command={commandHandle} onClose={onClose} />}
+            {route === KanbanRoute.CustomGroup && groupFieldId && (
+              <CustomGroupConfig
+                field={fieldMap![groupFieldId]}
+                onSave={(customGroupMap) => {
+                  // 保存自定义分组配置
+                  command.setKanbanStyle({
+                    styleKey: KanbanStyleKey.CustomGroupMap,
+                    styleValue: customGroupMap,
+                  });
+                  command.setKanbanStyle({
+                    styleKey: KanbanStyleKey.GroupMode,
+                    styleValue: 'custom',
+                  });
+                  onClose && onClose();
+                }}
+                onCancel={() => setRoute(KanbanRoute.Init)}
+              />
+            )}
           </div>
         </div>
       </div>

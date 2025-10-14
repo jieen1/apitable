@@ -1,0 +1,132 @@
+.customGroupConfig {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+
+  .header {
+    margin-bottom: 16px;
+  }
+
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px;
+  }
+
+  .groupList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .groupItem {
+    border: 1px solid var(--divider);
+    border-radius: 8px;
+    padding: 12px;
+    background: var(--bg);
+
+    .groupHeader {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+
+      .groupNameInput {
+        flex: 1;
+      }
+    }
+
+    .groupOptions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 40px;
+      padding: 8px;
+      background: var(--bgCommonDefault);
+      border-radius: 4px;
+
+      .emptyOptions {
+        width: 100%;
+        text-align: center;
+        padding: 8px 0;
+      }
+
+      .optionTag {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        background: var(--primaryColor);
+        color: white;
+        border-radius: 4px;
+        font-size: 12px;
+        gap: 4px;
+
+        .removeOption {
+          cursor: pointer;
+          font-weight: bold;
+          font-size: 16px;
+          line-height: 1;
+          
+          &:hover {
+            opacity: 0.8;
+          }
+        }
+      }
+    }
+  }
+
+  .createGroupButton {
+    margin-bottom: 16px;
+  }
+
+  .unassignedSection {
+    border-top: 1px solid var(--divider);
+    padding-top: 16px;
+
+    .unassignedOptions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+
+      .unassignedOption {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: var(--bgCommonDefault);
+        border-radius: 4px;
+        border: 1px dashed var(--divider);
+        cursor: move;
+
+        &:hover {
+          background: var(--bgCommonHover);
+        }
+
+        .assignSelect {
+          padding: 4px 8px;
+          border-radius: 4px;
+          border: 1px solid var(--divider);
+          background: var(--bg);
+          cursor: pointer;
+          font-size: 12px;
+
+          &:hover {
+            border-color: var(--primaryColor);
+          }
+        }
+      }
+    }
+  }
+
+  .footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--divider);
+  }
+}
+

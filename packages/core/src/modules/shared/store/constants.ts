@@ -351,6 +351,13 @@ export enum KanbanStyleKey {
   KanbanFieldId = 'kanbanFieldId',
   IsColNameVisible = 'isColNameVisible',
   HiddenGroupMap = 'hiddenGroupMap',
+  CustomGroupMap = 'customGroupMap',
+  GroupMode = 'groupMode',
+}
+
+export enum KanbanGroupMode {
+  Default = 'default',
+  Custom = 'custom',
 }
 
 export enum CalendarColorType {
