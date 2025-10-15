@@ -240,7 +240,7 @@ public interface INodeRoleService {
 
     NodeCollaboratorsVo listRole(String nodeId);
 
-    void disableRoleExtend(String nodeId);
+    void disableRoleExtend(String nodeId, Boolean includeExtend);
 
     void enableRoleExtend(String nodeId);
 

@@ -6,6 +6,7 @@ import com.apitable.shared.component.scanner.annotation.GetResource;
 import com.apitable.shared.component.scanner.annotation.PostResource;
 import com.apitable.shared.context.SessionContext;
 import com.apitable.workspace.ro.AddNodeRoleRo;
+import com.apitable.workspace.ro.DeleteNodeRoleRo;
 import com.apitable.workspace.ro.ModifyNodeRoleRo;
 import com.apitable.workspace.ro.RoleControlOpenRo;
 import com.apitable.workspace.service.INodeRoleService;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,8 +53,7 @@ public class NodeRoleController {
             schema = @Schema(type = "string"), in = ParameterIn.QUERY, example = "nodRTGSy43DJ9")
     public ResponseData<Void> disableRoleExtend(@RequestParam("nodeId") String nodeId,
                                                 @RequestBody RoleControlOpenRo roleControlOpenRo) {
-        // TODO 不知道roleControlOpenRo中的字段如何使用
-        iNodeRoleService.disableRoleExtend(nodeId);
+        iNodeRoleService.disableRoleExtend(nodeId, roleControlOpenRo.getIncludeExtend());
         return ResponseData.success();
     }
 
@@ -76,6 +77,17 @@ public class NodeRoleController {
     public ResponseData<Void> editRole(@RequestBody @Valid ModifyNodeRoleRo modifyNodeRoleRo) {
         Long userId = SessionContext.getUserId();
         iNodeRoleService.updateNodeRole(userId, modifyNodeRoleRo.getNodeId(), modifyNodeRoleRo.getRole(), Lists.newArrayList(modifyNodeRoleRo.getUnitId()));
+        return ResponseData.success();
+    }
+
+    /**
+     * edit role.
+     */
+    @DeleteMapping(path = "/deleteRole")
+    @Operation(summary = "delete role")
+    public ResponseData<Void> deleteRole(@RequestBody @Valid DeleteNodeRoleRo deleteNodeRoleRo) {
+        Long userId = SessionContext.getUserId();
+        iNodeRoleService.deleteNodeRole(userId, deleteNodeRoleRo.getNodeId(), deleteNodeRoleRo.getUnitId());
         return ResponseData.success();
     }
 

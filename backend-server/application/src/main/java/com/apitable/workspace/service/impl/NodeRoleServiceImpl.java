@@ -665,9 +665,6 @@ public class NodeRoleServiceImpl implements INodeRoleService {
 
         List<NodeRoleUnit> nodeRoleUnitList = getNodeRoleUnitList(nodeId);
         NodeRoleUnit rootNodeRoleUnit = getRootNodeRoleUnit(nodeSpaceId);
-        if (nodeRoleUnitList.stream().noneMatch(roleUnit -> Objects.equals(roleUnit.getUnitId(), rootNodeRoleUnit.getUnitId()))) {
-            nodeRoleUnitList.add(rootNodeRoleUnit);
-        }
         nodeCollaboratorsVo.setRoleUnits(nodeRoleUnitList);
         UnitMemberVo nodeOwner = getNodeOwner(nodeId);
         nodeCollaboratorsVo.setOwner(nodeOwner);
@@ -681,6 +678,10 @@ public class NodeRoleServiceImpl implements INodeRoleService {
         nodeCollaboratorsVo.setBelongRootFolder(iNodeService.isNodeBelongRootFolder(nodeSpaceId, nodeId));
         SimpleNodeInfo node = nodeMapper.selectNodeInfoWithPermissionStatus(nodeId);
         nodeCollaboratorsVo.setExtend(node.getExtend());
+        if (Boolean.TRUE.equals(node.getExtend())
+                && nodeRoleUnitList.stream().noneMatch(roleUnit -> Objects.equals(roleUnit.getUnitId(), rootNodeRoleUnit.getUnitId()))) {
+            nodeRoleUnitList.add(rootNodeRoleUnit);
+        }
         String nodeExtendNodeId = getNodeExtendNodeId(nodeId);
         if (nodeExtendNodeId != null) {
             nodeCollaboratorsVo.setExtendNodeName(iNodeService.getNodeNameByNodeId(nodeExtendNodeId));
@@ -689,14 +690,21 @@ public class NodeRoleServiceImpl implements INodeRoleService {
     }
 
     @Override
-    public void disableRoleExtend(String nodeId) {
+    public void disableRoleExtend(String nodeId, Boolean includeExtend) {
         SimpleNodeInfo node = nodeMapper.selectNodeInfoWithPermissionStatus(nodeId);
         if (Boolean.TRUE.equals(node.getExtend())) {
             // add control record
             Long userId = SessionContext.getUserId();
             String nodeSpaceId =
                     iNodeService.checkNodeIfExist(null, nodeId);
+            Long memberId = userSpaceCacheService.getMemberId(userId, nodeSpaceId);
+            // Enable the node to specify permissions and set the current member organization unit role to Owner
+            Long unitId = iUnitService.getUnitIdByRefId(memberId);
             iControlService.create(userId, nodeSpaceId, nodeId, ControlType.NODE);
+            iControlRoleService.addControlRole(userId, nodeId, Collections.singletonList(unitId), Node.OWNER);
+            if (Boolean.TRUE.equals(includeExtend)) {
+                addExtendNodeRole(userId, nodeSpaceId, nodeId);
+            }
         }
     }
 
