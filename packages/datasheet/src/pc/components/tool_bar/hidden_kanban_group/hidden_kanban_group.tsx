@@ -179,7 +179,7 @@ export const HiddenKanbanGroup = (props: { triggerInfo?: IUseListenTriggerInfo }
 
   const CellWrapper = isMemberField ? CellMember : CellOptions;
 
-  const groupItem = (provided: any, isDragDisabled: boolean, visible: boolean | undefined, id: any) => (
+  const groupItem = (provided: any, isDragDisabled: boolean, visible: boolean | undefined, id: any, groupName?: string) => (
     <div
       key={id}
       className={classNames({
@@ -196,7 +196,21 @@ export const HiddenKanbanGroup = (props: { triggerInfo?: IUseListenTriggerInfo }
       </WrapperTooltip>
 
       {id !== UN_GROUP ? (
-        <CellWrapper cellValue={isMemberField ? [id] : id} field={field as IMemberField} />
+        // 🔑 自定义分组模式：直接显示组名称
+        isCustomGroupMode && groupName ? (
+          <div className={styles.optionWrapper}>
+            <div className={styles.optionText}>
+              <span className={styles.name} style={{ fontWeight: 500 }}>{groupName}</span>
+              {view.style.customGroupMap![id] && (
+                <span style={{ fontSize: '12px', color: colors.fc3, marginLeft: '4px' }}>
+                  ({view.style.customGroupMap![id].optionIds.length} 个选项)
+                </span>
+              )}
+            </div>
+          </div>
+        ) : (
+          <CellWrapper cellValue={isMemberField ? [id] : id} field={field as IMemberField} />
+        )
       ) : (
         <div className={styles.optionWrapper}>
           <div className={styles.optionText}>
@@ -249,12 +263,12 @@ export const HiddenKanbanGroup = (props: { triggerInfo?: IUseListenTriggerInfo }
             <Droppable droppableId="kanbanGroupList" direction="vertical">
               {(provided) => (
                 <div ref={provided.innerRef} {...provided.droppableProps}>
-                  {groupInfoForRender.map(({ id }, index) => {
+                  {groupInfoForRender.map(({ id, name }, index) => {
                     const isDragDisabled = Boolean(query.length > 0 || id === UN_GROUP);
                     const visible = !hiddenGroupMap?.[id];
                     return (
                       <Draggable key={id} draggableId={id} index={index} isDragDisabled={isDragDisabled || isViewLock}>
-                        {(provided) => groupItem(provided, isDragDisabled, visible, id)}
+                        {(provided) => groupItem(provided, isDragDisabled, visible, id, name)}
                       </Draggable>
                     );
                   })}

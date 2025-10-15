@@ -43,6 +43,23 @@
       margin-right: 8px;
     }
 
+    .customGroupInput {
+      flex: 1;
+      padding: 4px 8px;
+      font-size: 14px;
+      font-weight: 500;
+      border: 1px solid var(--primaryColor);
+      border-radius: 4px;
+      background: var(--lowestBg);
+      color: var(--firstLevelText);
+      outline: none;
+
+      &:focus {
+        border-color: var(--primaryColor);
+        box-shadow: 0 0 0 2px rgba(99, 95, 255, 0.1);
+      }
+    }
+
     &.collapse {
       margin-right: 24px;
       overflow: hidden;

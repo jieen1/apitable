@@ -232,10 +232,24 @@ export const GroupHeader: React.FC<React.PropsWithChildren<IGroupHeaderProps>> =
     triggerRef.current?.close();
     Modal.confirm({
       title: t(Strings.delete_kanban_tip_title),
-      content: t(Strings.delete_kanban_tip_content),
+      content: isCustomGroupMode ? '确定要删除此自定义分组吗？' : t(Strings.delete_kanban_tip_content),
       okText: t(Strings.confirm),
       type: 'warning',
       onOk: () => {
+        // 🔑 自定义分组模式：删除自定义组
+        if (isCustomGroupMode) {
+          const updatedCustomGroupMap = { ...view.style.customGroupMap };
+          delete updatedCustomGroupMap[groupId];
+          
+          command.setKanbanStyle({
+            styleKey: KanbanStyleKey.CustomGroupMap,
+            styleValue: updatedCustomGroupMap,
+          });
+          notifyWithUndo('已删除自定义分组', NotifyKey.DeleteKanbanGroup);
+          return;
+        }
+        
+        // 默认模式：删除字段选项
         if (field.type === FieldType.Member) {
           deleteMemberGroup();
           return;
@@ -322,14 +336,49 @@ export const GroupHeader: React.FC<React.PropsWithChildren<IGroupHeaderProps>> =
             </span>
           )}
           {groupId !== UN_GROUP && customGroup && (
-            <span className={styles.customGroupName} style={{ fontWeight: 500 }}>
-              {customGroup.name}
-              {customGroup.optionIds.length > 0 && (
-                <span style={{ fontSize: '12px', color: colors.fc3, marginLeft: '4px' }}>
-                  ({customGroup.optionIds.length} 个选项)
-                </span>
-              )}
-            </span>
+            editing ? (
+              <input
+                autoFocus
+                type="text"
+                defaultValue={customGroup.name}
+                className={styles.customGroupInput}
+                onBlur={(e) => {
+                  const newName = e.target.value.trim();
+                  if (newName && newName !== customGroup.name) {
+                    const updatedCustomGroupMap = {
+                      ...view.style.customGroupMap,
+                      [groupId]: {
+                        ...customGroup,
+                        name: newName,
+                        updatedAt: Date.now(),
+                      },
+                    };
+                    command.setKanbanStyle({
+                      styleKey: KanbanStyleKey.CustomGroupMap,
+                      styleValue: updatedCustomGroupMap,
+                    });
+                  }
+                  setEditing(false);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.currentTarget.blur();
+                  } else if (e.key === 'Escape') {
+                    setEditing(false);
+                  }
+                }}
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : (
+              <span className={styles.customGroupName} style={{ fontWeight: 500 }}>
+                {customGroup.name}
+                {customGroup.optionIds.length > 0 && (
+                  <span style={{ fontSize: '12px', color: colors.fc3, marginLeft: '4px' }}>
+                    ({customGroup.optionIds.length} 个选项)
+                  </span>
+                )}
+              </span>
+            )
           )}
           {groupId !== UN_GROUP && !customGroup &&
             (field.type === FieldType.SingleSelect ? (

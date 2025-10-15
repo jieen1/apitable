@@ -28,8 +28,12 @@ export const KANBAN_GROUP_MORE = 'KANBAN_GROUP_MORE';
 
 export const GroupHeadMenu: React.FC<React.PropsWithChildren<unknown>> = () => {
   const { rowCreatable, fieldPropertyEditable } = useAppSelector(Selectors.getPermissions);
+  const view = useAppSelector(Selectors.getCurrentView) as any;
   const colors = useThemeColors();
   const isViewLock = useShowViewLockModal();
+
+  // 判断是否为自定义分组模式
+  const isCustomGroupMode = Boolean(view?.style?.customGroupMap && Object.keys(view.style.customGroupMap).length > 0);
 
   return (
     <ContextMenu
@@ -47,7 +51,7 @@ export const GroupHeadMenu: React.FC<React.PropsWithChildren<unknown>> = () => {
             },
             {
               icon: <EditOutlined color={colors.thirdLevelText} />,
-              text: t(Strings.editing_group),
+              text: isCustomGroupMode ? '编辑自定义组' : t(Strings.editing_group),
               hidden(arg: any) {
                 const {
                   props: { groupId },
