@@ -17,6 +17,8 @@
  */
 
 import { useClickAway } from 'ahooks';
+import type { InputRef } from 'antd';
+import { Input } from 'antd';
 import classNames from 'classnames';
 import produce from 'immer';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -38,12 +40,14 @@ import {
 // import numeral from 'numeral';
 import { MoreOutlined } from '@apitable/icons';
 import { getAvatarRandomColor, Modal } from 'pc/components/common';
+import { ColorPicker, OptionSetting } from 'pc/components/common/color_picker';
 import { notifyWithUndo } from 'pc/components/common/notify';
 import { NotifyKey } from 'pc/components/common/notify/notify.interface';
 import { KANBAN_GROUP_MORE } from 'pc/components/kanban_view/group_header/head_more_option';
 import { InsertPlace, useAddNewCard } from 'pc/components/kanban_view/kanban_group/kanban_group';
 import { inquiryValueByKey } from 'pc/components/multi_grid/cell/cell_options';
 import { store } from 'pc/store';
+import { setColor } from 'pc/components/multi_grid/format'
 
 import { useAppSelector } from 'pc/store/react-redux';
 import { useCommand } from '../hooks/use_command';
@@ -94,6 +98,8 @@ export const GroupHeader: React.FC<React.PropsWithChildren<IGroupHeaderProps>> =
   const [editing, setEditing] = useState(false);
   const triggerRef = useRef<any>();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const editAreaRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<InputRef>(null);
   const command = useCommand();
   const readOnly = useAppSelector((state) => !Selectors.getPermissions(state).manageable);
   const divRef = useRef<HTMLDivElement | null>(null);
@@ -149,10 +155,58 @@ export const GroupHeader: React.FC<React.PropsWithChildren<IGroupHeaderProps>> =
     command.setFieldAttr(field.id, value);
   }
 
+  // 🔑 处理自定义组颜色变化
+  function onCustomGroupColorChange(type: OptionSetting, id: string, value: string | number) {
+    if (type !== OptionSetting.SETCOLOR || !isCustomGroupMode || !customGroup) {
+      return;
+    }
+    const updatedCustomGroupMap: typeof view.style.customGroupMap = {
+      ...view.style.customGroupMap,
+      [groupId]: {
+        ...customGroup,
+        color: value as number,
+        updatedAt: Date.now(),
+      },
+    };
+    command.setKanbanStyle({
+      styleKey: KanbanStyleKey.CustomGroupMap,
+      styleValue: updatedCustomGroupMap,
+    });
+  }
+
+  // 🔑 处理自定义组名称保存
+  function onCustomGroupNameSave() {
+    if (!inputRef.current || !isCustomGroupMode || !customGroup) {
+      return;
+    }
+    const value = inputRef.current.input?.value?.trim();
+    if (!value || value === customGroup.name) {
+      setEditing(false);
+      return;
+    }
+    const updatedCustomGroupMap: typeof view.style.customGroupMap = {
+      ...view.style.customGroupMap,
+      [groupId]: {
+        ...customGroup,
+        name: value,
+        updatedAt: Date.now(),
+      },
+    };
+    command.setKanbanStyle({
+      styleKey: KanbanStyleKey.CustomGroupMap,
+      styleValue: updatedCustomGroupMap,
+    });
+    setEditing(false);
+  }
+
   function getBgColor(theme: ThemeName) {
     const field = fieldMap![kanbanFieldId];
     if (groupId === UN_GROUP) {
       return colors.borderCommonDefault;
+    }
+    // 🔑 自定义分组：使用自定义颜色
+    if (isCustomGroupMode && customGroup?.color) {
+      return setColor(customGroup.color, theme);
     }
     if (field.type === FieldType.SingleSelect) {
       return inquiryValueByKey('color', groupId, field, theme);
@@ -238,9 +292,9 @@ export const GroupHeader: React.FC<React.PropsWithChildren<IGroupHeaderProps>> =
       onOk: () => {
         // 🔑 自定义分组模式：删除自定义组
         if (isCustomGroupMode) {
-          const updatedCustomGroupMap = { ...view.style.customGroupMap };
+          const updatedCustomGroupMap: typeof view.style.customGroupMap = { ...view.style.customGroupMap };
           delete updatedCustomGroupMap[groupId];
-          
+
           command.setKanbanStyle({
             styleKey: KanbanStyleKey.CustomGroupMap,
             styleValue: updatedCustomGroupMap,
@@ -282,9 +336,13 @@ export const GroupHeader: React.FC<React.PropsWithChildren<IGroupHeaderProps>> =
   // adapts to the width of the statistics on the right
   useClickAway(
     () => {
-      field.type !== FieldType.SingleSelect && setEditing(false);
+      if (isCustomGroupMode && customGroup && editing) {
+        onCustomGroupNameSave();
+      } else if (field.type !== FieldType.SingleSelect) {
+        setEditing(false);
+      }
     },
-    wrapperRef,
+    editing && isCustomGroupMode ? editAreaRef : wrapperRef,
     'mousedown',
   );
 
@@ -337,38 +395,24 @@ export const GroupHeader: React.FC<React.PropsWithChildren<IGroupHeaderProps>> =
           )}
           {groupId !== UN_GROUP && customGroup && (
             editing ? (
-              <input
-                autoFocus
-                type="text"
-                defaultValue={customGroup.name}
-                className={styles.customGroupInput}
-                onBlur={(e) => {
-                  const newName = e.target.value.trim();
-                  if (newName && newName !== customGroup.name) {
-                    const updatedCustomGroupMap = {
-                      ...view.style.customGroupMap,
-                      [groupId]: {
-                        ...customGroup,
-                        name: newName,
-                        updatedAt: Date.now(),
-                      },
-                    };
-                    command.setKanbanStyle({
-                      styleKey: KanbanStyleKey.CustomGroupMap,
-                      styleValue: updatedCustomGroupMap,
-                    });
-                  }
-                  setEditing(false);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.currentTarget.blur();
-                  } else if (e.key === 'Escape') {
-                    setEditing(false);
-                  }
-                }}
-                onClick={(e) => e.stopPropagation()}
-              />
+              <div className={styles.optionEditArea} ref={editAreaRef}>
+                <ColorPicker
+                  onChange={onCustomGroupColorChange}
+                  option={{
+                    id: groupId,
+                    name: customGroup.name,
+                    color: (customGroup.color ?? 0) as number
+                  }}
+                />
+                <Input
+                  ref={inputRef}
+                  size="small"
+                  defaultValue={customGroup.name}
+                  onPressEnter={onCustomGroupNameSave}
+                  autoFocus
+                  style={{ marginLeft: 4, background: colors.defaultBg }}
+                />
+              </div>
             ) : (
               <span className={styles.customGroupName} style={{ fontWeight: 500 }}>
                 {customGroup.name}

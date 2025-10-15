@@ -787,7 +787,7 @@ export interface ICustomGroup {
   /** 显示顺序 */
   order: number;
   /** 组的颜色（可选） */
-  color?: string;
+  color?: number;
   /** 是否折叠（可选） */
   collapsed?: boolean;
   /** 创建时间戳（可选） */
