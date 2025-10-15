@@ -48,6 +48,7 @@ import { InsertPlace, useAddNewCard } from 'pc/components/kanban_view/kanban_gro
 import { inquiryValueByKey } from 'pc/components/multi_grid/cell/cell_options';
 import { store } from 'pc/store';
 import { setColor } from 'pc/components/multi_grid/format'
+import { Typography } from '@apitable/components/src/components/typography'
 
 import { useAppSelector } from 'pc/store/react-redux';
 import { useCommand } from '../hooks/use_command';
@@ -415,12 +416,11 @@ export const GroupHeader: React.FC<React.PropsWithChildren<IGroupHeaderProps>> =
               </div>
             ) : (
               <span className={styles.customGroupName} style={{ fontWeight: 500 }}>
-                {customGroup.name}
-                {customGroup.optionIds.length > 0 && (
-                  <span style={{ fontSize: '12px', color: colors.fc3, marginLeft: '4px' }}>
-                    ({customGroup.optionIds.length} 个选项)
-                  </span>
-                )}
+                <div className={classNames('optionText', styles.optionText)}>
+                  <Typography variant="body4" className={styles.name} color={setColor(customGroup?.color || 0, cacheTheme)} ellipsis>
+                    {customGroup.name}
+                  </Typography>
+                </div>
               </span>
             )
           )}

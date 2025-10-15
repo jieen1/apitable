@@ -19,10 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Workbench - Node Role Api")
@@ -83,7 +80,7 @@ public class NodeRoleController {
     /**
      * edit role.
      */
-    @DeleteMapping(path = "/deleteRole")
+    @PostResource(path = "/deleteRole", method = RequestMethod.DELETE, requiredPermission = false)
     @Operation(summary = "delete role")
     public ResponseData<Void> deleteRole(@RequestBody @Valid DeleteNodeRoleRo deleteNodeRoleRo) {
         Long userId = SessionContext.getUserId();
