@@ -80,12 +80,18 @@ export const HiddenKanbanGroup = (props: { triggerInfo?: IUseListenTriggerInfo }
 
   const [query, setQuery] = useState('');
 
+  // 🔑 判断是否为自定义分组模式
+  const isCustomGroupMode = Boolean(view.style.customGroupMap && Object.keys(view.style.customGroupMap).length > 0);
+
   const groupInfoForRender = useMemo(() => {
     const _groupIds = [...groupIds];
     return _groupIds
       .map((id) => {
         let name;
-        if (isMemberField) {
+        // 🔑 自定义分组模式：从 customGroupMap 获取组名
+        if (isCustomGroupMode && view.style.customGroupMap![id]) {
+          name = view.style.customGroupMap![id].name;
+        } else if (isMemberField) {
           name = unitMap[id]?.name;
         } else {
           name = inquiryValueByKey('name', id, field, cacheTheme);
@@ -96,28 +102,57 @@ export const HiddenKanbanGroup = (props: { triggerInfo?: IUseListenTriggerInfo }
         };
       })
       .filter((info) => {
-        return info.name.includes(query);
+        return info.name?.includes(query);
       });
-  }, [groupIds, query, field, isMemberField, unitMap, cacheTheme]);
+  }, [groupIds, query, field, isMemberField, unitMap, cacheTheme, isCustomGroupMode, view.style.customGroupMap]);
 
   const handleDragEnd = (result: DropResult) => {
     const { destination, source } = result;
-    const headIds = field.type === FieldType.SingleSelect ? field.property.options : (field as IMemberField).property.unitIds;
-    const headIdsCopy = [...headIds];
-    const newProperty = {
-      ...field.property,
-    };
-
     setIsDragging(false);
-    moveArrayElement(headIdsCopy, source.index, destination!.index);
 
-    if (field.type === FieldType.SingleSelect) {
-      (newProperty as ISelectFieldProperty).options = headIdsCopy as ISelectFieldOption[];
+    if (!destination) return;
+
+    // 🔑 自定义分组模式：修改自定义组的 order
+    if (isCustomGroupMode) {
+      const sortedGroups = Object.values(view.style.customGroupMap!)
+        .sort((a: any, b: any) => a.order - b.order);
+      
+      const movedGroup = sortedGroups[source.index];
+      sortedGroups.splice(source.index, 1);
+      sortedGroups.splice(destination.index, 0, movedGroup);
+      
+      // 更新所有组的 order
+      const updatedCustomGroupMap = { ...view.style.customGroupMap };
+      sortedGroups.forEach((group: any, index) => {
+        updatedCustomGroupMap[group.id] = {
+          ...updatedCustomGroupMap[group.id],
+          order: index,
+          updatedAt: Date.now(),
+        };
+      });
+
+      command.setKanbanStyle({
+        styleKey: KanbanStyleKey.CustomGroupMap,
+        styleValue: updatedCustomGroupMap,
+      });
     } else {
-      (newProperty as IMemberProperty).unitIds = headIdsCopy as string[];
-    }
+      // 默认模式：修改字段的 options 或 unitIds
+      const headIds = field.type === FieldType.SingleSelect ? field.property.options : (field as IMemberField).property.unitIds;
+      const headIdsCopy = [...headIds];
+      const newProperty = {
+        ...field.property,
+      };
 
-    command.setFieldAttr(field.id, { ...field, property: newProperty });
+      moveArrayElement(headIdsCopy, source.index, destination!.index);
+
+      if (field.type === FieldType.SingleSelect) {
+        (newProperty as ISelectFieldProperty).options = headIdsCopy as ISelectFieldOption[];
+      } else {
+        (newProperty as IMemberProperty).unitIds = headIdsCopy as string[];
+      }
+
+      command.setFieldAttr(field.id, { ...field, property: newProperty });
+    }
   };
 
   const handleDragStart = () => {

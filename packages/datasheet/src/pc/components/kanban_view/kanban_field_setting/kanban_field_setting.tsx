@@ -84,6 +84,7 @@ export const KanbanFieldSettingModal: React.FC<React.PropsWithChildren<IKanbanFi
   const [route, setRoute] = useState<KanbanRoute>(KanbanRoute.Init);
   const columnCount = useAppSelector(Selectors.getColumnCount)!;
   const groupFieldId = useAppSelector(Selectors.getKanbanFieldId);
+  const view = useAppSelector(Selectors.getCurrentView) as any;
   const command = useCommand();
   const fieldCreatable = useAppSelector((state) => Selectors.getPermissions(state).fieldCreatable);
   const fieldMap = useAppSelector((state) => Selectors.getFieldMap(state, state.pageParams.datasheetId!));
@@ -225,15 +226,39 @@ export const KanbanFieldSettingModal: React.FC<React.PropsWithChildren<IKanbanFi
               </>
             )}
             {groupFieldId && (
-              <WrapperTooltip wrapper={isViewLock} tip={t(Strings.view_lock_setting_desc)}>
-                <div 
-                  className={classNames(styles.fieldItem, { [styles.disabled]: isViewLock })} 
-                  onClick={() => !isViewLock && setRoute(KanbanRoute.CustomGroup)}
-                >
-                  <AddOutlined className={styles.addIcon} />
-                  配置自定义分组
-                </div>
-              </WrapperTooltip>
+              <>
+                <WrapperTooltip wrapper={isViewLock} tip={t(Strings.view_lock_setting_desc)}>
+                  <div 
+                    className={classNames(styles.fieldItem, { [styles.disabled]: isViewLock })} 
+                    onClick={() => !isViewLock && setRoute(KanbanRoute.CustomGroup)}
+                  >
+                    <AddOutlined className={styles.addIcon} />
+                    配置自定义分组
+                  </div>
+                </WrapperTooltip>
+                {view.style.groupMode === 'custom' && (
+                  <WrapperTooltip wrapper={isViewLock} tip={t(Strings.view_lock_setting_desc)}>
+                    <div 
+                      className={classNames(styles.fieldItem, { [styles.disabled]: isViewLock })} 
+                      onClick={() => {
+                        if (isViewLock) return;
+                        // 切换回默认分组模式
+                        command.setKanbanStyle({
+                          styleKey: KanbanStyleKey.GroupMode,
+                          styleValue: 'default',
+                        });
+                        command.setKanbanStyle({
+                          styleKey: KanbanStyleKey.CustomGroupMap,
+                          styleValue: null,
+                        });
+                      }}
+                    >
+                      <AddOutlined className={styles.addIcon} />
+                      切换回默认分组
+                    </div>
+                  </WrapperTooltip>
+                )}
+              </>
             )}
             <Button
               color="primary"
