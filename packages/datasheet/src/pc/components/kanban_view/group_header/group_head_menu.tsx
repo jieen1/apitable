@@ -415,7 +415,7 @@ export const GroupHeader: React.FC<React.PropsWithChildren<IGroupHeaderProps>> =
               </div>
             ) : (
               <span className={styles.customGroupName} style={{ fontWeight: 500 }}>
-                <div className={classNames('optionText', styles.optionText)} style={{ background: setColor(customGroup?.color || 0, cacheTheme)}}>
+                <div className={classNames('optionText', styles.optionText)} style={{ background: setColor(customGroup?.color || 0, cacheTheme), padding: '0 10px', borderRadius: '10px'}}>
                     {customGroup.name}
                 </div>
               </span>
