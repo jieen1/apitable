@@ -27,12 +27,7 @@ import com.apitable.shared.component.scanner.annotation.GetResource;
 import com.apitable.shared.component.scanner.annotation.PostResource;
 import com.apitable.shared.context.SessionContext;
 import com.apitable.shared.util.page.PageObjectParam;
-import com.apitable.widget.ro.WidgetPackageCreateRo;
-import com.apitable.widget.ro.WidgetPackageReleaseV2Ro;
-import com.apitable.widget.ro.WidgetPackageRollbackRo;
-import com.apitable.widget.ro.WidgetPackageSubmitV2Ro;
-import com.apitable.widget.ro.WidgetPackageUnpublishRo;
-import com.apitable.widget.ro.WidgetTransferOwnerRo;
+import com.apitable.widget.ro.*;
 import com.apitable.widget.service.IWidgetPackageService;
 import com.apitable.widget.vo.WidgetPackageInfoVo;
 import com.apitable.widget.vo.WidgetReleaseCreateVo;
@@ -187,6 +182,23 @@ public class WidgetPackageController {
         @RequestBody @Valid WidgetTransferOwnerRo transferOwnerRo) {
         Long userId = SessionContext.getUserId();
         iWidgetPackageService.transferWidgetOwner(userId, transferOwnerRo);
+        return ResponseData.success();
+    }
+
+    /**
+     * widgetAuth.
+     */
+    @PostResource(path = "/auth", requiredPermission = false)
+    @Parameters({
+            @Parameter(name = HttpHeaders.AUTHORIZATION, in = ParameterIn.HEADER,
+                    description = "developer token", required = true,
+                    schema = @Schema(type = "string"), example = "Bearer uskaoeiu"),
+            @Parameter(name = HttpHeaders.ACCEPT_LANGUAGE, in = ParameterIn.HEADER,
+                    description = "developer's language",
+                    schema = @Schema(type = "string"), example = "「en-US/zh-CN」")
+    })
+    public ResponseData<Void> auth(
+            @RequestBody @Valid WidgetPackageAuthRo authRo) {
         return ResponseData.success();
     }
 
