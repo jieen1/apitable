@@ -11,9 +11,7 @@ import com.apitable.shared.context.SessionContext;
 import com.apitable.shared.util.page.PageInfo;
 import com.apitable.shared.util.page.PageObjectParam;
 import com.apitable.shared.validator.NodeMatch;
-import com.apitable.workspace.ro.FieldRoleCreateRo;
-import com.apitable.workspace.ro.FieldRoleEditRo;
-import com.apitable.workspace.ro.RoleControlOpenRo;
+import com.apitable.workspace.ro.*;
 import com.apitable.workspace.service.IFieldRoleService;
 import com.apitable.workspace.service.INodeService;
 import com.apitable.workspace.service.INodeShareSettingService;
@@ -29,10 +27,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -145,6 +140,72 @@ public class DataSheetController {
         Long userId = SessionContext.getUserId();
         ControlIdBuilder.ControlId controlId = ControlIdBuilder.fieldId(dstId, fieldId);
         iFieldRoleService.editFieldRole(userId, controlId.toString(), Lists.newArrayList(fieldRoleEditRo.getUnitId()), fieldRoleEditRo.getRole());
+        return ResponseData.success();
+    }
+
+    @PostResource(path = "/{dstId}/field/{fieldId}/batchEditRole", requiredPermission = false)
+    @Operation(summary = "batchEditRole filed permission")
+    @Parameters({
+            @Parameter(name = "dstId", description = "table id", required = true,
+                    schema = @Schema(type = "string"), in = ParameterIn.PATH, example = "dstGxznHFXf9pvF1LZ"),
+            @Parameter(name = "fieldId", description = "field id", required = true,
+                    schema = @Schema(type = "string"), in = ParameterIn.PATH, example = "fldB7uWmwYrQf")
+    })
+    public ResponseData<Void> batchEditRole(@PathVariable("dstId") @NodeMatch String dstId,
+                                       @PathVariable("fieldId") String fieldId,
+                                       @RequestBody BatchFieldRoleEditRo batchFieldRoleEditRo) {
+        Long userId = SessionContext.getUserId();
+        ControlIdBuilder.ControlId controlId = ControlIdBuilder.fieldId(dstId, fieldId);
+        iFieldRoleService.editFieldRole(userId, controlId.toString(), batchFieldRoleEditRo.getUnitIds(), batchFieldRoleEditRo.getRole());
+        return ResponseData.success();
+    }
+
+    @PostResource(path = "/{dstId}/field/{fieldId}/deleteRole", requiredPermission = false, method = RequestMethod.DELETE)
+    @Operation(summary = "deleteRole filed permission")
+    @Parameters({
+            @Parameter(name = "dstId", description = "table id", required = true,
+                    schema = @Schema(type = "string"), in = ParameterIn.PATH, example = "dstGxznHFXf9pvF1LZ"),
+            @Parameter(name = "fieldId", description = "field id", required = true,
+                    schema = @Schema(type = "string"), in = ParameterIn.PATH, example = "fldB7uWmwYrQf")
+    })
+    public ResponseData<Void> deleteRole(@PathVariable("dstId") @NodeMatch String dstId,
+                                       @PathVariable("fieldId") String fieldId,
+                                       @RequestBody FieldRoleDeleteRo fieldRoleDeleteRo) {
+        ControlIdBuilder.ControlId controlId = ControlIdBuilder.fieldId(dstId, fieldId);
+        iFieldRoleService.deleteFieldRole(controlId.toString(), dstId, fieldRoleDeleteRo.getUnitId());
+        return ResponseData.success();
+    }
+
+    @PostResource(path = "/{dstId}/field/{fieldId}/batchDeleteRole", requiredPermission = false, method = RequestMethod.DELETE)
+    @Operation(summary = "batchDeleteRole filed permission")
+    @Parameters({
+            @Parameter(name = "dstId", description = "table id", required = true,
+                    schema = @Schema(type = "string"), in = ParameterIn.PATH, example = "dstGxznHFXf9pvF1LZ"),
+            @Parameter(name = "fieldId", description = "field id", required = true,
+                    schema = @Schema(type = "string"), in = ParameterIn.PATH, example = "fldB7uWmwYrQf")
+    })
+    public ResponseData<Void> batchDeleteRole(@PathVariable("dstId") @NodeMatch String dstId,
+                                         @PathVariable("fieldId") String fieldId,
+                                         @RequestBody BatchFieldRoleDeleteRo batchFieldRoleDeleteRo) {
+        ControlIdBuilder.ControlId controlId = ControlIdBuilder.fieldId(dstId, fieldId);
+        iFieldRoleService.deleteFieldRoles(controlId.toString(), batchFieldRoleDeleteRo.getUnitIds());
+        return ResponseData.success();
+    }
+
+    @PostResource(path = "/{dstId}/field/{fieldId}/updateRoleSetting", requiredPermission = false)
+    @Operation(summary = "updateRoleSetting filed permission")
+    @Parameters({
+            @Parameter(name = "dstId", description = "table id", required = true,
+                    schema = @Schema(type = "string"), in = ParameterIn.PATH, example = "dstGxznHFXf9pvF1LZ"),
+            @Parameter(name = "fieldId", description = "field id", required = true,
+                    schema = @Schema(type = "string"), in = ParameterIn.PATH, example = "fldB7uWmwYrQf")
+    })
+    public ResponseData<Void> updateRoleSetting(@PathVariable("dstId") @NodeMatch String dstId,
+                                              @PathVariable("fieldId") String fieldId,
+                                              @RequestBody FieldControlProp fieldControlProp) {
+        Long userId = SessionContext.getUserId();
+        ControlIdBuilder.ControlId controlId = ControlIdBuilder.fieldId(dstId, fieldId);
+        iFieldRoleService.updateFieldRoleProp(userId, controlId.toString(), fieldControlProp);
         return ResponseData.success();
     }
 
