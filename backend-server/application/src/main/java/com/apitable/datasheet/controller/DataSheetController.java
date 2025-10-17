@@ -102,6 +102,21 @@ public class DataSheetController {
         return ResponseData.success();
     }
 
+    @PostResource(path = "/{dstId}/field/{fieldId}/permission/disable", requiredPermission = false)
+    @Operation(summary = "disable filed permission")
+    @Parameters({
+            @Parameter(name = "dstId", description = "table id", required = true,
+                    schema = @Schema(type = "string"), in = ParameterIn.PATH, example = "dstGxznHFXf9pvF1LZ"),
+            @Parameter(name = "fieldId", description = "field id", required = true,
+                    schema = @Schema(type = "string"), in = ParameterIn.PATH, example = "fldB7uWmwYrQf")
+    })
+    public ResponseData<Void> disableFiledPermission(@PathVariable("dstId") @NodeMatch String dstId,
+                                                              @PathVariable("fieldId") String fieldId) {
+        Long userId = SessionContext.getUserId();
+        iFieldRoleService.disableFieldRole(userId, dstId, fieldId);
+        return ResponseData.success();
+    }
+
     @GetResource(path = "/field/permission", requiredPermission = false)
     @Operation(summary = "list collaborator paged")
     @Parameters({

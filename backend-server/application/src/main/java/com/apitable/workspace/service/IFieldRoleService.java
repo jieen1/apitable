@@ -96,6 +96,19 @@ public interface IFieldRoleService {
      */
     void enableFieldRole(Long userId, String dstId, String fldId, boolean includeExtend);
 
+
+    /**
+     * close field permissions.
+     * </p>
+     * includeExtend Whether to inherit the default role organization unit list after field permissions are enabled.
+     * Default role organization unit list: the datasheet, the parent node of the datasheet, or the role organization unit of the root department.
+     *
+     * @param userId        user id
+     * @param dstId         datasheet id
+     * @param fldId         field id
+     */
+    void disableFieldRole(Long userId, String dstId, String fldId);
+
     /**
      * add field permission role.
      *

@@ -87,11 +87,11 @@ import com.apitable.workspace.vo.FieldRole;
 import com.apitable.workspace.vo.FieldRoleMemberVo;
 import com.apitable.workspace.vo.FieldRoleSetting;
 import com.apitable.workspace.vo.NodeRoleMemberVo;
-import com.apitable.workspace.vo.NodeRoleUnit;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -415,6 +415,16 @@ public class FieldRoleServiceImpl implements IFieldRoleService {
             }
         }
 
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void disableFieldRole(Long userId, String dstId, String fldId) {
+        ControlId controlId = ControlIdBuilder.fieldId(dstId, fldId);
+        ControlEntity existEntity = iControlService.getByControlId(controlId.toString());
+        if (existEntity != null) {
+            iControlService.removeControl(userId, Lists.newArrayList(controlId.toString()), true);
+        }
     }
 
     @Override
