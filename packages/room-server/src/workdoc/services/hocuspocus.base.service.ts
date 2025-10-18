@@ -17,6 +17,7 @@
  */
 
 import { Hocuspocus } from '@hocuspocus/server';
+import { Database } from '@hocuspocus/extension-database';
 import { Injectable } from '@nestjs/common';
 import { getIPAddress } from 'shared/helpers/system.helper';
 
@@ -41,9 +42,84 @@ export class HocuspocusService extends HocuspocusBaseService {
     return new Hocuspocus({
       name: getIPAddress(),
       port,
+      
       async onListen(data) {
         console.log(`Hocuspocus server[${data.configuration.name}] is listening on port "${data.port}"!`);
       },
+
+      // 认证
+      async onAuthenticate(data) {
+        const { requestParameters } = data;
+        const userId = requestParameters.get('userId');
+        const resourceId = requestParameters.get('resourceId');
+        const fieldId = requestParameters.get('fieldId');
+        const recordId = requestParameters.get('recordId');
+
+        console.log('[Hocuspocus] Authentication:', { userId, resourceId, fieldId, recordId });
+
+        // 基础验证
+        if (!userId || !resourceId || !fieldId) {
+          throw new Error('Missing required parameters');
+        }
+
+        // TODO: 这里可以添加权限验证逻辑
+        // 例如：检查用户是否有权限访问该文档
+
+        return {
+          user: {
+            id: userId,
+            name: userId,
+          },
+        };
+      },
+
+      // 连接建立
+      async onConnect(data) {
+        const { documentName, requestParameters } = data;
+        console.log('[Hocuspocus] Client connected:', {
+          documentName,
+          userId: requestParameters.get('userId'),
+          resourceId: requestParameters.get('resourceId'),
+        });
+      },
+
+      // 连接断开
+      async onDisconnect(data) {
+        const { documentName } = data;
+        console.log('[Hocuspocus] Client disconnected:', { documentName });
+      },
+
+      // 文档变更
+      async onChange(data) {
+        const { documentName } = data;
+        console.log('[Hocuspocus] Document changed:', { documentName });
+      },
+
+      // 扩展
+      extensions: [
+        // 数据库扩展 - 用于持久化文档
+        new Database({
+          // 从数据库加载文档
+          fetch: async ({ documentName }) => {
+            console.log('[Hocuspocus] Fetching document:', documentName);
+            
+            // TODO: 从数据库加载文档内容
+            // 返回 Uint8Array 格式的 Y.js 文档状态
+            // 如果文档不存在，返回 null，Hocuspocus 会创建新文档
+            
+            return null;
+          },
+
+          // 保存文档到数据库
+          store: async ({ documentName, state }) => {
+            console.log('[Hocuspocus] Storing document:', documentName, 'size:', state.byteLength);
+            
+            // TODO: 将文档保存到数据库
+            // state 是 Uint8Array 格式的 Y.js 文档状态
+            // 需要存储到对应的 datasheet/field/record 中
+          },
+        }),
+      ],
     });
   }
 }

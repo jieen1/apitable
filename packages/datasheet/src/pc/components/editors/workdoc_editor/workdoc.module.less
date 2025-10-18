@@ -1,0 +1,116 @@
+.workdoc {
+  :global {
+    .ant-drawer-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--lineColor);
+    }
+
+    .ant-drawer-body {
+      padding: 16px 24px;
+      height: calc(100% - 120px);
+      overflow: hidden;
+    }
+
+    .ant-drawer-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--lineColor);
+    }
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 16px;
+
+  .status {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    white-space: nowrap;
+
+    .connecting,
+    .connected,
+    .disconnected,
+    .error {
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .connecting {
+      color: var(--warningColor);
+      background-color: rgba(255, 152, 0, 0.1);
+    }
+
+    .connected {
+      color: var(--successColor);
+      background-color: rgba(76, 175, 80, 0.1);
+    }
+
+    .disconnected,
+    .error {
+      color: var(--dangerColor);
+      background-color: rgba(244, 67, 54, 0.1);
+    }
+  }
+
+  .titleSection {
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--textColor);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    &:hover {
+      color: var(--primaryColor);
+    }
+  }
+
+  .titleInput {
+    width: 100%;
+
+    :global {
+      .ant-input {
+        font-size: 16px;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .editIcon {
+    opacity: 0.6;
+    font-size: 14px;
+  }
+
+  .closeBtn {
+    color: var(--textColor);
+    padding: 4px;
+
+    &:hover {
+      background-color: var(--bgControlsElevateDefault);
+    }
+  }
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.editorContainer {
+  height: 100%;
+  border: 1px solid var(--lineColor);
+  border-radius: 4px;
+  background-color: var(--defaultBg);
+}

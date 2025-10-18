@@ -3,8 +3,7 @@ import * as React from 'react';
 import { forwardRef, memo, useImperativeHandle } from 'react';
 import { ICellValue } from '@apitable/core';
 import { IBaseEditorProps, IEditor } from '../interface';
-// @ts-ignore
-import { Workdoc } from 'enterprise/editor/workdoc';
+import { Workdoc } from './workdoc';
 
 export interface IWorkdocEditorProps extends IBaseEditorProps {
   editable: boolean;

@@ -5,8 +5,7 @@ import { IconButton } from '@apitable/components';
 import { ICellValue, IField, Strings, t } from '@apitable/core';
 import { AddOutlined, FileOutlined } from '@apitable/icons';
 import { IEditor } from 'pc/components/editors/interface';
-// @ts-ignore
-import { Workdoc } from 'enterprise/editor/workdoc/workdoc';
+import { Workdoc } from 'pc/components/editors/workdoc_editor/workdoc';
 import styles from './styles.module.less';
 
 interface IWorkdocProps {
