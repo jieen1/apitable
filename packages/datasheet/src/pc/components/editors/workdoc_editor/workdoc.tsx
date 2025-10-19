@@ -259,6 +259,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       }, 500);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [documentValue, autoSave]);
 
   const documentTitle = useMemo(() => {
