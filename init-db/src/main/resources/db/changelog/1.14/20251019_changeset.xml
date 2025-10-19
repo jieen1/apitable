@@ -1,0 +1,50 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<!--
+ APITable <https://github.com/apitable/apitable>
+ Copyright (C) 2022 APITable Ltd. <https://apitable.com>
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+	  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="V1.14-20251019-001" author="jieen" labels="workdoc">
+        <comment>Create workdoc document table</comment>
+        <sql>
+            CREATE TABLE IF NOT EXISTS `${table.prefix}workdoc_document` (
+            `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
+            `document_id` varchar(50) NOT NULL COMMENT 'Document ID (same as documentId in datasheet cell)',
+            `dst_id` varchar(50) NOT NULL COMMENT 'Datasheet ID',
+            `field_id` varchar(50) NOT NULL COMMENT 'Field ID',
+            `record_id` varchar(50) NOT NULL COMMENT 'Record ID',
+            `title` varchar(255) DEFAULT NULL COMMENT 'Document title',
+            `content` mediumblob COMMENT 'Y.js document state (Uint8Array)',
+            `created_by` bigint(20) DEFAULT NULL COMMENT 'Creator user ID',
+            `updated_by` bigint(20) DEFAULT NULL COMMENT 'Last modifier user ID',
+            `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create time',
+            `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
+            `is_deleted` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Delete flag(0:No,1:Yes)',
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `uk_document_id` (`document_id`),
+            KEY `idx_dst_field_record` (`dst_id`, `field_id`, `record_id`),
+            KEY `idx_updated_at` (`updated_at`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='WorkDoc document content storage';
+        </sql>
+        <rollback>
+            <dropTable tableName="${table.prefix}workdoc_document"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
