@@ -20,6 +20,7 @@ import { Hocuspocus, onAuthenticatePayload } from '@hocuspocus/server';
 import { Database } from '@hocuspocus/extension-database';
 import { Injectable } from '@nestjs/common';
 import { getIPAddress } from 'shared/helpers/system.helper';
+import { WorkdocDocumentRepository } from 'database/workdoc/repositories/workdoc.document.repository';
 
 @Injectable()
 export abstract class HocuspocusBaseService {
@@ -34,11 +35,14 @@ export abstract class HocuspocusBaseService {
 @Injectable()
 export class HocuspocusService extends HocuspocusBaseService {
 
-  constructor() {
+  constructor(
+    private readonly workdocDocumentRepository: WorkdocDocumentRepository,
+  ) {
     super();
   }
 
   override init(port: number): Hocuspocus {
+    const self = this;
     return new Hocuspocus({
       name: getIPAddress(),
       port,
@@ -103,20 +107,63 @@ export class HocuspocusService extends HocuspocusBaseService {
           fetch: async ({ documentName }) => {
             console.log('[Hocuspocus] Fetching document:', documentName);
             
-            // TODO: 从数据库加载文档内容
-            // 返回 Uint8Array 格式的 Y.js 文档状态
-            // 如果文档不存在，返回 null，Hocuspocus 会创建新文档
-            
-            return null;
+            try {
+              // documentName 就是 documentId
+              const content = await self.workdocDocumentRepository.getDocumentContent(documentName);
+              
+              if (content) {
+                console.log('[Hocuspocus] Document loaded from database, size:', content.byteLength);
+                return content;
+              }
+              
+              console.log('[Hocuspocus] Document not found in database, will create new');
+              return null;
+            } catch (error) {
+              console.error('[Hocuspocus] Error fetching document:', error);
+              return null;
+            }
           },
 
           // 保存文档到数据库
-          store: async ({ documentName, state }) => {
+          store: async ({ documentName, state, requestParameters }) => {
             console.log('[Hocuspocus] Storing document:', documentName, 'size:', state.byteLength);
             
-            // TODO: 将文档保存到数据库
-            // state 是 Uint8Array 格式的 Y.js 文档状态
-            // 需要存储到对应的 datasheet/field/record 中
+            try {
+              const userId = requestParameters?.get('userId');
+              const resourceId = requestParameters?.get('resourceId');
+              const fieldId = requestParameters?.get('fieldId');
+              const recordId = requestParameters?.get('recordId');
+              const title = requestParameters?.get('title') || '';
+              
+              // 检查文档是否已存在
+              const existing = await self.workdocDocumentRepository.findByDocumentId(documentName);
+              
+              if (existing) {
+                // 更新现有文档
+                await self.workdocDocumentRepository.saveDocumentContent(
+                  documentName,
+                  state,
+                  userId || undefined
+                );
+                console.log('[Hocuspocus] Document content updated');
+              } else if (resourceId && fieldId && recordId) {
+                // 创建新文档
+                await self.workdocDocumentRepository.saveDocument({
+                  documentId: documentName,
+                  dstId: resourceId,
+                  fieldId,
+                  recordId,
+                  title,
+                  content: Buffer.from(state),
+                  updatedBy: userId || undefined,
+                });
+                console.log('[Hocuspocus] New document created');
+              } else {
+                console.warn('[Hocuspocus] Missing location parameters, cannot save document');
+              }
+            } catch (error) {
+              console.error('[Hocuspocus] Error storing document:', error);
+            }
           },
         }),
       ],

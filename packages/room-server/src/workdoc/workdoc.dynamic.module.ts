@@ -20,6 +20,7 @@ import { DynamicModule, Module } from '@nestjs/common';
 import path from 'path';
 import * as fs from 'fs';
 import { HocuspocusBaseService, HocuspocusService } from './services/hocuspocus.base.service';
+import { WorkdocDatabaseModule } from 'database/workdoc/workdoc.database.module';
 
 @Module({
 })
@@ -42,6 +43,7 @@ export class WorkDocDynamicModule {
 }
 
 @Module({
+  imports: [WorkdocDatabaseModule],
   providers: [
     {
       provide: HocuspocusBaseService,

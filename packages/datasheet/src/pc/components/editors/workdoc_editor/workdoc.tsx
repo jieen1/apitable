@@ -31,7 +31,6 @@ import { Status } from './interface';
 import styles from './workdoc.module.less';
 
 interface IWorkDocCellValue extends IWorkDocValue {
-  content?: any;
 }
 
 interface IWorkdocProps {
@@ -62,19 +61,16 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     if (value && Array.isArray(value) && value.length > 0) {
       return value;
     }
-    // 创建新文档的初始值
+    // 创建新文档的初始值（只包含documentId和title）
     return [{
       documentId: generateId(),
       title: '',
-      content: createDefaultContent()
     }];
   });
 
+  // 编辑器内容状态（不保存到datasheet，通过Hocuspocus同步）
   const [editorContent, setEditorContent] = useState(() => {
-    const value = cellValue as IWorkDocCellValue[];
-    if (value && Array.isArray(value) && value.length > 0 && value[0].content) {
-      return value[0].content;
-    }
+    // 总是从默认内容开始，实际内容通过Hocuspocus加载
     return createDefaultContent();
   });
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -91,9 +87,9 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     const value = cellValue as IWorkDocCellValue[];
     if (value && Array.isArray(value) && value.length > 0) {
       setDocumentValue(value);
-      setEditorContent(value[0]?.content || createDefaultContent());
+      // 编辑器内容通过Hocuspocus加载，不从cellValue读取
     }
-  }, [cellValue, createDefaultContent]);
+  }, [cellValue]);
 
   // Hocuspocus Provider 连接管理
   useEffect(() => {
@@ -170,17 +166,8 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     const observer = () => {
       const content = sharedType.get('content');
       if (content) {
-        console.log('[Hocuspocus] Document updated from remote');
+        console.log('[Hocuspocus] Document content updated from remote');
         setEditorContent(content);
-        setDocumentValue(prev => {
-          if (prev && prev.length > 0) {
-            return [{
-              ...prev[0],
-              content,
-            }];
-          }
-          return prev;
-        });
       }
     };
     sharedType.observe(observer);
@@ -199,28 +186,17 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     // 更新编辑器内容
     setEditorContent(value.document);
 
-    // 更新文档内容，但保持 documentId 和 title
-    if (documentValue && documentValue.length > 0) {
-      const updatedDoc = [{
-        ...documentValue[0],
-        content: value.document
-      }];
-      setDocumentValue(updatedDoc);
-
-      // 通过 Y.js/Hocuspocus 实时同步内容
-      if (ydocRef.current) {
-        try {
-          const sharedType = ydocRef.current.getMap('document');
-          sharedType.set('content', value.document);
-          sharedType.set('title', documentValue[0].title);
-          sharedType.set('documentId', documentValue[0].documentId);
-          console.log('[Hocuspocus] Document updated locally');
-        } catch (error) {
-          console.error('[Hocuspocus] Failed to update document:', error);
-        }
+    // 通过 Y.js/Hocuspocus 实时同步内容到后端
+    if (ydocRef.current) {
+      try {
+        const sharedType = ydocRef.current.getMap('document');
+        sharedType.set('content', value.document);
+        console.log('[Hocuspocus] Document content updated locally');
+      } catch (error) {
+        console.error('[Hocuspocus] Failed to update document:', error);
       }
     }
-  }, [documentValue]);
+  }, []);
 
   const handleTitleChange = useCallback((newTitle: string) => {
     if (documentValue && documentValue.length > 0) {
@@ -253,16 +229,30 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     toggleEditing?.(false);
   }, [toggleEditing]);
 
-  const handleSave = useCallback(() => {
-    // 确保文档数据是最新的
-    const updatedDocumentValue = documentValue && documentValue.length > 0 ? [{
-      ...documentValue[0],
-      content: editorContent
-    }] : documentValue;
+  // 自动保存文档元数据到datasheet
+  const autoSave = useCallback(() => {
+    if (!documentValue || documentValue.length === 0) return;
+    
+    const saveValue: IWorkDocValue[] = [{
+      documentId: documentValue[0].documentId,
+      title: documentValue[0].title,
+    }];
 
-    onSave?.(updatedDocumentValue);
-    toggleEditing?.(false);
-  }, [documentValue, editorContent, onSave, toggleEditing]);
+    console.log('[WorkDoc] Auto-saving document metadata:', saveValue);
+    onSave?.(saveValue);
+  }, [documentValue, onSave]);
+
+  // 当documentValue变化时自动保存
+  useEffect(() => {
+    // 只有在documentId存在时才保存（避免初始化时保存）
+    if (documentValue && documentValue.length > 0 && documentValue[0].documentId) {
+      // 延迟保存，避免频繁调用
+      const timer = setTimeout(() => {
+        autoSave();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [documentValue, autoSave]);
 
   const documentTitle = useMemo(() => {
     return documentValue?.[0]?.title || '未命名文档';
@@ -323,20 +313,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
           />
         </div>
       }
-      footer={
-        <div className={styles.footer}>
-          <Button onClick={handleClose}>
-            取消
-          </Button>
-          <Button
-            color="primary"
-            onClick={handleSave}
-            disabled={!editable}
-          >
-            保存
-          </Button>
-        </div>
-      }
+      footer={null}
     >
       <div className={styles.editorContainer}>
         <SlateEditor
