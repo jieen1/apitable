@@ -127,6 +127,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       url: `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/document`,
       name: documentId, // 文档名称/ID
       document: ydoc,
+      token: documentId,
       parameters: {
         userId: userInfo.uuid,
         resourceId: datasheetId,

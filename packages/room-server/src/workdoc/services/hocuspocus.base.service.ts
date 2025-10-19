@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Hocuspocus } from '@hocuspocus/server';
+import { Hocuspocus, onAuthenticatePayload } from '@hocuspocus/server';
 import { Database } from '@hocuspocus/extension-database';
 import { Injectable } from '@nestjs/common';
 import { getIPAddress } from 'shared/helpers/system.helper';
@@ -48,14 +48,14 @@ export class HocuspocusService extends HocuspocusBaseService {
       },
 
       // 认证
-      async onAuthenticate(data) {
-        const { requestParameters } = data;
+      async onAuthenticate(data: onAuthenticatePayload) {
+        const { requestParameters, token } = data;
         const userId = requestParameters.get('userId');
         const resourceId = requestParameters.get('resourceId');
         const fieldId = requestParameters.get('fieldId');
         const recordId = requestParameters.get('recordId');
 
-        console.log('[Hocuspocus] Authentication:', { userId, resourceId, fieldId, recordId });
+        console.log('[Hocuspocus] Authentication:', { userId, resourceId, fieldId, recordId, token });
 
         // 基础验证
         if (!userId || !resourceId || !fieldId) {
