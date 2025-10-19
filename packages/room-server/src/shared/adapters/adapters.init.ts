@@ -282,7 +282,8 @@ export const initRedisIoAdapter = (app: INestApplication) => {
   return app;
 };
 
-export const initHocuspocus = (app: INestApplication) => {
+export const initHocuspocus = (logger: LoggerService, app: INestApplication) => {
+  logger.log(`hocuspocus port is [${GatewayConstants.DOCUMENT_PORT}], enableHocuspocus is [${enableHocuspocus}]`, 'Bootstrap');
   if (!enableHocuspocus) {
     return;
   }

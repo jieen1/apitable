@@ -76,7 +76,7 @@ async function bootstrap() {
   initRoomGrpc(logger, app);
   initSocketGrpc(logger, app);
 
-  initHocuspocus(app);
+  initHocuspocus(logger, app);
 
   await app.startAllMicroservices();
   // eslint-disable-next-line react-hooks/rules-of-hooks
