@@ -59,9 +59,10 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
   const [documentValue, setDocumentValue] = useState<IWorkDocCellValue[]>(() => {
     const value = cellValue as IWorkDocCellValue[];
     if (value && Array.isArray(value) && value.length > 0) {
+      // 已有文档，使用现有的documentId和title
       return value;
     }
-    // 创建新文档的初始值（只包含documentId和title）
+    // 新建文档，生成新的documentId
     return [{
       documentId: generateId(),
       title: '',
@@ -69,10 +70,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
   });
 
   // 编辑器内容状态（不保存到datasheet，通过Hocuspocus同步）
-  const [editorContent, setEditorContent] = useState(() => {
-    // 总是从默认内容开始，实际内容通过Hocuspocus加载
-    return createDefaultContent();
-  });
+  const [editorContent, setEditorContent] = useState(() => createDefaultContent());
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const titleInputRef = useRef<InputRef>(null);
 
@@ -156,6 +154,15 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       },
       onSynced: () => {
         console.log('[Hocuspocus] Document synced');
+        // 同步完成后，从Y.js加载初始内容
+        if (ydocRef.current) {
+          const sharedType = ydocRef.current.getMap('document');
+          const content = sharedType.get('content');
+          if (content) {
+            console.log('[Hocuspocus] Loading initial document content');
+            setEditorContent(content as any);
+          }
+        }
       },
     });
 
@@ -167,7 +174,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       const content = sharedType.get('content');
       if (content) {
         console.log('[Hocuspocus] Document content updated from remote');
-        setEditorContent(content);
+        setEditorContent(content as any);
       }
     };
     sharedType.observe(observer);
