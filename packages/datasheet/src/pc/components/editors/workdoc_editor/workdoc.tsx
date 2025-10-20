@@ -112,21 +112,6 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     }
 
     const { documentId, title } = documentMeta;
-    
-    // 准备认证token
-    // 优先级：userInfo.token > cookie token > documentId
-    const authToken = (() => {
-      if (userInfo.token) return userInfo.token;
-      // 尝试从cookie或localStorage获取token
-      const cookieToken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('token='))
-        ?.split('=')[1];
-      if (cookieToken) return cookieToken;
-      // fallback: 使用documentId作为临时token
-      console.warn('[Hocuspocus] No auth token found, using documentId as fallback');
-      return documentId;
-    })();
 
     console.log('[Hocuspocus] Connecting...', {
       userId: userInfo.uuid,
@@ -136,7 +121,6 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       documentId,
       title,
       cellKey,
-      hasAuthToken: authToken !== documentId,
       cellValue: cellValue ? 'exists' : 'empty',
       isNewDocument: !cellValue || (cellValue as IWorkDocCellValue[]).length === 0,
     });
@@ -150,7 +134,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       url: `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/document`,
       name: documentId, // 文档名称/ID
       document: ydoc,
-      token: authToken,
+      token: documentId,
       parameters: {
         userId: userInfo.uuid,
         resourceId: datasheetId,
@@ -180,11 +164,6 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       },
       onAuthenticationFailed: ({ reason }) => {
         console.error('[Hocuspocus] Authentication failed:', reason);
-        console.error('[Hocuspocus] Debug info:', {
-          documentId,
-          hasUserToken: !!userInfo.token,
-          tokenLength: authToken?.length,
-        });
         setStatus(Status.Error);
       },
       onSynced: () => {
