@@ -20,7 +20,7 @@ target "backend-server" {
   args = {
     SEMVER_FULL = SEMVER_FULL
   }
-  platforms = ["linux/amd64", "linux/arm64"]
+  platforms = ["linux/amd64"]
   tags = ["${IMAGE_REGISTRY}/jieen1/backend-server:latest", "${IMAGE_REGISTRY}/jieen1/backend-server:${IMAGE_TAG}"]
 }
 
@@ -30,7 +30,7 @@ target "room-server" {
   args = {
     SEMVER_FULL = SEMVER_FULL
   }
-  platforms = ["linux/amd64", "linux/arm64"]
+  platforms = ["linux/amd64"]
   tags = ["${IMAGE_REGISTRY}/jieen1/room-server:latest", "${IMAGE_REGISTRY}/jieen1/room-server:${IMAGE_TAG}"]
 }
 
@@ -51,7 +51,7 @@ target "web-server-experimental" {
   args = {
     SEMVER_FULL = SEMVER_FULL
   }
-  platforms = ["linux/amd64", "linux/arm64"]
+  platforms = ["linux/amd64"]
   tags = ["${IMAGE_REGISTRY}/jieen1/web-server:latest", "${IMAGE_REGISTRY}/jieen1/web-server:${IMAGE_TAG}"]
 }
 
@@ -61,7 +61,7 @@ target "init-db" {
   args = {
     SEMVER_FULL = SEMVER_FULL
   }
-  platforms = ["linux/amd64", "linux/arm64"]
+  platforms = ["linux/amd64"]
   tags = ["${IMAGE_REGISTRY}/jieen1/init-db:latest", "${IMAGE_REGISTRY}/jieen1/init-db:${IMAGE_TAG}"]
 }
 
@@ -71,7 +71,7 @@ target "openresty" {
   args = {
     SEMVER_FULL = SEMVER_FULL
   }
-  platforms = ["linux/amd64", "linux/arm64"]
+  platforms = ["linux/amd64"]
   tags = ["${IMAGE_REGISTRY}/jieen1/openresty:latest", "${IMAGE_REGISTRY}/jieen1/openresty:${IMAGE_TAG}"]
 }
 
