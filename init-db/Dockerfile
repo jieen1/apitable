@@ -16,14 +16,14 @@
 
 FROM liquibase/liquibase:4.21.1
 RUN lpm add mysql --global
-ADD src/main/resources /liquibase/changelog
+ADD src/main/resources /liquibase
 
 ARG SEMVER_FULL
 ENV SEMVER_FULL=${SEMVER_FULL}
 
 CMD ["sh", "-c", "echo \"clearChecksums\"; \
                     docker-entrypoint.sh \
-                        --classpath=/liquibase/changelog \
+                        --classpath=/liquibase \
                         --changelog-file=${CHANGELOG_FILE:=db/changelog/db.changelog-master.xml} \
                         --log-level=warning \
                         --username=${DB_USERNAME} \
@@ -34,7 +34,7 @@ CMD ["sh", "-c", "echo \"clearChecksums\"; \
                         --url=\"jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?characterEncoding=utf8&autoReconnect=true&useSSL=true\" \
                          clearChecksums; \
                     echo ACTION=${ACTION}; docker-entrypoint.sh \
-                        --classpath=/liquibase/changelog \
+                        --classpath=/liquibase \
                         --changelog-file=${CHANGELOG_FILE:=db/changelog/db.changelog-master.xml} \
                         --log-level=debug \
                         --username=${DB_USERNAME} \
