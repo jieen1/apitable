@@ -245,6 +245,9 @@ buildpush-docker: ## build all and push all to hub.docker.io registry
 	echo $$APITABLE_DOCKER_HUB_TOKEN | docker login -u jieen1 --password-stdin;\
 	$(BUILDER) $(target) --push
 
+buildlocal-docker:
+	$(BUILDER) $(target)
+
 .PHONY: build
 build-docker: ## build all containers
 	$(BUILDER) $(target) --load

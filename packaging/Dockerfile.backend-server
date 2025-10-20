@@ -1,4 +1,4 @@
-FROM amazoncorretto:17 AS builder
+FROM docker.1ms.run/amazoncorretto:17 AS builder
 
 WORKDIR /app
 COPY ./backend-server/. .
@@ -6,7 +6,7 @@ RUN ./gradlew -v
 RUN ./gradlew build -x test
 
 
-FROM amazoncorretto:17
+FROM docker.1ms.run/amazoncorretto:17
 
 ARG SEMVER_FULL
 ENV SEMVER_FULL=${SEMVER_FULL}

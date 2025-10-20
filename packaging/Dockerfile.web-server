@@ -1,5 +1,5 @@
 # Install dependencies only when needed
-FROM apitable/nodepy:16.15.0-alpine AS deps
+FROM docker.1ms.run/apitable/nodepy:16.15.0-alpine AS deps
 
 RUN npm install -g pnpm@8.13.1
 
@@ -25,7 +25,7 @@ COPY packages/datasheet/package.json ./packages/datasheet/
 RUN pnpm install
 
 # stage builder
-FROM apitable/nodepy:16.15.0-alpine AS builder
+FROM docker.1ms.run/apitable/nodepy:16.15.0-alpine AS builder
 
 ARG SEMVER_FULL="v0.0.0-alpha"
 ARG NEXT_ASSET_PREFIX=""
@@ -60,7 +60,7 @@ RUN pnpm --version
 RUN pnpm run build:dst
 
 # stage runner
-FROM apitable/nodepy:16.15.0-alpine AS runner
+FROM docker.1ms.run/apitable/nodepy:16.15.0-alpine AS runner
 
 WORKDIR /app
 
