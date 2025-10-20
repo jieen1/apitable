@@ -19,11 +19,10 @@
 import React, { useCallback, useState, useMemo, useRef, useEffect } from 'react';
 import { HocuspocusProvider } from '@hocuspocus/provider';
 import * as Y from 'yjs';
-import { Button } from '@apitable/components';
 import { Input, InputRef } from 'antd';
 import { Drawer } from 'antd';
 import { ICellValue, Strings, t, IWorkDocValue } from '@apitable/core';
-import { CloseOutlined, EditOutlined } from '@apitable/icons';
+import { EditOutlined } from '@apitable/icons';
 import { SlateEditor } from 'pc/components/slate_editor';
 import { GENERATOR, generateId } from 'pc/components/slate_editor/elements';
 import { useAppSelector } from 'pc/store/react-redux';
@@ -56,38 +55,34 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     return [GENERATOR.paragraph({})];
   }, []);
 
-  const [documentValue, setDocumentValue] = useState<IWorkDocCellValue[]>(() => {
+  const documentMeta = useMemo(() => {
     const value = cellValue as IWorkDocCellValue[];
     if (value && Array.isArray(value) && value.length > 0) {
-      // 已有文档，使用现有的documentId和title
-      return value;
+      return value[0];
     }
-    // 新建文档，生成新的documentId
-    return [{
+    // 新建文档时生成 documentId（只在首次渲染时生成）
+    return {
       documentId: generateId(),
       title: '',
-    }];
-  });
+    };
+  }, [cellValue]);
 
+  // 当前编辑的标题（本地状态，仅在编辑时使用）
+  const [localTitle, setLocalTitle] = useState('');
+  
   // 编辑器内容状态（不保存到datasheet，通过Hocuspocus同步）
   const [editorContent, setEditorContent] = useState(() => createDefaultContent());
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const titleInputRef = useRef<InputRef>(null);
 
+  // 当开始编辑标题时，初始化本地标题值
   useEffect(() => {
-    if (isEditingTitle && titleInputRef.current) {
-      titleInputRef.current.focus();
-      titleInputRef.current.select();
+    if (isEditingTitle) {
+      setLocalTitle(documentMeta.title || '');
+      titleInputRef.current?.focus();
+      titleInputRef.current?.select();
     }
-  }, [isEditingTitle]);
-
-  useEffect(() => {
-    const value = cellValue as IWorkDocCellValue[];
-    if (value && Array.isArray(value) && value.length > 0) {
-      setDocumentValue(value);
-      // 编辑器内容通过Hocuspocus加载，不从cellValue读取
-    }
-  }, [cellValue]);
+  }, [isEditingTitle, documentMeta.title]);
 
   // Hocuspocus Provider 连接管理
   useEffect(() => {
@@ -101,8 +96,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       return;
     }
 
-    const documentId = documentValue?.[0]?.documentId || generateId();
-    const title = documentValue?.[0]?.title || '';
+    const { documentId, title } = documentMeta;
     
     console.log('[Hocuspocus] Connecting...', {
       userId: userInfo.uuid,
@@ -110,6 +104,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       fieldId,
       recordId,
       documentId,
+      title,
     });
 
     // 创建 Y.js 文档
@@ -187,7 +182,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       providerRef.current = null;
       ydocRef.current = null;
     };
-  }, [editing, recordId, fieldId, datasheetId, userInfo]);
+  }, [editing, recordId, fieldId, datasheetId, userInfo, documentMeta]);
 
   const handleEditorChange = useCallback((value: { document: any; meta: any }) => {
     // 更新编辑器内容
@@ -205,66 +200,63 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     }
   }, []);
 
-  const handleTitleChange = useCallback((newTitle: string) => {
-    if (documentValue && documentValue.length > 0) {
-      setDocumentValue([{
-        ...documentValue[0],
-        title: newTitle
-      }]);
-    }
-  }, [documentValue]);
+  // 保存文档元数据到 datasheet
+  const saveDocumentMeta = useCallback((title: string) => {
+    const saveValue: IWorkDocValue[] = [{
+      documentId: documentMeta.documentId,
+      title: title || documentMeta.title || '',
+    }];
 
+    console.log('[WorkDoc] Saving document metadata:', saveValue);
+    onSave?.(saveValue);
+  }, [documentMeta, onSave]);
+
+  // 标题编辑相关
   const handleTitleEdit = useCallback(() => {
     setIsEditingTitle(true);
   }, []);
 
   const handleTitleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    handleTitleChange(e.target.value);
-  }, [handleTitleChange]);
+    setLocalTitle(e.target.value);
+  }, []);
+
+  const handleTitleSave = useCallback(() => {
+    setIsEditingTitle(false);
+    // 只有标题发生变化时才保存
+    if (localTitle !== documentMeta.title) {
+      saveDocumentMeta(localTitle);
+    }
+  }, [localTitle, documentMeta.title, saveDocumentMeta]);
 
   const handleTitleInputBlur = useCallback(() => {
-    setIsEditingTitle(false);
-  }, []);
+    handleTitleSave();
+  }, [handleTitleSave]);
 
   const handleTitleInputKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
+      handleTitleSave();
+    } else if (e.key === 'Escape') {
+      // ESC 取消编辑，恢复原标题
       setIsEditingTitle(false);
     }
-  }, []);
+  }, [handleTitleSave]);
 
   const handleClose = useCallback(() => {
-    toggleEditing?.(false);
-  }, [toggleEditing]);
-
-  // 自动保存文档元数据到datasheet
-  const autoSave = useCallback(() => {
-    if (!documentValue || documentValue.length === 0) return;
-    
-    const saveValue: IWorkDocValue[] = [{
-      documentId: documentValue[0].documentId,
-      title: documentValue[0].title,
-    }];
-
-    console.log('[WorkDoc] Auto-saving document metadata:', saveValue);
-    onSave?.(saveValue);
-  }, [documentValue, onSave]);
-
-  // 当documentValue变化时自动保存
-  useEffect(() => {
-    // 只有在documentId存在时才保存（避免初始化时保存）
-    if (documentValue && documentValue.length > 0 && documentValue[0].documentId) {
-      // 延迟保存，避免频繁调用
-      const timer = setTimeout(() => {
-        autoSave();
-      }, 500);
-      return () => clearTimeout(timer);
+    // 关闭时确保文档元数据已保存（对于新建文档）
+    if (!cellValue || (cellValue as IWorkDocCellValue[]).length === 0) {
+      const currentTitle = isEditingTitle ? localTitle : documentMeta.title;
+      saveDocumentMeta(currentTitle || '');
     }
-    return undefined;
-  }, [documentValue, autoSave]);
+    toggleEditing?.(false);
+  }, [toggleEditing, cellValue, documentMeta, localTitle, isEditingTitle, saveDocumentMeta]);
 
+  // 当前显示的标题
   const documentTitle = useMemo(() => {
-    return documentValue?.[0]?.title || '未命名文档';
-  }, [documentValue]);
+    if (isEditingTitle) {
+      return localTitle;
+    }
+    return documentMeta.title || '未命名文档';
+  }, [isEditingTitle, localTitle, documentMeta.title]);
 
   if (!editing) {
     return null;
@@ -313,12 +305,6 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
               </span>
             )}
           </div>
-          <Button
-            type="button"
-            prefixIcon={<CloseOutlined />}
-            onClick={handleClose}
-            className={styles.closeBtn}
-          />
         </div>
       }
       footer={null}
