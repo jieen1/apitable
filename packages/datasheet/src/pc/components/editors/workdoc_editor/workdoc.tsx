@@ -51,41 +51,39 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
   const providerRef = useRef<HocuspocusProvider | null>(null);
   const ydocRef = useRef<Y.Doc | null>(null);
   
-  // 为新建文档生成稳定的documentId
-  // 使用 recordId + fieldId 作为key，确保每个单元格有唯一的ID
-  const cellKey = `${recordId}-${fieldId}`;
-  const newDocumentIdRef = useRef<{ key: string; id: string }>({ 
-    key: cellKey, 
-    id: generateId() 
-  });
-  
-  // 如果单元格变了（打开了不同的单元格），重新生成documentId
-  if (newDocumentIdRef.current.key !== cellKey) {
-    newDocumentIdRef.current = { 
-      key: cellKey, 
-      id: generateId() 
-    };
-  }
-  
   const createDefaultContent = useCallback(() => {
     return [GENERATOR.paragraph({})];
   }, []);
 
-  const documentMeta = useMemo(() => {
+  const [documentMeta, setDocumentMeta] = useState<IWorkDocCellValue>(() => {
     const value = cellValue as IWorkDocCellValue[];
     if (value && Array.isArray(value) && value.length > 0) {
       return value[0];
     }
     return {
-      documentId: newDocumentIdRef.current.id,
+      documentId: generateId(),
       title: '',
     };
+  });
+
+  // 当 cellValue 变化时同步（切换到其他单元格）
+  useEffect(() => {
+    const value = cellValue as IWorkDocCellValue[];
+    if (value && Array.isArray(value) && value.length > 0) {
+      setDocumentMeta(value[0]);
+    }
   }, [cellValue]);
 
-  // 当前编辑的标题（本地状态，仅在编辑时使用）
+  useEffect(() => {
+    if (editing && (!cellValue || (cellValue as IWorkDocCellValue[]).length === 0)) {
+      console.log('[WorkDoc] New document created, saving metadata immediately:', documentMeta);
+      const saveValue: IWorkDocValue[] = [documentMeta];
+      onSave?.(saveValue);
+    }
+  }, [editing]); // 只依赖 editing，在打开编辑器时执行一次
+
   const [localTitle, setLocalTitle] = useState('');
   
-  // 编辑器内容状态（不保存到datasheet，通过Hocuspocus同步）
   const [editorContent, setEditorContent] = useState(() => createDefaultContent());
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const titleInputRef = useRef<InputRef>(null);
@@ -113,16 +111,10 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
 
     const { documentId, title } = documentMeta;
 
-    console.log('[Hocuspocus] Connecting...', {
-      userId: userInfo.uuid,
-      resourceId: datasheetId,
+    console.log('[Hocuspocus] Connecting to document:', documentId, {
+      title,
       fieldId,
       recordId,
-      documentId,
-      title,
-      cellKey,
-      cellValue: cellValue ? 'exists' : 'empty',
-      isNewDocument: !cellValue || (cellValue as IWorkDocCellValue[]).length === 0,
     });
 
     // 创建 Y.js 文档
@@ -261,13 +253,8 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
   }, [handleTitleSave]);
 
   const handleClose = useCallback(() => {
-    // 关闭时确保文档元数据已保存（对于新建文档）
-    if (!cellValue || (cellValue as IWorkDocCellValue[]).length === 0) {
-      const currentTitle = isEditingTitle ? localTitle : documentMeta.title;
-      saveDocumentMeta(currentTitle || '');
-    }
     toggleEditing?.(false);
-  }, [toggleEditing, cellValue, documentMeta, localTitle, isEditingTitle, saveDocumentMeta]);
+  }, [toggleEditing]);
 
   // 当前显示的标题
   const documentTitle = useMemo(() => {
