@@ -40,7 +40,7 @@ COPY packages/core ./packages/core
 
 COPY packages/room-server ./packages/room-server
 
-RUN pnpm run build:sr
+RUN pnpm config set registry https://registry.npmmirror.com && pnpm run build:sr
 
 ARG KEEP_DEV_DEP
 

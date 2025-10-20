@@ -22,7 +22,7 @@ COPY packages/api-client/package.json ./packages/api-client/
 # datasheet main
 COPY packages/datasheet/package.json ./packages/datasheet/
 
-RUN pnpm install
+RUN pnpm config set registry https://registry.npmmirror.com && pnpm install
 
 # stage builder
 FROM docker.1ms.run/apitable/nodepy:16.15.0-alpine AS builder
