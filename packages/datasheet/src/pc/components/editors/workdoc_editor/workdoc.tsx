@@ -51,6 +51,22 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
   const providerRef = useRef<HocuspocusProvider | null>(null);
   const ydocRef = useRef<Y.Doc | null>(null);
   
+  // 为新建文档生成稳定的documentId
+  // 使用 recordId + fieldId 作为key，确保每个单元格有唯一的ID
+  const cellKey = `${recordId}-${fieldId}`;
+  const newDocumentIdRef = useRef<{ key: string; id: string }>({ 
+    key: cellKey, 
+    id: generateId() 
+  });
+  
+  // 如果单元格变了（打开了不同的单元格），重新生成documentId
+  if (newDocumentIdRef.current.key !== cellKey) {
+    newDocumentIdRef.current = { 
+      key: cellKey, 
+      id: generateId() 
+    };
+  }
+  
   const createDefaultContent = useCallback(() => {
     return [GENERATOR.paragraph({})];
   }, []);
@@ -60,9 +76,8 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     if (value && Array.isArray(value) && value.length > 0) {
       return value[0];
     }
-    // 新建文档时生成 documentId（只在首次渲染时生成）
     return {
-      documentId: generateId(),
+      documentId: newDocumentIdRef.current.id,
       title: '',
     };
   }, [cellValue]);
@@ -98,6 +113,21 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
 
     const { documentId, title } = documentMeta;
     
+    // 准备认证token
+    // 优先级：userInfo.token > cookie token > documentId
+    const authToken = (() => {
+      if (userInfo.token) return userInfo.token;
+      // 尝试从cookie或localStorage获取token
+      const cookieToken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('token='))
+        ?.split('=')[1];
+      if (cookieToken) return cookieToken;
+      // fallback: 使用documentId作为临时token
+      console.warn('[Hocuspocus] No auth token found, using documentId as fallback');
+      return documentId;
+    })();
+
     console.log('[Hocuspocus] Connecting...', {
       userId: userInfo.uuid,
       resourceId: datasheetId,
@@ -105,6 +135,10 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       recordId,
       documentId,
       title,
+      cellKey,
+      hasAuthToken: authToken !== documentId,
+      cellValue: cellValue ? 'exists' : 'empty',
+      isNewDocument: !cellValue || (cellValue as IWorkDocCellValue[]).length === 0,
     });
 
     // 创建 Y.js 文档
@@ -116,13 +150,14 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       url: `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/document`,
       name: documentId, // 文档名称/ID
       document: ydoc,
-      token: documentId,
+      token: authToken,
       parameters: {
         userId: userInfo.uuid,
         resourceId: datasheetId,
         fieldId,
         recordId,
         title,
+        documentId, // 明确传递documentId参数
         documentType: '0',
       },
       onConnect: () => {
@@ -145,6 +180,11 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       },
       onAuthenticationFailed: ({ reason }) => {
         console.error('[Hocuspocus] Authentication failed:', reason);
+        console.error('[Hocuspocus] Debug info:', {
+          documentId,
+          hasUserToken: !!userInfo.token,
+          tokenLength: authToken?.length,
+        });
         setStatus(Status.Error);
       },
       onSynced: () => {
