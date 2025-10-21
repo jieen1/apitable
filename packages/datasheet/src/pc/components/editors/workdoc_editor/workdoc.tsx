@@ -222,11 +222,8 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       isLocalUpdateRef.current = false; // 重置本地更新标记
       currentDocIdRef.current = ''; // 清除文档ID
       
-      // 重置编辑器内容，防止旧内容污染下一个文档
-      console.log('[Hocuspocus] Resetting editor content to default');
-      setEditorContent(createDefaultContent());
     };
-  }, [editing, recordId, fieldId, datasheetId, userInfo, documentMeta, createDefaultContent]);
+  }, [editing, recordId, fieldId, datasheetId, userInfo, documentMeta.documentId, documentMeta.title]);
 
   const handleEditorChange = useCallback((value: { document: any; meta: any }) => {
     // 始终更新本地状态，保持 UI 响应性
