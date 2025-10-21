@@ -50,6 +50,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
   const [status, setStatus] = useState<Status>(Status.Connecting);
   const providerRef = useRef<HocuspocusProvider | null>(null);
   const ydocRef = useRef<Y.Doc | null>(null);
+  const isLocalUpdateRef = useRef<boolean>(false); // 标记是否为本地更新
   
   const createDefaultContent = useCallback(() => {
     return [GENERATOR.paragraph({})];
@@ -161,12 +162,15 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       onSynced: () => {
         console.log('[Hocuspocus] Document synced');
         // 同步完成后，从Y.js加载初始内容
+        // 注意：这里只在文档真正有内容时才加载，避免加载空数据
         if (ydocRef.current) {
           const sharedType = ydocRef.current.getMap('document');
           const content = sharedType.get('content');
-          if (content) {
+          if (content && Array.isArray(content) && content.length > 0) {
             console.log('[Hocuspocus] Loading initial document content', content);
             setEditorContent(content as any);
+          } else {
+            console.log('[Hocuspocus] Document synced but no content yet, waiting for observer');
           }
         }
       },
@@ -177,6 +181,13 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     // 监听文档变化
     const sharedType = ydoc.getMap('document');
     const observer = () => {
+      // 如果是本地更新触发的，跳过处理，避免循环更新
+      if (isLocalUpdateRef.current) {
+        console.log('[Hocuspocus] Skipping observer for local update');
+        isLocalUpdateRef.current = false;
+        return;
+      }
+      
       const content = sharedType.get('content');
       if (content) {
         console.log('[Hocuspocus] Document content updated from remote', content);
@@ -196,17 +207,20 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
   }, [editing, recordId, fieldId, datasheetId, userInfo, documentMeta]);
 
   const handleEditorChange = useCallback((value: { document: any; meta: any }) => {
-    // 更新编辑器内容
     setEditorContent(value.document);
 
     // 通过 Y.js/Hocuspocus 实时同步内容到后端
     if (ydocRef.current) {
       try {
+        // 标记为本地更新，避免 observer 重复处理
+        isLocalUpdateRef.current = true;
+        
         const sharedType = ydocRef.current.getMap('document');
         sharedType.set('content', value.document);
         console.log('[Hocuspocus] Document content updated locally', value.document);
       } catch (error) {
         console.error('[Hocuspocus] Failed to update document:', error);
+        isLocalUpdateRef.current = false; // 发生错误时重置标记
       }
     }
   }, []);
