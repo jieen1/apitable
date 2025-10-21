@@ -153,10 +153,6 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       recordId,
     });
 
-    const newEditorKey = `${documentId}_${Date.now()}`;
-    console.log('[Hocuspocus] Setting new editor key:', newEditorKey);
-    setEditorKey(newEditorKey);
-
     isSyncedRef.current = false;
     isLocalUpdateRef.current = false;
     currentDocIdRef.current = documentId; // 记录当前连接的文档ID
@@ -219,6 +215,11 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
         
         // 在加载内容后才标记为已同步，允许后续的编辑同步
         isSyncedRef.current = true;
+        
+        // 在同步完成且内容加载后才设置编辑器key，确保编辑器创建时已有正确的内容
+        const newEditorKey = `${documentId}_${Date.now()}`;
+        console.log('[Hocuspocus] Setting new editor key after sync:', newEditorKey);
+        setEditorKey(newEditorKey);
       },
     });
 
