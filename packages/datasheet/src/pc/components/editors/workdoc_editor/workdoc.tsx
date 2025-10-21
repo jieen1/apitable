@@ -46,16 +46,6 @@ interface IWorkdocProps {
 export const Workdoc: React.FC<IWorkdocProps> = (props) => {
   const { editing = false, toggleEditing, cellValue, onSave, editable = true, datasheetId, fieldId, recordId } = props;
   
-  // 调试：监控 props 变化
-  useEffect(() => {
-    console.log('[WorkDoc] Props changed:', {
-      editing,
-      cellValue,
-      fieldId,
-      recordId,
-    });
-  }, [editing, cellValue, fieldId, recordId]);
-  
   const userInfo = useAppSelector(state => state.user.info);
   const [status, setStatus] = useState<Status>(Status.Connecting);
   const providerRef = useRef<HocuspocusProvider | null>(null);
@@ -71,58 +61,42 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
 
   const [documentMeta, setDocumentMeta] = useState<IWorkDocCellValue>(() => {
     const value = cellValue as IWorkDocCellValue[];
-    console.log('[WorkDoc] Initializing documentMeta from cellValue:', value);
     if (value && Array.isArray(value) && value.length > 0) {
-      console.log('[WorkDoc] Using existing document:', value[0]);
       return value[0];
     }
     const newMeta = {
       documentId: generateId(),
       title: '',
     };
-    console.log('[WorkDoc] Creating new document:', newMeta);
     return newMeta;
   });
 
-  // 当 cellValue 变化时同步（切换到其他单元格或 cellValue 延迟到达）
   useEffect(() => {
     const value = cellValue as IWorkDocCellValue[];
-    console.log('[WorkDoc] cellValue changed effect triggered:', value, 'current documentMeta:', documentMeta);
     
     if (value && Array.isArray(value) && value.length > 0) {
       const newDocumentMeta = value[0];
-      console.log('[WorkDoc] New documentMeta from cellValue:', newDocumentMeta);
       
       if (newDocumentMeta.documentId !== documentMeta.documentId) {
-        console.log('[WorkDoc] Document ID changed! Old:', documentMeta.documentId, 'New:', newDocumentMeta.documentId);
-        console.log('[WorkDoc] This will trigger reconnection with correct document ID');
         setEditorContent(createDefaultContent());
         isSyncedRef.current = false; // 重置同步状态
       }
       setDocumentMeta(newDocumentMeta);
-    } else {
-      console.log('[WorkDoc] cellValue is empty or invalid, keeping current documentMeta');
     }
   }, [cellValue, documentMeta.documentId, createDefaultContent]);
 
   useEffect(() => {
     if (editing && (!cellValue || (cellValue as IWorkDocCellValue[]).length === 0)) {
-      console.log('[WorkDoc] New document created, saving metadata immediately:', documentMeta);
       const saveValue: IWorkDocValue[] = [documentMeta];
       onSave?.(saveValue);
     }
-  }, [editing]); // 只依赖 editing，在打开编辑器时执行一次
+  }, [editing]);
 
   const [localTitle, setLocalTitle] = useState('');
   
   const [editorContent, setEditorContent] = useState(() => createDefaultContent());
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const titleInputRef = useRef<InputRef>(null);
-
-  // 调试：监控 editorContent 的变化
-  useEffect(() => {
-    console.log('[WorkDoc] editorContent changed:', editorContent, 'for document:', documentMeta.documentId);
-  }, [editorContent, documentMeta.documentId]);
 
   // 当开始编辑标题时，初始化本地标题值
   useEffect(() => {
@@ -135,24 +109,10 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
 
   // Hocuspocus Provider 连接管理
   useEffect(() => {
-    if (!editing || !recordId || !fieldId) {
+    if (!editing || !recordId || !fieldId || !userInfo?.uuid) {
       return;
     }
-
-    // 确保 userInfo 已加载
-    if (!userInfo?.uuid) {
-      console.warn('[Hocuspocus] UserInfo not loaded yet');
-      return;
-    }
-
     const { documentId, title } = documentMeta;
-
-    console.log('[Hocuspocus] Connecting to document:', documentId, {
-      title,
-      fieldId,
-      recordId,
-    });
-
     isSyncedRef.current = false;
     isLocalUpdateRef.current = false;
     currentDocIdRef.current = documentId; // 记录当前连接的文档ID
@@ -164,7 +124,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     // 创建 Hocuspocus Provider
     const provider = new HocuspocusProvider({
       url: `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/document`,
-      name: documentId, // 文档名称/ID
+      name: documentId,
       document: ydoc,
       token: documentId,
       parameters: {
@@ -173,7 +133,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
         fieldId,
         recordId,
         title,
-        documentId, // 明确传递documentId参数
+        documentId,
         documentType: '0',
       },
       onConnect: () => {
@@ -206,45 +166,34 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
           const sharedType = ydocRef.current.getMap('document');
           const content = sharedType.get('content');
           if (content && Array.isArray(content) && content.length > 0) {
-            console.log('[Hocuspocus] Loading initial document content from server', content);
             setEditorContent(content as any);
-          } else {
-            console.log('[Hocuspocus] Document synced but no content on server, using empty document');
           }
         }
         
-        // 在加载内容后才标记为已同步，允许后续的编辑同步
         isSyncedRef.current = true;
         
-        // 在同步完成且内容加载后才设置编辑器key，确保编辑器创建时已有正确的内容
         const newEditorKey = `${documentId}_${Date.now()}`;
-        console.log('[Hocuspocus] Setting new editor key after sync:', newEditorKey);
         setEditorKey(newEditorKey);
       },
     });
 
     providerRef.current = provider;
 
-    // 监听文档变化
     const sharedType = ydoc.getMap('document');
     const observer = () => {
-      // 如果是本地更新触发的，跳过处理，避免循环更新
       if (isLocalUpdateRef.current) {
-        console.log('[Hocuspocus] Skipping observer for local update');
         isLocalUpdateRef.current = false;
         return;
       }
       
       const content = sharedType.get('content');
       if (content) {
-        console.log('[Hocuspocus] Document content updated from remote', content);
         setEditorContent(content as any);
       }
     };
     sharedType.observe(observer);
 
     return () => {
-      console.log('[Hocuspocus] Cleaning up provider and resetting state for document:', currentDocIdRef.current);
       sharedType.unobserve(observer);
       provider.destroy();
       ydoc.destroy();
@@ -258,47 +207,35 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
   }, [editing, recordId, fieldId, datasheetId, userInfo, documentMeta.documentId, documentMeta.title]);
 
   const handleEditorChange = useCallback((value: { document: any; meta: any }) => {
-    // 始终更新本地状态，保持 UI 响应性
     setEditorContent(value.document);
 
-    // 验证当前文档ID是否匹配，防止快速切换时的内容混乱
     if (currentDocIdRef.current !== documentMeta.documentId) {
-      console.log('[Hocuspocus] Skipping sync - document ID mismatch', {
-        current: currentDocIdRef.current,
-        expected: documentMeta.documentId,
-      });
       return;
     }
 
     if (!isSyncedRef.current) {
-      console.log('[Hocuspocus] Skipping sync before initial document loaded');
       return;
     }
 
-    // 通过 Y.js/Hocuspocus 实时同步内容到后端
     if (ydocRef.current) {
       try {
-        // 标记为本地更新，避免 observer 重复处理
         isLocalUpdateRef.current = true;
         
         const sharedType = ydocRef.current.getMap('document');
         sharedType.set('content', value.document);
-        console.log('[Hocuspocus] Document content updated locally', value.document);
       } catch (error) {
         console.error('[Hocuspocus] Failed to update document:', error);
-        isLocalUpdateRef.current = false; // 发生错误时重置标记
+        isLocalUpdateRef.current = false;
       }
     }
   }, [documentMeta.documentId]);
 
-  // 保存文档元数据到 datasheet
   const saveDocumentMeta = useCallback((title: string) => {
     const saveValue: IWorkDocValue[] = [{
       documentId: documentMeta.documentId,
       title: title || documentMeta.title || '',
     }];
 
-    console.log('[WorkDoc] Saving document metadata:', saveValue);
     onSave?.(saveValue);
   }, [documentMeta, onSave]);
 
