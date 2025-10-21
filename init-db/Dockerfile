@@ -36,7 +36,7 @@ CMD ["sh", "-c", "echo \"clearChecksums\"; \
                     echo ACTION=${ACTION}; docker-entrypoint.sh \
                         --classpath=/liquibase \
                         --changelog-file=${CHANGELOG_FILE:=db/changelog/db.changelog-master.xml} \
-                        --log-level=debug \
+                        --log-level=warning \
                         --username=${DB_USERNAME} \
                         --password=${DB_PASSWORD} \
                         --driver=\"com.mysql.cj.jdbc.Driver\" \
