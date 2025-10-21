@@ -51,6 +51,8 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
   const providerRef = useRef<HocuspocusProvider | null>(null);
   const ydocRef = useRef<Y.Doc | null>(null);
   const isLocalUpdateRef = useRef<boolean>(false); // 标记是否为本地更新
+  const isSyncedRef = useRef<boolean>(false); // 标记是否已完成初始同步
+  const currentDocIdRef = useRef<string>(''); // 当前连接的文档ID，用于防止文档切换时的内容混乱
   
   const createDefaultContent = useCallback(() => {
     return [GENERATOR.paragraph({})];
@@ -71,9 +73,16 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
   useEffect(() => {
     const value = cellValue as IWorkDocCellValue[];
     if (value && Array.isArray(value) && value.length > 0) {
-      setDocumentMeta(value[0]);
+      const newDocumentMeta = value[0];
+      // 如果是切换到不同的文档，需要重置编辑器内容
+      if (newDocumentMeta.documentId !== documentMeta.documentId) {
+        console.log('[WorkDoc] Switching document, resetting editor content');
+        setEditorContent(createDefaultContent());
+        isSyncedRef.current = false; // 重置同步状态
+      }
+      setDocumentMeta(newDocumentMeta);
     }
-  }, [cellValue]);
+  }, [cellValue, documentMeta.documentId, createDefaultContent]);
 
   useEffect(() => {
     if (editing && (!cellValue || (cellValue as IWorkDocCellValue[]).length === 0)) {
@@ -118,6 +127,10 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       recordId,
     });
 
+    isSyncedRef.current = false;
+    isLocalUpdateRef.current = false;
+    currentDocIdRef.current = documentId; // 记录当前连接的文档ID
+
     // 创建 Y.js 文档
     const ydoc = new Y.Doc();
     ydocRef.current = ydoc;
@@ -161,16 +174,18 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       },
       onSynced: () => {
         console.log('[Hocuspocus] Document synced');
+        // 标记已完成同步
+        isSyncedRef.current = true;
+        
         // 同步完成后，从Y.js加载初始内容
-        // 注意：这里只在文档真正有内容时才加载，避免加载空数据
         if (ydocRef.current) {
           const sharedType = ydocRef.current.getMap('document');
           const content = sharedType.get('content');
           if (content && Array.isArray(content) && content.length > 0) {
-            console.log('[Hocuspocus] Loading initial document content', content);
+            console.log('[Hocuspocus] Loading initial document content from server', content);
             setEditorContent(content as any);
           } else {
-            console.log('[Hocuspocus] Document synced but no content yet, waiting for observer');
+            console.log('[Hocuspocus] Document synced but no content on server, using empty document');
           }
         }
       },
@@ -197,17 +212,39 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     sharedType.observe(observer);
 
     return () => {
-      console.log('[Hocuspocus] Cleaning up...');
+      console.log('[Hocuspocus] Cleaning up provider and resetting state for document:', currentDocIdRef.current);
       sharedType.unobserve(observer);
       provider.destroy();
       ydoc.destroy();
       providerRef.current = null;
       ydocRef.current = null;
+      isSyncedRef.current = false; // 重置同步状态
+      isLocalUpdateRef.current = false; // 重置本地更新标记
+      currentDocIdRef.current = ''; // 清除文档ID
+      
+      // 重置编辑器内容，防止旧内容污染下一个文档
+      console.log('[Hocuspocus] Resetting editor content to default');
+      setEditorContent(createDefaultContent());
     };
-  }, [editing, recordId, fieldId, datasheetId, userInfo, documentMeta]);
+  }, [editing, recordId, fieldId, datasheetId, userInfo, documentMeta, createDefaultContent]);
 
   const handleEditorChange = useCallback((value: { document: any; meta: any }) => {
+    // 始终更新本地状态，保持 UI 响应性
     setEditorContent(value.document);
+
+    // 验证当前文档ID是否匹配，防止快速切换时的内容混乱
+    if (currentDocIdRef.current !== documentMeta.documentId) {
+      console.log('[Hocuspocus] Skipping sync - document ID mismatch', {
+        current: currentDocIdRef.current,
+        expected: documentMeta.documentId,
+      });
+      return;
+    }
+
+    if (!isSyncedRef.current) {
+      console.log('[Hocuspocus] Skipping sync before initial document loaded');
+      return;
+    }
 
     // 通过 Y.js/Hocuspocus 实时同步内容到后端
     if (ydocRef.current) {
@@ -223,7 +260,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
         isLocalUpdateRef.current = false; // 发生错误时重置标记
       }
     }
-  }, []);
+  }, [documentMeta.documentId]);
 
   // 保存文档元数据到 datasheet
   const saveDocumentMeta = useCallback((title: string) => {
