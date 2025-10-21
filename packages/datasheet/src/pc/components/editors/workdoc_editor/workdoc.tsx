@@ -165,7 +165,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
           const sharedType = ydocRef.current.getMap('document');
           const content = sharedType.get('content');
           if (content) {
-            console.log('[Hocuspocus] Loading initial document content');
+            console.log('[Hocuspocus] Loading initial document content', content);
             setEditorContent(content as any);
           }
         }
@@ -179,7 +179,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     const observer = () => {
       const content = sharedType.get('content');
       if (content) {
-        console.log('[Hocuspocus] Document content updated from remote');
+        console.log('[Hocuspocus] Document content updated from remote', content);
         setEditorContent(content as any);
       }
     };
@@ -204,7 +204,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       try {
         const sharedType = ydocRef.current.getMap('document');
         sharedType.set('content', value.document);
-        console.log('[Hocuspocus] Document content updated locally');
+        console.log('[Hocuspocus] Document content updated locally', value.document);
       } catch (error) {
         console.error('[Hocuspocus] Failed to update document:', error);
       }
