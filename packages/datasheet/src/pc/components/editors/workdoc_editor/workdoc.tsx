@@ -46,6 +46,16 @@ interface IWorkdocProps {
 export const Workdoc: React.FC<IWorkdocProps> = (props) => {
   const { editing = false, toggleEditing, cellValue, onSave, editable = true, datasheetId, fieldId, recordId } = props;
   
+  // 调试：监控 props 变化
+  useEffect(() => {
+    console.log('[WorkDoc] Props changed:', {
+      editing,
+      cellValue,
+      fieldId,
+      recordId,
+    });
+  }, [editing, cellValue, fieldId, recordId]);
+  
   const userInfo = useAppSelector(state => state.user.info);
   const [status, setStatus] = useState<Status>(Status.Connecting);
   const providerRef = useRef<HocuspocusProvider | null>(null);
@@ -53,6 +63,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
   const isLocalUpdateRef = useRef<boolean>(false); // 标记是否为本地更新
   const isSyncedRef = useRef<boolean>(false); // 标记是否已完成初始同步
   const currentDocIdRef = useRef<string>(''); // 当前连接的文档ID，用于防止文档切换时的内容混乱
+  const [editorKey, setEditorKey] = useState<string>(''); // 编辑器唯一key，用于强制重新创建
   
   const createDefaultContent = useCallback(() => {
     return [GENERATOR.paragraph({})];
@@ -60,27 +71,37 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
 
   const [documentMeta, setDocumentMeta] = useState<IWorkDocCellValue>(() => {
     const value = cellValue as IWorkDocCellValue[];
+    console.log('[WorkDoc] Initializing documentMeta from cellValue:', value);
     if (value && Array.isArray(value) && value.length > 0) {
+      console.log('[WorkDoc] Using existing document:', value[0]);
       return value[0];
     }
-    return {
+    const newMeta = {
       documentId: generateId(),
       title: '',
     };
+    console.log('[WorkDoc] Creating new document:', newMeta);
+    return newMeta;
   });
 
-  // 当 cellValue 变化时同步（切换到其他单元格）
+  // 当 cellValue 变化时同步（切换到其他单元格或 cellValue 延迟到达）
   useEffect(() => {
     const value = cellValue as IWorkDocCellValue[];
+    console.log('[WorkDoc] cellValue changed effect triggered:', value, 'current documentMeta:', documentMeta);
+    
     if (value && Array.isArray(value) && value.length > 0) {
       const newDocumentMeta = value[0];
-      // 如果是切换到不同的文档，需要重置编辑器内容
+      console.log('[WorkDoc] New documentMeta from cellValue:', newDocumentMeta);
+      
       if (newDocumentMeta.documentId !== documentMeta.documentId) {
-        console.log('[WorkDoc] Switching document, resetting editor content');
+        console.log('[WorkDoc] Document ID changed! Old:', documentMeta.documentId, 'New:', newDocumentMeta.documentId);
+        console.log('[WorkDoc] This will trigger reconnection with correct document ID');
         setEditorContent(createDefaultContent());
         isSyncedRef.current = false; // 重置同步状态
       }
       setDocumentMeta(newDocumentMeta);
+    } else {
+      console.log('[WorkDoc] cellValue is empty or invalid, keeping current documentMeta');
     }
   }, [cellValue, documentMeta.documentId, createDefaultContent]);
 
@@ -97,6 +118,11 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
   const [editorContent, setEditorContent] = useState(() => createDefaultContent());
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const titleInputRef = useRef<InputRef>(null);
+
+  // 调试：监控 editorContent 的变化
+  useEffect(() => {
+    console.log('[WorkDoc] editorContent changed:', editorContent, 'for document:', documentMeta.documentId);
+  }, [editorContent, documentMeta.documentId]);
 
   // 当开始编辑标题时，初始化本地标题值
   useEffect(() => {
@@ -126,6 +152,10 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       fieldId,
       recordId,
     });
+
+    const newEditorKey = `${documentId}_${Date.now()}`;
+    console.log('[Hocuspocus] Setting new editor key:', newEditorKey);
+    setEditorKey(newEditorKey);
 
     isSyncedRef.current = false;
     isLocalUpdateRef.current = false;
@@ -174,8 +204,6 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       },
       onSynced: () => {
         console.log('[Hocuspocus] Document synced');
-        // 标记已完成同步
-        isSyncedRef.current = true;
         
         // 同步完成后，从Y.js加载初始内容
         if (ydocRef.current) {
@@ -188,6 +216,9 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
             console.log('[Hocuspocus] Document synced but no content on server, using empty document');
           }
         }
+        
+        // 在加载内容后才标记为已同步，允许后续的编辑同步
+        isSyncedRef.current = true;
       },
     });
 
@@ -365,6 +396,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     >
       <div className={styles.editorContainer}>
         <SlateEditor
+          key={editorKey || documentMeta.documentId}
           value={editorContent}
           onChange={handleEditorChange}
           placeholder="开始编辑文档内容..."
