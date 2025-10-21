@@ -187,26 +187,26 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
 
     const sharedType = ydoc.getMap('document');
     
-    // 监听文档变化，使用 Y.js 的事务信息来区分本地和远程更新
+    // 监听文档变化，详细调试
     const observer = (event: Y.YMapEvent<any>, transaction: Y.Transaction) => {
-      // 检查事务来源：如果是 'local' 标记的事务，说明是本地更新，跳过处理
-      if (transaction.origin === 'local') {
-        console.log('[Hocuspocus] Skipping local transaction in observer');
-        return;
-      }
+      const content = sharedType.get('content') as any;
       
-      // 双重保险：检查本地更新标记
-      if (isLocalUpdateRef.current) {
-        console.log('[Hocuspocus] Skipping observer for local update (fallback)');
-        isLocalUpdateRef.current = false;
-        return;
-      }
+      // 详细调试日志
+      console.log('[Hocuspocus DEBUG] Observer triggered:', {
+        'transaction.origin': transaction.origin,
+        'origin type': typeof transaction.origin,
+        'origin === provider': transaction.origin === provider,
+        'origin === "local"': transaction.origin === 'local',
+        'isLocalUpdateRef': isLocalUpdateRef.current,
+        'content exists': !!content,
+        'content is array': Array.isArray(content),
+        'content length': Array.isArray(content) ? content.length : 0,
+      });
       
-      // 处理远程更新
-      const content = sharedType.get('content');
+      // TODO: 先不做任何过滤，观察所有更新
       if (content) {
-        console.log('[Hocuspocus] Document content updated from remote (observer)', content);
-        setEditorContent(content as any);
+        console.log('[Hocuspocus DEBUG] Content from observer:', JSON.stringify(content).substring(0, 200));
+        setEditorContent(content);
       }
     };
     sharedType.observe(observer);
@@ -228,33 +228,31 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     setEditorContent(value.document);
 
     if (currentDocIdRef.current !== documentMeta.documentId) {
+      console.log('[Hocuspocus DEBUG] Skipping - document ID mismatch');
       return;
     }
 
     if (!isSyncedRef.current) {
+      console.log('[Hocuspocus DEBUG] Skipping - not synced yet');
       return;
     }
 
     if (ydocRef.current) {
-      try {
-        // 标记为本地更新
-        isLocalUpdateRef.current = true;
-        
-        // 使用 Y.js 事务确保原子更新
-        ydocRef.current.transact(() => {
-          const sharedType = ydocRef.current!.getMap('document');
-          sharedType.set('content', value.document);
-        }, 'local'); // 标记为本地来源
-        
-        console.log('[Hocuspocus] Document content updated locally via transaction');
-      } catch (error) {
-        console.error('[Hocuspocus] Failed to update document:', error);
-      } finally {
-        // 确保无论如何都重置标记，使用微任务延迟重置，确保 observer 先执行
-        Promise.resolve().then(() => {
-          isLocalUpdateRef.current = false;
-        });
-      }
+      console.log('[Hocuspocus DEBUG] handleEditorChange - updating Y.js document');
+      
+      // 标记为本地更新
+      isLocalUpdateRef.current = true;
+      
+      const sharedType = ydocRef.current.getMap('document');
+      sharedType.set('content', value.document);
+      
+      console.log('[Hocuspocus DEBUG] Document updated, isLocalUpdateRef set to true');
+      
+      // 延迟重置标记
+      setTimeout(() => {
+        isLocalUpdateRef.current = false;
+        console.log('[Hocuspocus DEBUG] isLocalUpdateRef reset to false');
+      }, 100);
     }
   }, [documentMeta.documentId]);
 
