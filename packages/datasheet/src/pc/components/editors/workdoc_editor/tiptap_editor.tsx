@@ -133,17 +133,17 @@ export const TiptapCollaborativeEditor: React.FC<ITiptapEditorProps> = ({
         Placeholder.configure({
           placeholder,
         }),
-        Underline,
+        Underline.configure({}),
         TextAlign.configure({
           types: ['heading', 'paragraph'],
         }),
         Link.configure({
           openOnClick: false,
         }),
-        Image,
-        Highlight,
-        TextStyle,
-        Color,
+        Image.configure({}),
+        Highlight.configure({}),
+        TextStyle.configure({}),
+        Color.configure({}),
       ] : [],
     },
     [provider, ydoc, userName, userColor, placeholder, readOnly]
