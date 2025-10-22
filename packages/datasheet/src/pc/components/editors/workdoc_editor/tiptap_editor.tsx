@@ -139,7 +139,7 @@ export const TiptapCollaborativeEditor: React.FC<ITiptapEditorProps> = ({
         }),
         Image.configure({}),
         Highlight.configure({}),
-        TextStyle,
+        // TextStyle.configure({}),
         Color.configure({}),
       ] : [],
     },
