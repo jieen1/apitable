@@ -28,7 +28,7 @@ import { GENERATOR, generateId } from 'pc/components/slate_editor/elements';
 import { useAppSelector } from 'pc/store/react-redux';
 import { Status } from './interface';
 import styles from './workdoc.module.less';
-import { Awareness } from 'y-protocols/awareness';
+import type { Awareness } from 'y-protocols/awareness';
 
 interface IWorkDocCellValue extends IWorkDocValue {
 }
