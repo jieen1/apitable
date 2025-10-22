@@ -113,10 +113,7 @@ export const TiptapCollaborativeEditor: React.FC<ITiptapEditorProps> = ({
     {
       editable: !readOnly,
       extensions: provider && ydoc ? [
-        StarterKit.configure({
-          // 禁用默认的 history，因为协作模式有自己的历史
-          history: false,
-        }),
+        StarterKit.configure({}),
         // 协作编辑扩展
         Collaboration.configure({
           document: ydoc,
