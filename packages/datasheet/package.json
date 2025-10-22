@@ -77,7 +77,7 @@
     "ajv-i18n": "^4.2.0",
     "antd": "4.23.5",
     "antd-mobile": "5.32.4",
-    "antd-icons": "4.23.5",
+    "antd-icons": "0.1.0-alpha.1",
     "attr-accept": "^2.1.0",
     "axios": "0.21.4",
     "bowser": "^2.11.0",
