@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Hocuspocus, onAuthenticatePayload } from '@hocuspocus/server';
+import { Hocuspocus, onAuthenticatePayload, onAwarenessUpdatePayload } from '@hocuspocus/server';
 import { Database } from '@hocuspocus/extension-database';
 import { Injectable } from '@nestjs/common';
 import { getIPAddress } from 'shared/helpers/system.helper';
@@ -24,7 +24,6 @@ import { WorkdocDocumentRepository } from 'database/workdoc/repositories/workdoc
 
 @Injectable()
 export abstract class HocuspocusBaseService {
-
   init(port: number): Hocuspocus {
     return new Hocuspocus({
       port,
@@ -34,7 +33,6 @@ export abstract class HocuspocusBaseService {
 
 @Injectable()
 export class HocuspocusService extends HocuspocusBaseService {
-
   constructor(
     private readonly workdocDocumentRepository: WorkdocDocumentRepository,
   ) {
@@ -51,23 +49,23 @@ export class HocuspocusService extends HocuspocusBaseService {
         console.log(`Hocuspocus server[${data.configuration.name}] is listening on port "${data.port}"!`);
       },
 
-      // 认证
+      // 认证：验证用户权限
       async onAuthenticate(data: onAuthenticatePayload) {
-        const { requestParameters, token } = data;
+        const { requestParameters } = data;
         const userId = requestParameters.get('userId');
         const resourceId = requestParameters.get('resourceId');
         const fieldId = requestParameters.get('fieldId');
         const recordId = requestParameters.get('recordId');
 
-        console.log('[Hocuspocus] Authentication:', { userId, resourceId, fieldId, recordId, token });
+        console.log('[Hocuspocus] Authentication:', { userId, resourceId, fieldId, recordId });
 
         // 基础验证
         if (!userId || !resourceId || !fieldId) {
-          throw new Error('Missing required parameters');
+          throw new Error('Missing required parameters: userId, resourceId, or fieldId');
         }
 
-        // TODO: 这里可以添加权限验证逻辑
-        // 例如：检查用户是否有权限访问该文档
+        // TODO: 添加权限验证逻辑
+        // 例如：检查用户是否有权限访问该数据表和记录
 
         return {
           user: {
@@ -79,36 +77,46 @@ export class HocuspocusService extends HocuspocusBaseService {
 
       // 连接建立
       async onConnect(data) {
-        const { documentName, requestParameters } = data;
+        const { documentName, requestParameters, socketId } = data;
         console.log('[Hocuspocus] Client connected:', {
           documentName,
+          socketId,
           userId: requestParameters.get('userId'),
-          resourceId: requestParameters.get('resourceId'),
         });
       },
 
       // 连接断开
       async onDisconnect(data) {
-        const { documentName } = data;
-        console.log('[Hocuspocus] Client disconnected:', { documentName });
+        const { documentName, socketId } = data;
+        console.log('[Hocuspocus] Client disconnected:', { documentName, socketId });
       },
 
-      // 文档变更
+      // 文档变更（防抖后保存到数据库）
       async onChange(data) {
         const { documentName } = data;
         console.log('[Hocuspocus] Document changed:', { documentName });
       },
 
-      // 扩展
+      // Awareness 更新（用于显示协作者光标和状态）
+      async onAwarenessUpdate(data: onAwarenessUpdatePayload) {
+        const { documentName, awareness } = data;
+        const states = awareness.getStates();
+        const activeUsers = Array.from(states.values()).filter((state: any) => state.user);
+        
+        console.log('[Hocuspocus] Awareness updated:', {
+          documentName,
+          activeUsers: activeUsers.length,
+        });
+      },
+
+      // 扩展：数据库持久化
       extensions: [
-        // 数据库扩展 - 用于持久化文档
         new Database({
           // 从数据库加载文档
           fetch: async ({ documentName }) => {
             console.log('[Hocuspocus] Fetching document:', documentName);
             
             try {
-              // documentName 就是 documentId
               const content = await self.workdocDocumentRepository.getDocumentContent(documentName);
               
               if (content) {
@@ -116,7 +124,7 @@ export class HocuspocusService extends HocuspocusBaseService {
                 return content;
               }
               
-              console.log('[Hocuspocus] Document not found in database, will create new');
+              console.log('[Hocuspocus] Document not found in database, creating new');
               return null;
             } catch (error) {
               console.error('[Hocuspocus] Error fetching document:', error);
@@ -135,7 +143,6 @@ export class HocuspocusService extends HocuspocusBaseService {
               const recordId = requestParameters?.get('recordId');
               const title = requestParameters?.get('title') || '';
               
-              // 检查文档是否已存在
               const existing = await self.workdocDocumentRepository.findByDocumentId(documentName);
               
               if (existing) {
@@ -163,6 +170,7 @@ export class HocuspocusService extends HocuspocusBaseService {
               }
             } catch (error) {
               console.error('[Hocuspocus] Error storing document:', error);
+              throw error;
             }
           },
         }),

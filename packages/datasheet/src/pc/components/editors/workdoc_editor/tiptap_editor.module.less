@@ -1,0 +1,173 @@
+/**
+ * APITable <https://github.com/apitable/apitable>
+ * Copyright (C) 2022 APITable Ltd. <https://apitable.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.tiptapEditor {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.editorContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+
+  :global {
+    .ProseMirror {
+      outline: none;
+      min-height: 100%;
+
+      > * + * {
+        margin-top: 0.75em;
+      }
+
+      /* Placeholder */
+      p.is-editor-empty:first-child::before {
+        content: attr(data-placeholder);
+        float: left;
+        color: #adb5bd;
+        pointer-events: none;
+        height: 0;
+      }
+
+      /* Headings */
+      h1 {
+        font-size: 2em;
+        font-weight: 700;
+        line-height: 1.2;
+      }
+
+      h2 {
+        font-size: 1.5em;
+        font-weight: 700;
+        line-height: 1.3;
+      }
+
+      h3 {
+        font-size: 1.25em;
+        font-weight: 600;
+        line-height: 1.4;
+      }
+
+      /* Lists */
+      ul,
+      ol {
+        padding-left: 1.5em;
+      }
+
+      li {
+        p {
+          margin: 0;
+        }
+      }
+
+      /* Code */
+      code {
+        background-color: rgba(97, 97, 97, 0.1);
+        color: #616161;
+        padding: 0.2em 0.4em;
+        border-radius: 3px;
+        font-size: 0.9em;
+        font-family: 'JetBrainsMono', monospace;
+      }
+
+      pre {
+        background: #0d0d0d;
+        color: #fff;
+        font-family: 'JetBrainsMono', monospace;
+        padding: 1em;
+        border-radius: 6px;
+        overflow-x: auto;
+
+        code {
+          background: none;
+          color: inherit;
+          padding: 0;
+          font-size: 0.9em;
+        }
+      }
+
+      /* Blockquote */
+      blockquote {
+        padding-left: 1em;
+        border-left: 3px solid #dee2e6;
+        color: #495057;
+        font-style: italic;
+      }
+
+      /* Horizontal rule */
+      hr {
+        border: none;
+        border-top: 2px solid #dee2e6;
+        margin: 2em 0;
+      }
+
+      /* Link */
+      a {
+        color: #4299e1;
+        text-decoration: underline;
+        cursor: pointer;
+
+        &:hover {
+          color: #2b6cb0;
+        }
+      }
+
+      /* Image */
+      img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+      }
+
+      /* Mark/Highlight */
+      mark {
+        background-color: #ffd24d;
+        padding: 0.1em 0.2em;
+        border-radius: 2px;
+      }
+
+      /* 协作光标样式 */
+      .collaboration-cursor__caret {
+        border-left: 2px solid;
+        border-right: 2px solid;
+        margin-left: -1px;
+        margin-right: -1px;
+        pointer-events: none;
+        position: relative;
+        word-break: normal;
+      }
+
+      .collaboration-cursor__label {
+        border-radius: 3px 3px 3px 0;
+        color: #fff;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 600;
+        left: -1px;
+        line-height: normal;
+        padding: 2px 6px;
+        position: absolute;
+        top: -1.4em;
+        user-select: none;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+

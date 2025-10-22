@@ -17,18 +17,13 @@
  */
 
 import React, { useCallback, useState, useMemo, useRef, useEffect } from 'react';
-import { HocuspocusProvider } from '@hocuspocus/provider';
-import * as Y from 'yjs';
-import { Input, InputRef } from 'antd';
-import { Drawer } from 'antd';
+import { Input, InputRef, Drawer } from 'antd';
 import { ICellValue, Strings, t, IWorkDocValue } from '@apitable/core';
 import { EditOutlined } from '@apitable/icons';
-import { SlateEditor } from 'pc/components/slate_editor';
-import { GENERATOR, generateId } from 'pc/components/slate_editor/elements';
 import { useAppSelector } from 'pc/store/react-redux';
+import { TiptapCollaborativeEditor } from './tiptap_editor';
 import { Status } from './interface';
 import styles from './workdoc.module.less';
-import type { Awareness } from 'y-protocols/awareness';
 
 interface IWorkDocCellValue extends IWorkDocValue {
 }
@@ -44,62 +39,57 @@ interface IWorkdocProps {
   editable?: boolean;
 }
 
+/**
+ * 生成唯一文档 ID
+ */
+const generateDocumentId = () => {
+  return `doc_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+};
+
+/**
+ * Workdoc 协作文档编辑器组件
+ * 使用 Tiptap + Hocuspocus 实现实时协作编辑
+ */
 export const Workdoc: React.FC<IWorkdocProps> = (props) => {
-  const { editing = false, toggleEditing, cellValue, onSave, editable = true, datasheetId, fieldId, recordId } = props;
+  const { 
+    editing = false, 
+    toggleEditing, 
+    cellValue, 
+    onSave, 
+    editable = true, 
+    datasheetId, 
+    fieldId, 
+    recordId 
+  } = props;
   
   const userInfo = useAppSelector(state => state.user.info);
   const [status, setStatus] = useState<Status>(Status.Connecting);
-  const providerRef = useRef<HocuspocusProvider | null>(null);
-  const ydocRef = useRef<Y.Doc | null>(null);
-  const isLocalUpdateRef = useRef<boolean>(false); // 标记是否为本地更新
-  const isSyncedRef = useRef<boolean>(false); // 标记是否已完成初始同步
-  const currentDocIdRef = useRef<string>(''); // 当前连接的文档ID，用于防止文档切换时的内容混乱
-  const [editorKey, setEditorKey] = useState<string>(''); // 编辑器唯一key，用于强制重新创建
-  
-  const createDefaultContent = useCallback(() => {
-    return [GENERATOR.paragraph({})];
-  }, []);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [localTitle, setLocalTitle] = useState('');
+  const titleInputRef = useRef<InputRef>(null);
 
-  const [documentMeta, setDocumentMeta] = useState<IWorkDocCellValue>(() => {
+  // 获取或创建文档元数据
+  const documentMeta = useMemo<IWorkDocCellValue>(() => {
     const value = cellValue as IWorkDocCellValue[];
     if (value && Array.isArray(value) && value.length > 0) {
       return value[0];
     }
-    const newMeta = {
-      documentId: generateId(),
+    // 创建新文档
+    return {
+      documentId: generateDocumentId(),
       title: '',
     };
-    return newMeta;
-  });
+  }, [cellValue]);
 
-  useEffect(() => {
-    const value = cellValue as IWorkDocCellValue[];
-    
-    if (value && Array.isArray(value) && value.length > 0) {
-      const newDocumentMeta = value[0];
-      
-      if (newDocumentMeta.documentId !== documentMeta.documentId) {
-        setEditorContent(createDefaultContent());
-        isSyncedRef.current = false; // 重置同步状态
-      }
-      setDocumentMeta(newDocumentMeta);
-    }
-  }, [cellValue, documentMeta.documentId, createDefaultContent]);
-
+  // 首次编辑时保存文档元数据
   useEffect(() => {
     if (editing && (!cellValue || (cellValue as IWorkDocCellValue[]).length === 0)) {
       const saveValue: IWorkDocValue[] = [documentMeta];
       onSave?.(saveValue);
     }
-  }, [editing]);
+  }, [editing, cellValue, documentMeta, onSave]);
 
-  const [localTitle, setLocalTitle] = useState('');
-  
-  const [editorContent, setEditorContent] = useState(() => createDefaultContent());
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const titleInputRef = useRef<InputRef>(null);
-
-  // 当开始编辑标题时，初始化本地标题值
+  // 初始化标题编辑
   useEffect(() => {
     if (isEditingTitle) {
       setLocalTitle(documentMeta.title || '');
@@ -108,157 +98,21 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     }
   }, [isEditingTitle, documentMeta.title]);
 
-  // Hocuspocus Provider 连接管理
-  useEffect(() => {
-    if (!editing || !recordId || !fieldId || !userInfo?.uuid) {
-      return;
-    }
-    const { documentId, title } = documentMeta;
-    isSyncedRef.current = false;
-    isLocalUpdateRef.current = false;
-    currentDocIdRef.current = documentId; // 记录当前连接的文档ID
-
-    // 创建 Y.js 文档
-    const ydoc = new Y.Doc();
-    ydocRef.current = ydoc;
-
-    // 创建 Hocuspocus Provider
-    const provider = new HocuspocusProvider({
-      url: `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/document`,
-      name: documentId,
-      document: ydoc,
-      token: documentId,
-      awareness: new Awareness(ydoc),
-      parameters: {
-        userId: userInfo.uuid,
-        resourceId: datasheetId,
-        fieldId,
-        recordId,
-        title,
-        documentId,
-        documentType: '0',
-      },
-      onConnect: () => {
-        console.log('[Hocuspocus] Connected');
-        setStatus(Status.Connected);
-      },
-      onDisconnect: () => {
-        console.log('[Hocuspocus] Disconnected');
-        setStatus(Status.Disconnected);
-      },
-      onStatus: ({ status: providerStatus }) => {
-        console.log('[Hocuspocus] Status:', providerStatus);
-        if (providerStatus === 'connecting') {
-          setStatus(Status.Connecting);
-        } else if (providerStatus === 'connected') {
-          setStatus(Status.Connected);
-        } else if (providerStatus === 'disconnected') {
-          setStatus(Status.Disconnected);
-        }
-      },
-      onAuthenticationFailed: ({ reason }) => {
-        console.error('[Hocuspocus] Authentication failed:', reason);
-        setStatus(Status.Error);
-      },
-      onSynced: () => {
-        console.log('[Hocuspocus] Document synced');
-        
-        // 同步完成后，从Y.js加载初始内容
-        if (ydocRef.current) {
-          const sharedType = ydocRef.current.getMap('document');
-          const content = sharedType.get('content');
-          if (content && Array.isArray(content) && content.length > 0) {
-            console.log('[Hocuspocus] Loading initial document content from server', content);
-            setEditorContent(content as any);
-          } else {
-            console.log('[Hocuspocus] Document synced but no content on server, using empty document');
-          }
-        }
-        
-        // 标记已完成初始同步
-        isSyncedRef.current = true;
-        
-        // 在同步完成且内容加载后才设置编辑器key，确保编辑器创建时已有正确的内容
-        const newEditorKey = `${documentId}_${Date.now()}`;
-        console.log('[Hocuspocus] Setting new editor key after sync:', newEditorKey);
-        setEditorKey(newEditorKey);
-      },
-    });
-
-    provider.setAwarenessField('user', userInfo)
-    providerRef.current = provider;
-
-    const sharedType = ydoc.getMap('document');
-    
-    // 监听文档变化，详细调试
-    const observer = (event: Y.YMapEvent<any>, transaction: Y.Transaction) => {
-      const content = sharedType.get('content') as any;
-      
-      if (content) {
-        console.log('[Hocuspocus DEBUG] Content from observer:', JSON.stringify(content).substring(0, 200));
-        setEditorContent(content);
-      }
-    };
-    sharedType.observe(observer);
-
-    return () => {
-      sharedType.unobserve(observer);
-      provider.destroy();
-      ydoc.destroy();
-      providerRef.current = null;
-      ydocRef.current = null;
-      isSyncedRef.current = false; // 重置同步状态
-      isLocalUpdateRef.current = false; // 重置本地更新标记
-      currentDocIdRef.current = ''; // 清除文档ID
-      
-    };
-  }, [editing, recordId, fieldId, datasheetId, userInfo, documentMeta.documentId, documentMeta.title]);
-
-  const handleEditorChange = useCallback((value: { document: any; meta: any }) => {
-    setEditorContent(value.document);
-
-    if (currentDocIdRef.current !== documentMeta.documentId) {
-      console.log('[Hocuspocus DEBUG] Skipping - document ID mismatch');
-      return;
-    }
-
-    if (!isSyncedRef.current) {
-      console.log('[Hocuspocus DEBUG] Skipping - not synced yet');
-      return;
-    }
-
-    if (ydocRef.current) {
-      console.log('[Hocuspocus DEBUG] handleEditorChange - updating Y.js document');
-      
-      // 标记为本地更新
-      isLocalUpdateRef.current = true;
-      
-      const sharedType = ydocRef.current.getMap('document');
-      sharedType.set('content', value.document);
-      
-      console.log('[Hocuspocus DEBUG] Document updated, isLocalUpdateRef set to true');
-      
-      // 延迟重置标记
-      setTimeout(() => {
-        isLocalUpdateRef.current = false;
-        console.log('[Hocuspocus DEBUG] isLocalUpdateRef reset to false');
-      }, 100);
-    }
-  }, [documentMeta.documentId]);
-
+  // 保存文档元数据
   const saveDocumentMeta = useCallback((title: string) => {
     const saveValue: IWorkDocValue[] = [{
       documentId: documentMeta.documentId,
       title: title || documentMeta.title || '',
     }];
-
     onSave?.(saveValue);
   }, [documentMeta, onSave]);
 
   // 标题编辑相关
   const handleTitleEdit = useCallback(() => {
-    setIsEditingTitle(true);
-  }, []);
+    if (editable) {
+      setIsEditingTitle(true);
+    }
+  }, [editable]);
 
   const handleTitleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setLocalTitle(e.target.value);
@@ -266,7 +120,6 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
 
   const handleTitleSave = useCallback(() => {
     setIsEditingTitle(false);
-    // 只有标题发生变化时才保存
     if (localTitle !== documentMeta.title) {
       saveDocumentMeta(localTitle);
     }
@@ -280,7 +133,6 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     if (e.key === 'Enter') {
       handleTitleSave();
     } else if (e.key === 'Escape') {
-      // ESC 取消编辑，恢复原标题
       setIsEditingTitle(false);
     }
   }, [handleTitleSave]);
@@ -289,13 +141,35 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     toggleEditing?.(false);
   }, [toggleEditing]);
 
+  // 连接状态改变处理
+  const handleConnectionChange = useCallback((connectionStatus: 'connecting' | 'connected' | 'disconnected') => {
+    const statusMap = {
+      connecting: Status.Connecting,
+      connected: Status.Connected,
+      disconnected: Status.Disconnected,
+    };
+    setStatus(statusMap[connectionStatus]);
+  }, []);
+
   // 当前显示的标题
-  const documentTitle = useMemo(() => {
+  const displayTitle = useMemo(() => {
     if (isEditingTitle) {
       return localTitle;
     }
     return documentMeta.title || '未命名文档';
   }, [isEditingTitle, localTitle, documentMeta.title]);
+
+  // 用户颜色（根据用户ID生成）
+  const userColor = useMemo(() => {
+    if (!userInfo?.uuid) return '#' + Math.floor(Math.random() * 16777215).toString(16);
+    // 根据用户ID生成固定颜色
+    let hash = 0;
+    for (let i = 0; i < userInfo.uuid.length; i++) {
+      hash = userInfo.uuid.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const color = Math.floor(Math.abs((Math.sin(hash) * 10000) % 1) * 16777215);
+    return '#' + color.toString(16).padStart(6, '0');
+  }, [userInfo?.uuid]);
 
   if (!editing) {
     return null;
@@ -330,7 +204,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
             {isEditingTitle ? (
               <Input
                 ref={titleInputRef}
-                value={documentTitle}
+                value={displayTitle}
                 onChange={handleTitleInputChange}
                 onBlur={handleTitleInputBlur}
                 onPressEnter={handleTitleInputKeyDown}
@@ -339,7 +213,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
               />
             ) : (
               <span className={styles.title} onClick={handleTitleEdit}>
-                {documentTitle}
+                {displayTitle}
                 {editable && <EditOutlined className={styles.editIcon} />}
               </span>
             )}
@@ -349,19 +223,21 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       footer={null}
     >
       <div className={styles.editorContainer}>
-        <SlateEditor
-          key={editorKey || documentMeta.documentId}
-          value={editorContent}
-          onChange={handleEditorChange}
-          placeholder="开始编辑文档内容..."
-          mode="full"
-          height="calc(100vh - 200px)"
-          autoFocus={editing}
-          readOnly={!editable}
-          sectionSpacing='middle'
-          useMention
-          headerToolbarEnabled
-        />
+        {userInfo?.uuid && recordId && (
+          <TiptapCollaborativeEditor
+            documentId={documentMeta.documentId}
+            userId={userInfo.uuid}
+            userName={userInfo.nickName || userInfo.memberName || 'Anonymous'}
+            userColor={userColor}
+            resourceId={datasheetId}
+            fieldId={fieldId}
+            recordId={recordId}
+            title={documentMeta.title || ''}
+            readOnly={!editable}
+            placeholder="开始编辑文档内容..."
+            onConnectionChange={handleConnectionChange}
+          />
+        )}
       </div>
     </Drawer>
   );
