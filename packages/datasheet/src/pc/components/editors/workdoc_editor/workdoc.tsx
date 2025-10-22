@@ -28,6 +28,7 @@ import { GENERATOR, generateId } from 'pc/components/slate_editor/elements';
 import { useAppSelector } from 'pc/store/react-redux';
 import { Status } from './interface';
 import styles from './workdoc.module.less';
+import { Awareness } from 'y-protocols/awareness';
 
 interface IWorkDocCellValue extends IWorkDocValue {
 }
@@ -127,6 +128,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       name: documentId,
       document: ydoc,
       token: documentId,
+      awareness: new Awareness(ydoc),
       parameters: {
         userId: userInfo.uuid,
         resourceId: datasheetId,
@@ -183,6 +185,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
       },
     });
 
+    provider.setAwarenessField('user', userInfo)
     providerRef.current = provider;
 
     const sharedType = ydoc.getMap('document');
@@ -191,19 +194,6 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     const observer = (event: Y.YMapEvent<any>, transaction: Y.Transaction) => {
       const content = sharedType.get('content') as any;
       
-      // 详细调试日志
-      console.log('[Hocuspocus DEBUG] Observer triggered:', {
-        'transaction.origin': transaction.origin,
-        'origin type': typeof transaction.origin,
-        'origin === provider': transaction.origin === provider,
-        'origin === "local"': transaction.origin === 'local',
-        'isLocalUpdateRef': isLocalUpdateRef.current,
-        'content exists': !!content,
-        'content is array': Array.isArray(content),
-        'content length': Array.isArray(content) ? content.length : 0,
-      });
-      
-      // TODO: 先不做任何过滤，观察所有更新
       if (content) {
         console.log('[Hocuspocus DEBUG] Content from observer:', JSON.stringify(content).substring(0, 200));
         setEditorContent(content);
