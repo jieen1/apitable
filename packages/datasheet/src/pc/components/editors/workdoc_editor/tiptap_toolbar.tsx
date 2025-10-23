@@ -18,7 +18,6 @@
 
 import React from 'react';
 import { Editor } from '@tiptap/react';
-import { Button, Divider } from 'antd';
 import {
   BoldOutlined,
   ItalicOutlined,
@@ -33,7 +32,9 @@ import {
   UndoOutlined,
   RedoOutlined,
 } from '@ant-design/icons';
-import styles from './tiptap_toolbar.module.less';
+import { Toolbar, ToolbarGroup, ToolbarSeparator } from './primitives/toolbar';
+import { Button } from './primitives/button';
+import { Spacer } from './primitives/spacer';
 
 interface ITiptapToolbarProps {
   editor: Editor | null;
@@ -41,6 +42,7 @@ interface ITiptapToolbarProps {
 
 /**
  * Tiptap 编辑器工具栏
+ * 使用官方推荐的 Toolbar 架构
  */
 export const TiptapToolbar: React.FC<ITiptapToolbarProps> = ({ editor }) => {
   if (!editor) {
@@ -118,171 +120,202 @@ export const TiptapToolbar: React.FC<ITiptapToolbarProps> = ({ editor }) => {
   };
 
   return (
-    <div className={styles.toolbar}>
+    <Toolbar variant="default">
       {/* 撤销/重做 */}
-      <Button.Group>
+      <ToolbarGroup>
         <Button
-          size="small"
-          icon={<UndoOutlined />}
+          data-style="ghost"
+          data-size="small"
           onClick={handleUndo}
           disabled={!editor.can().undo()}
           title="撤销"
-        />
+        >
+          <UndoOutlined />
+        </Button>
         <Button
-          size="small"
-          icon={<RedoOutlined />}
+          data-style="ghost"
+          data-size="small"
           onClick={handleRedo}
           disabled={!editor.can().redo()}
           title="重做"
-        />
-      </Button.Group>
+        >
+          <RedoOutlined />
+        </Button>
+      </ToolbarGroup>
 
-      <Divider type="vertical" />
+      <ToolbarSeparator />
 
       {/* 标题 */}
-      <Button.Group>
+      <ToolbarGroup>
         <Button
-          size="small"
+          data-style="ghost"
+          data-size="small"
+          data-active={editor.isActive('heading', { level: 1 })}
           onClick={() => handleHeading(1)}
-          className={editor.isActive('heading', { level: 1 }) ? styles.active : ''}
           title="标题 1"
         >
           H1
         </Button>
         <Button
-          size="small"
+          data-style="ghost"
+          data-size="small"
+          data-active={editor.isActive('heading', { level: 2 })}
           onClick={() => handleHeading(2)}
-          className={editor.isActive('heading', { level: 2 }) ? styles.active : ''}
           title="标题 2"
         >
           H2
         </Button>
         <Button
-          size="small"
+          data-style="ghost"
+          data-size="small"
+          data-active={editor.isActive('heading', { level: 3 })}
           onClick={() => handleHeading(3)}
-          className={editor.isActive('heading', { level: 3 }) ? styles.active : ''}
           title="标题 3"
         >
           H3
         </Button>
-      </Button.Group>
+      </ToolbarGroup>
 
-      <Divider type="vertical" />
+      <ToolbarSeparator />
 
       {/* 文本格式 */}
-      <Button.Group>
+      <ToolbarGroup>
         <Button
-          size="small"
-          icon={<BoldOutlined />}
+          data-style="ghost"
+          data-size="small"
+          data-active={editor.isActive('bold')}
           onClick={handleBold}
-          className={editor.isActive('bold') ? styles.active : ''}
           title="粗体"
-        />
+        >
+          <BoldOutlined />
+        </Button>
         <Button
-          size="small"
-          icon={<ItalicOutlined />}
+          data-style="ghost"
+          data-size="small"
+          data-active={editor.isActive('italic')}
           onClick={handleItalic}
-          className={editor.isActive('italic') ? styles.active : ''}
           title="斜体"
-        />
+        >
+          <ItalicOutlined />
+        </Button>
         <Button
-          size="small"
-          icon={<UnderlineOutlined />}
+          data-style="ghost"
+          data-size="small"
+          data-active={editor.isActive('underline')}
           onClick={handleUnderline}
-          className={editor.isActive('underline') ? styles.active : ''}
           title="下划线"
-        />
+        >
+          <UnderlineOutlined />
+        </Button>
         <Button
-          size="small"
-          icon={<StrikethroughOutlined />}
+          data-style="ghost"
+          data-size="small"
+          data-active={editor.isActive('strike')}
           onClick={handleStrike}
-          className={editor.isActive('strike') ? styles.active : ''}
           title="删除线"
-        />
+        >
+          <StrikethroughOutlined />
+        </Button>
         <Button
-          size="small"
-          icon={<CodeOutlined />}
+          data-style="ghost"
+          data-size="small"
+          data-active={editor.isActive('code')}
           onClick={handleCode}
-          className={editor.isActive('code') ? styles.active : ''}
           title="行内代码"
-        />
+        >
+          <CodeOutlined />
+        </Button>
         <Button
-          size="small"
-          icon={<HighlightOutlined />}
+          data-style="ghost"
+          data-size="small"
+          data-active={editor.isActive('highlight')}
           onClick={handleHighlight}
-          className={editor.isActive('highlight') ? styles.active : ''}
           title="高亮"
-        />
-      </Button.Group>
+        >
+          <HighlightOutlined />
+        </Button>
+      </ToolbarGroup>
 
-      <Divider type="vertical" />
+      <ToolbarSeparator />
 
       {/* 列表 */}
-      <Button.Group>
+      <ToolbarGroup>
         <Button
-          size="small"
-          icon={<UnorderedListOutlined />}
+          data-style="ghost"
+          data-size="small"
+          data-active={editor.isActive('bulletList')}
           onClick={handleBulletList}
-          className={editor.isActive('bulletList') ? styles.active : ''}
           title="无序列表"
-        />
+        >
+          <UnorderedListOutlined />
+        </Button>
         <Button
-          size="small"
-          icon={<OrderedListOutlined />}
+          data-style="ghost"
+          data-size="small"
+          data-active={editor.isActive('orderedList')}
           onClick={handleOrderedList}
-          className={editor.isActive('orderedList') ? styles.active : ''}
           title="有序列表"
-        />
-      </Button.Group>
+        >
+          <OrderedListOutlined />
+        </Button>
+      </ToolbarGroup>
 
-      <Divider type="vertical" />
+      <ToolbarSeparator />
 
       {/* 插入 */}
-      <Button.Group>
+      <ToolbarGroup>
         <Button
-          size="small"
-          icon={<LinkOutlined />}
+          data-style="ghost"
+          data-size="small"
+          data-active={editor.isActive('link')}
           onClick={handleLink}
-          className={editor.isActive('link') ? styles.active : ''}
           title="插入链接"
-        />
+        >
+          <LinkOutlined />
+        </Button>
         <Button
-          size="small"
-          icon={<PictureOutlined />}
+          data-style="ghost"
+          data-size="small"
           onClick={handleImage}
           title="插入图片"
-        />
-      </Button.Group>
+        >
+          <PictureOutlined />
+        </Button>
+      </ToolbarGroup>
 
-      <Divider type="vertical" />
+      <ToolbarSeparator />
 
       {/* 其他 */}
-      <Button.Group>
+      <ToolbarGroup>
         <Button
-          size="small"
+          data-style="ghost"
+          data-size="small"
+          data-active={editor.isActive('blockquote')}
           onClick={handleBlockquote}
-          className={editor.isActive('blockquote') ? styles.active : ''}
           title="引用块"
         >
           &quot;
         </Button>
         <Button
-          size="small"
+          data-style="ghost"
+          data-size="small"
+          data-active={editor.isActive('codeBlock')}
           onClick={handleCodeBlock}
-          className={editor.isActive('codeBlock') ? styles.active : ''}
           title="代码块"
         >
           {'</>'}
         </Button>
         <Button
-          size="small"
+          data-style="ghost"
+          data-size="small"
           onClick={handleHorizontalRule}
           title="水平分割线"
         >
           —
         </Button>
-      </Button.Group>
-    </div>
+      </ToolbarGroup>
+
+      <Spacer />
+    </Toolbar>
   );
 };
-

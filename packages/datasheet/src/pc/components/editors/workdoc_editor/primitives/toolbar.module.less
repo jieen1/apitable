@@ -1,0 +1,63 @@
+/**
+ * Toolbar 组件样式
+ */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: #ffffff;
+  border-bottom: 1px solid #e8e8e8;
+  flex-wrap: wrap;
+  min-height: 44px;
+
+  &--default {
+    border-radius: 0;
+  }
+
+  &--floating {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e8e8e8;
+  }
+
+  &--plain {
+    background: transparent;
+    border: none;
+    padding: 4px;
+  }
+}
+
+.toolbarGroup {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 4px;
+
+  &:first-child {
+    padding-left: 0;
+  }
+
+  &:last-child {
+    padding-right: 0;
+  }
+}
+
+.toolbarSeparator {
+  background-color: #e8e8e8;
+  flex-shrink: 0;
+
+  &--vertical {
+    width: 1px;
+    height: 24px;
+    margin: 0 4px;
+  }
+
+  &--horizontal {
+    height: 1px;
+    width: 100%;
+    margin: 4px 0;
+  }
+}
+

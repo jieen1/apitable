@@ -16,26 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: #fff;
-  border-bottom: 1px solid #e8e8e8;
-  flex-wrap: wrap;
+import React from 'react';
+import styles from './spacer.module.less';
 
-  :global {
-    .ant-divider-vertical {
-      height: 20px;
-      margin: 0 4px;
-    }
-  }
+interface SpacerProps {
+  className?: string;
 }
 
-.active {
-  background: #e6f7ff !important;
-  border-color: #1890ff !important;
-  color: #1890ff !important;
-}
+/**
+ * Spacer 组件
+ * 用于在工具栏中创建灵活的间距，将左侧和右侧内容分开
+ */
+export const Spacer: React.FC<SpacerProps> = ({ className }) => {
+  return <div className={`${styles.spacer} ${className || ''}`} />;
+};
 
