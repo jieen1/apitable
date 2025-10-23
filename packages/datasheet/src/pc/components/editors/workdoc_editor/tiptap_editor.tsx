@@ -142,7 +142,8 @@ export const TiptapCollaborativeEditor: React.FC<ITiptapEditorProps> = ({
         Highlight.configure({}),
         // TextStyle.configure({}),
         Color.configure({}),
-      ] : [],
+      ] : [StarterKit],
+      immediatelyRender: false,
     },
     [provider, ydoc, userName, userColor, placeholder, readOnly]
   );
