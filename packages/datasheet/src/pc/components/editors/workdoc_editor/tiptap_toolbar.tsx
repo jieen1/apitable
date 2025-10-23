@@ -20,18 +20,23 @@ import React from 'react';
 import { Editor } from '@tiptap/react';
 import {
   BoldOutlined,
-  ItalicOutlined,
+  ItalicsOutlined,
   UnderlineOutlined,
   StrikethroughOutlined,
   CodeOutlined,
   HighlightOutlined,
-  OrderedListOutlined,
-  UnorderedListOutlined,
+  OrderedOutlined,
+  UnorderedOutlined,
   LinkOutlined,
-  PictureOutlined,
+  ImageOutlined,
   UndoOutlined,
   RedoOutlined,
-} from '@ant-design/icons';
+  QuoteOutlined,
+  DividingLineOutlined,
+  Headline1Outlined,
+  Headline2Outlined,
+  Headline3Outlined,
+} from '@apitable/icons';
 import { Toolbar, ToolbarGroup, ToolbarSeparator } from './primitives/toolbar';
 import { Button } from './primitives/button';
 import { Spacer } from './primitives/spacer';
@@ -154,7 +159,7 @@ export const TiptapToolbar: React.FC<ITiptapToolbarProps> = ({ editor }) => {
           onClick={() => handleHeading(1)}
           title="标题 1"
         >
-          H1
+          <Headline1Outlined />
         </Button>
         <Button
           data-style="ghost"
@@ -163,7 +168,7 @@ export const TiptapToolbar: React.FC<ITiptapToolbarProps> = ({ editor }) => {
           onClick={() => handleHeading(2)}
           title="标题 2"
         >
-          H2
+          <Headline2Outlined />
         </Button>
         <Button
           data-style="ghost"
@@ -172,7 +177,7 @@ export const TiptapToolbar: React.FC<ITiptapToolbarProps> = ({ editor }) => {
           onClick={() => handleHeading(3)}
           title="标题 3"
         >
-          H3
+          <Headline3Outlined />
         </Button>
       </ToolbarGroup>
 
@@ -196,7 +201,7 @@ export const TiptapToolbar: React.FC<ITiptapToolbarProps> = ({ editor }) => {
           onClick={handleItalic}
           title="斜体"
         >
-          <ItalicOutlined />
+          <ItalicsOutlined />
         </Button>
         <Button
           data-style="ghost"
@@ -247,7 +252,7 @@ export const TiptapToolbar: React.FC<ITiptapToolbarProps> = ({ editor }) => {
           onClick={handleBulletList}
           title="无序列表"
         >
-          <UnorderedListOutlined />
+          <UnorderedOutlined />
         </Button>
         <Button
           data-style="ghost"
@@ -256,7 +261,7 @@ export const TiptapToolbar: React.FC<ITiptapToolbarProps> = ({ editor }) => {
           onClick={handleOrderedList}
           title="有序列表"
         >
-          <OrderedListOutlined />
+          <OrderedOutlined />
         </Button>
       </ToolbarGroup>
 
@@ -279,7 +284,7 @@ export const TiptapToolbar: React.FC<ITiptapToolbarProps> = ({ editor }) => {
           onClick={handleImage}
           title="插入图片"
         >
-          <PictureOutlined />
+          <ImageOutlined />
         </Button>
       </ToolbarGroup>
 
@@ -294,7 +299,7 @@ export const TiptapToolbar: React.FC<ITiptapToolbarProps> = ({ editor }) => {
           onClick={handleBlockquote}
           title="引用块"
         >
-          &quot;
+          <QuoteOutlined />
         </Button>
         <Button
           data-style="ghost"
@@ -303,7 +308,7 @@ export const TiptapToolbar: React.FC<ITiptapToolbarProps> = ({ editor }) => {
           onClick={handleCodeBlock}
           title="代码块"
         >
-          {'</>'}
+          <CodeOutlined />
         </Button>
         <Button
           data-style="ghost"
@@ -311,7 +316,7 @@ export const TiptapToolbar: React.FC<ITiptapToolbarProps> = ({ editor }) => {
           onClick={handleHorizontalRule}
           title="水平分割线"
         >
-          —
+          <DividingLineOutlined />
         </Button>
       </ToolbarGroup>
 
