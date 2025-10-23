@@ -117,6 +117,7 @@ export const TiptapCollaborativeEditor: React.FC<ITiptapEditorProps> = ({
         // 协作编辑扩展
         Collaboration.configure({
           document: ydoc,
+          field: 'default', // Y.js fragment 名称
         }),
         // 协作光标扩展
         CollaborationCaret.configure({
