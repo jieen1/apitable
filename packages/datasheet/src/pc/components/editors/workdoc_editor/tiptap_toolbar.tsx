@@ -125,7 +125,7 @@ export const TiptapToolbar: React.FC<ITiptapToolbarProps> = ({ editor }) => {
   };
 
   return (
-    <Toolbar variant="default">
+    <Toolbar variant="floating">
       {/* 撤销/重做 */}
       <ToolbarGroup>
         <Button

@@ -22,12 +22,10 @@ import StarterKit from '@tiptap/starter-kit';
 import Collaboration from '@tiptap/extension-collaboration';
 import CollaborationCaret from '@tiptap/extension-collaboration-caret';
 import Placeholder from '@tiptap/extension-placeholder';
-import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import Highlight from '@tiptap/extension-highlight';
-import TextStyle from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
 import { HocuspocusProvider } from '@hocuspocus/provider';
 import * as Y from 'yjs';
@@ -118,6 +116,7 @@ export const TiptapCollaborativeEditor: React.FC<ITiptapEditorProps> = ({
         Collaboration.configure({
           document: ydoc,
           field: 'default', // Y.js fragment 名称
+          provider: provider,
         }),
         // 协作光标扩展
         CollaborationCaret.configure({
@@ -131,7 +130,6 @@ export const TiptapCollaborativeEditor: React.FC<ITiptapEditorProps> = ({
         Placeholder.configure({
           placeholder,
         }),
-        Underline.configure({}),
         TextAlign.configure({
           types: ['heading', 'paragraph'],
         }),
@@ -140,7 +138,6 @@ export const TiptapCollaborativeEditor: React.FC<ITiptapEditorProps> = ({
         }),
         Image.configure({}),
         Highlight.configure({}),
-        // TextStyle.configure({}),
         Color.configure({}),
       ] : [StarterKit],
       immediatelyRender: false,
