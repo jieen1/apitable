@@ -26,7 +26,7 @@ importers:
         specifier: 5.1.2
         version: 5.1.2
       react:
-        specifier: 18.2.0
+        specifier: link:@udecode/plate/react
         version: 18.2.0
     devDependencies:
       '@babel/core':
@@ -911,7 +911,7 @@ importers:
         version: 3.7.2(@tiptap/core@3.7.2)
       '@tiptap/react':
         specifier: ^3.7.2
-        version: 3.7.2(@floating-ui/dom@1.6.3)(@tiptap/core@3.7.2)(@tiptap/pm@3.7.2)(@types/react-dom@18.2.7)(@types/react@18.0.2)(react-dom@18.2.0)(react@18.2.0)
+        version: 3.7.2(@floating-ui/dom@1.7.4)(@tiptap/core@3.7.2)(@tiptap/pm@3.7.2)(@types/react-dom@18.2.7)(@types/react@18.0.2)(react-dom@18.2.0)(react@18.2.0)
       '@tiptap/starter-kit':
         specifier: ^3.7.2
         version: 3.7.2
@@ -1083,9 +1083,6 @@ importers:
       antd:
         specifier: 4.23.5
         version: 4.23.5(react-dom@18.2.0)(react@18.2.0)
-      antd-icons:
-        specifier: 0.1.0-alpha.1
-        version: 0.1.0-alpha.1
       antd-mobile:
         specifier: 5.32.4
         version: 5.32.4(react-dom@18.2.0)(react@18.2.0)
@@ -7058,7 +7055,7 @@ packages:
     dependencies:
       '@nestjs/common': 8.1.2(cache-manager@3.6.3)(class-transformer@0.3.1)(class-validator@0.14.0)(debug@4.3.4)(reflect-metadata@0.1.13)(rxjs@7.5.7)
       lodash: 4.17.21
-      nanoid: 3.3.6
+      nanoid: 3.3.11
     dev: false
 
   /@golevelup/nestjs-discovery@3.0.1(@nestjs/common@8.1.2)(@nestjs/core@8.1.2):
@@ -10282,7 +10279,7 @@ packages:
       lodash: 4.17.21
       lodash-es: 4.17.21
       markdown-to-jsx: 7.3.2(react@18.2.0)
-      nanoid: 3.3.6
+      nanoid: 3.3.11
       prop-types: 15.8.1
       react: 18.2.0
     dev: false
@@ -12359,7 +12356,7 @@ packages:
       fs-extra: 9.1.0
       global: 4.4.0
       isomorphic-unfetch: 3.1.0
-      nanoid: 3.3.6
+      nanoid: 3.3.11
       read-pkg-up: 7.0.1
       regenerator-runtime: 0.13.11
     transitivePeerDependencies:
@@ -13091,7 +13088,7 @@ packages:
     dependencies:
       '@tiptap/core': 3.7.2(@tiptap/pm@3.7.2)
       '@tiptap/pm': 3.7.2
-      '@tiptap/y-tiptap': 3.0.0(prosemirror-model@1.25.4)(prosemirror-state@1.4.3)(prosemirror-view@1.41.3)(y-protocols@1.0.6)(yjs@13.6.8)
+      '@tiptap/y-tiptap': 3.0.0(prosemirror-model@1.25.4)(prosemirror-state@1.4.3)(prosemirror-view@1.41.3)(y-protocols@1.0.6)(yjs@13.6.27)
     dev: false
 
   /@tiptap/extension-collaboration@3.7.2(@tiptap/core@3.7.2)(@tiptap/pm@3.7.2)(@tiptap/y-tiptap@3.0.0)(yjs@13.6.8):
@@ -13150,7 +13147,7 @@ packages:
       '@tiptap/extensions': 3.7.2(@tiptap/core@3.7.2)(@tiptap/pm@3.7.2)
     dev: false
 
-  /@tiptap/extension-floating-menu@3.7.2(@floating-ui/dom@1.6.3)(@tiptap/core@3.7.2)(@tiptap/pm@3.7.2):
+  /@tiptap/extension-floating-menu@3.7.2(@floating-ui/dom@1.7.4)(@tiptap/core@3.7.2)(@tiptap/pm@3.7.2):
     resolution: {integrity: sha512-g19ratrXlplYDS29VLQa1y/IM/ro0UFhSS4fQokiQKkazwnA1ZVnebjw8ERYg5lkMm/hiImqstpgdO0LtoivvQ==}
     requiresBuild: true
     peerDependencies:
@@ -13158,7 +13155,7 @@ packages:
       '@tiptap/core': ^3.7.2
       '@tiptap/pm': ^3.7.2
     dependencies:
-      '@floating-ui/dom': 1.6.3
+      '@floating-ui/dom': 1.7.4
       '@tiptap/core': 3.7.2(@tiptap/pm@3.7.2)
       '@tiptap/pm': 3.7.2
     dev: false
@@ -13489,7 +13486,7 @@ packages:
       prosemirror-view: 1.41.3
     dev: false
 
-  /@tiptap/react@3.7.2(@floating-ui/dom@1.6.3)(@tiptap/core@3.7.2)(@tiptap/pm@3.7.2)(@types/react-dom@18.2.7)(@types/react@18.0.2)(react-dom@18.2.0)(react@18.2.0):
+  /@tiptap/react@3.7.2(@floating-ui/dom@1.7.4)(@tiptap/core@3.7.2)(@tiptap/pm@3.7.2)(@types/react-dom@18.2.7)(@types/react@18.0.2)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-tka4ioSmsGI4TyGZ7jAUoIw8t8DVjr1It0B38vZVLqg8M/ZFgR1NkF50TJ6qAkhy8Uz12AO50so0v79tV2pmEA==}
     peerDependencies:
       '@tiptap/core': ^3.7.2
@@ -13510,7 +13507,7 @@ packages:
       use-sync-external-store: 1.6.0(react@18.2.0)
     optionalDependencies:
       '@tiptap/extension-bubble-menu': 3.7.2(@tiptap/core@3.7.2)(@tiptap/pm@3.7.2)
-      '@tiptap/extension-floating-menu': 3.7.2(@floating-ui/dom@1.6.3)(@tiptap/core@3.7.2)(@tiptap/pm@3.7.2)
+      '@tiptap/extension-floating-menu': 3.7.2(@floating-ui/dom@1.7.4)(@tiptap/core@3.7.2)(@tiptap/pm@3.7.2)
     transitivePeerDependencies:
       - '@floating-ui/dom'
     dev: false
@@ -13578,6 +13575,24 @@ packages:
     dependencies:
       '@tiptap/core': 3.7.2(@tiptap/pm@3.7.2)
       '@tiptap/pm': 3.7.2
+    dev: false
+
+  /@tiptap/y-tiptap@3.0.0(prosemirror-model@1.25.4)(prosemirror-state@1.4.3)(prosemirror-view@1.41.3)(y-protocols@1.0.6)(yjs@13.6.27):
+    resolution: {integrity: sha512-HIeJZCj+KYJde2x6fONzo4o6kd7gW7eonwhQsv2p2VQnUgwNXMVhN+D6Z3AH/2i541Sq33y1PO4U/1ThCPjqbA==}
+    engines: {node: '>=16.0.0', npm: '>=8.0.0'}
+    peerDependencies:
+      prosemirror-model: ^1.7.1
+      prosemirror-state: ^1.2.3
+      prosemirror-view: ^1.9.10
+      y-protocols: ^1.0.1
+      yjs: ^13.5.38
+    dependencies:
+      lib0: 0.2.114
+      prosemirror-model: 1.25.4
+      prosemirror-state: 1.4.3
+      prosemirror-view: 1.41.3
+      y-protocols: 1.0.6(yjs@13.6.27)
+      yjs: 13.6.27
     dev: false
 
   /@tiptap/y-tiptap@3.0.0(prosemirror-model@1.25.4)(prosemirror-state@1.4.3)(prosemirror-view@1.41.3)(y-protocols@1.0.6)(yjs@13.6.8):
@@ -16929,10 +16944,6 @@ packages:
     dependencies:
       entities: 2.2.0
     dev: true
-
-  /antd-icons@0.1.0-alpha.1:
-    resolution: {integrity: sha512-+P+9ce1o7ShB72V7q1pvhnosEQNkN0MfIzHnsjFcLgT2Xv+eiQor907jf95mfEWQWPqkTU8a1tb4DBDe9KYI3Q==}
-    dev: false
 
   /antd-mobile-icons@0.3.0:
     resolution: {integrity: sha512-rqINQpJWZWrva9moCd1Ye695MZYWmqLPE+bY8d2xLRy7iSQwPsinCdZYjpUPp2zL/LnKYSyXxP2ut2A+DC+whQ==}
@@ -30376,7 +30387,6 @@ packages:
     resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
-    dev: false
 
   /nanoid@3.3.6:
     resolution: {integrity: sha512-BGcqMMJuToF7i1rt+2PWSNVnWIkGCU78jBG3RxO/bZlnZPK2Cmi2QaffxGO/2RvWi9sL+FAiRiXMgsyxQ1DIDA==}
@@ -32693,7 +32703,7 @@ packages:
     resolution: {integrity: sha512-E398TUmfAYFPBSdzgeieK2Y1+1cpdxJx8yXbK/m57nRhKSmk1GB2tO4lbLBtlkfPQTDKfe4Xqv1ASWPpayPEig==}
     engines: {node: ^10 || ^12 || >=14}
     dependencies:
-      nanoid: 3.3.6
+      nanoid: 3.3.11
       picocolors: 1.0.0
       source-map-js: 1.0.2
 
@@ -32709,7 +32719,7 @@ packages:
     resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
     engines: {node: ^10 || ^12 || >=14}
     dependencies:
-      nanoid: 3.3.6
+      nanoid: 3.3.11
       picocolors: 1.0.0
       source-map-js: 1.0.2
     dev: true
