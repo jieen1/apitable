@@ -38,42 +38,65 @@ portfinder
         const server = express();
 
         if (isDevelopment) {
+          const databusTarget = process.env.API_PROXY || 'http://127.0.0.1:8082';
+          const nestTarget = process.env.API_PROXY || process.env.API_ROOM_SERVER || 'http://127.0.0.1:3333';
+          const apiTarget = process.env.API_PROXY || process.env.API_BACKEND_SERVER || 'http://127.0.0.1:8081';
+          const fusionTarget = process.env.API_PROXY || process.env.API_FUSION_SERVER || 'http://127.0.0.1:3333';
+          const documentTarget = process.env.API_PROXY || process.env.API_SOCKET_SERVER_DOCUMENT || 'http://127.0.0.1:3006';
+          const roomTarget = process.env.API_PROXY || process.env.API_SOCKET_SERVER_ROOM || 'http://127.0.0.1:3005';
+          const notificationTarget = process.env.API_PROXY || process.env.API_SOCKET_SERVER_NOTIFICATION || 'http://127.0.0.1:3002';
+
+          if (!databusTarget || !nestTarget || !apiTarget || !fusionTarget || !documentTarget || !roomTarget || !notificationTarget) {
+            console.warn('Warning: Some API proxy targets are not configured. Please set environment variables:');
+            console.warn('- API_PROXY');
+            console.warn('- API_ROOM_SERVER');
+            console.warn('- API_BACKEND_SERVER');
+            console.warn('- API_FUSION_SERVER');
+            console.warn('- API_SOCKET_SERVER_DOCUMENT');
+            console.warn('- API_SOCKET_SERVER_ROOM');
+            console.warn('- API_SOCKET_SERVER_NOTIFICATION');
+          }
+
           server.use(
-            createProxyMiddleware('/databus', {
-              target: process.env.API_PROXY || 'http://127.0.0.1:8082',
+            '/databus',
+            createProxyMiddleware({
+              target: databusTarget,
               changeOrigin: true,
               cookieDomainRewrite: '',
             }),
           );
 
           server.use(
-            createProxyMiddleware('/nest', {
-              // Direct connection to local NodeJS environment
-              target: process.env.API_PROXY || process.env.API_ROOM_SERVER || 'http://127.0.0.1:3333',
+            '/nest',
+            createProxyMiddleware({
+              target: nestTarget,
               changeOrigin: true,
               cookieDomainRewrite: '',
             }),
           );
 
           server.use(
-            createProxyMiddleware('/api', {
-              target: process.env.API_PROXY || process.env.API_BACKEND_SERVER || 'http://127.0.0.1:8081',
+            '/api',
+            createProxyMiddleware({
+              target: apiTarget,
               changeOrigin: true,
               cookieDomainRewrite: '',
             }),
           );
 
           server.use(
-            createProxyMiddleware('/fusion', {
-              target: process.env.API_PROXY || process.env.API_FUSION_SERVER || 'http://127.0.0.1:3333',
+            '/fusion',
+            createProxyMiddleware({
+              target: fusionTarget,
               changeOrigin: true,
               cookieDomainRewrite: '',
             }),
           );
 
           server.use(
-            createProxyMiddleware('/document', {
-              target: process.env.API_PROXY || process.env.API_SOCKET_SERVER_DOCUMENT || 'http://127.0.0.1:3006',
+            '/document',
+            createProxyMiddleware({
+              target: documentTarget,
               ws: true,
               changeOrigin: true,
               cookieDomainRewrite: '',
@@ -81,8 +104,9 @@ portfinder
           );
 
           server.use(
-            createProxyMiddleware('/room', {
-              target: process.env.API_PROXY || process.env.API_SOCKET_SERVER_ROOM || 'http://127.0.0.1:3005',
+            '/room',
+            createProxyMiddleware({
+              target: roomTarget,
               ws: true,
               changeOrigin: true,
               cookieDomainRewrite: '',
@@ -90,17 +114,9 @@ portfinder
           );
 
           server.use(
-            createProxyMiddleware('/notification', {
-              target: process.env.API_PROXY || process.env.API_SOCKET_SERVER_NOTIFICATION || 'http://127.0.0.1:3002',
-              ws: true,
-              changeOrigin: true,
-              cookieDomainRewrite: '',
-            }),
-          );
-
-          server.use(
-            createProxyMiddleware('/document', {
-              target: process.env.API_PROXY || process.env.API_DOCUMENT_SERVER_ROOM || 'http://127.0.0.1:3006',
+            '/notification',
+            createProxyMiddleware({
+              target: notificationTarget,
               ws: true,
               changeOrigin: true,
               cookieDomainRewrite: '',
@@ -108,7 +124,7 @@ portfinder
           );
         }
 
-        server.all('*', (req, res) => {
+        server.all('/*path', (req, res) => {
           return handle(req, res);
         });
 

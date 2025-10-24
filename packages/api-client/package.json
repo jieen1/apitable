@@ -26,11 +26,11 @@
   },
   "dependencies": {
     "whatwg-fetch": "^3.6.*",
-    "es6-promise": "^4.2.4",
-    "url-parse": "^1.4.3"
+    "es6-promise": "^4.2.8",
+    "url-parse": "^1.5.10"
   },
   "devDependencies": {
-    "typescript": "^4.0",
-    "@types/url-parse": "1.4.4"
+    "typescript": "^5.9",
+    "@types/url-parse": "1.4.11"
   }
 }

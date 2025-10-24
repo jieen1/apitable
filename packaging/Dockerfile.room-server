@@ -1,5 +1,5 @@
 # Install dependencies only when needed
-FROM docker.1ms.run/apitable/node:v16.15.0 AS deps
+FROM docker.1ms.run/node:22-alpine AS deps
 
 WORKDIR /app
 
@@ -19,7 +19,7 @@ COPY packages/room-server/package.json ./packages/room-server/
 RUN pnpm install --filter @apitable/room-server --filter root
 
 # stage builder
-FROM docker.1ms.run/apitable/node:v16.15.0 AS builder
+FROM docker.1ms.run/node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -47,7 +47,7 @@ ARG KEEP_DEV_DEP
 RUN if [ "$KEEP_DEV_DEP" = "" ] ; then pnpm install --filter @apitable/room-server; fi
 
 # stage runner
-FROM docker.1ms.run/apitable/node:v16.15.0 AS runner
+FROM docker.1ms.run/node:22-alpine AS runner
 
 WORKDIR /app
 

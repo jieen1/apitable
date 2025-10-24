@@ -61,53 +61,53 @@
     "extends": "react-app"
   },
   "engines": {
-    "node": "16.15.0",
-    "pnpm": "^8"
+    "node": "22.21.0",
+    "pnpm": "^10.19.0"
   },
   "devDependencies": {
-    "@babel/core": "7.22.20",
-    "@commitlint/cli": "17.7.1",
-    "@commitlint/config-conventional": "17.7.0",
-    "@microsoft/eslint-formatter-sarif": "^3.0.0",
-    "@swc/core": "^1.3.86",
-    "@swc/jest": "^0.2.29",
-    "@types/dot-object": "^2.1.2",
-    "@types/jest": "^29.5.11",
-    "@types/lru-cache": "^7.10.9",
-    "@types/node": "^20.6.2",
-    "@typescript-eslint/eslint-plugin": "^6.7.2",
-    "@typescript-eslint/parser": "^6.7.2",
+    "@babel/core": "7.28.5",
+    "@commitlint/cli": "20.1.0",
+    "@commitlint/config-conventional": "20.0.0",
+    "@microsoft/eslint-formatter-sarif": "^3.1.0",
+    "@swc/core": "^1.13.21",
+    "@swc/jest": "^0.2.39",
+    "@types/dot-object": "^2.1.6",
+    "@types/jest": "^30.0.0",
+    "@types/lru-cache": "^7.10.10",
+    "@types/node": "^24.9.1",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
+    "@typescript-eslint/parser": "^8.46.2",
     "apitable": "latest",
     "babel-eslint": "10.1.0",
-    "chalk": "^5.3.0",
-    "concurrently": "^8.2.1",
-    "dot-object": "^2.1.4",
-    "dotenv": "16.3.1",
-    "dotenv-expand": "10.0.0",
-    "eslint": "^8.49.0",
-    "eslint-config-prettier": "^8",
+    "chalk": "^5.6.2",
+    "concurrently": "^9.2.1",
+    "dot-object": "^2.1.5",
+    "dotenv": "17.2.3",
+    "dotenv-expand": "12.0.3",
+    "eslint": "^9.38.0",
+    "eslint-config-prettier": "^10",
     "eslint-config-react-app": "7.0.1",
     "eslint-plugin-flowtype": "8.0.3",
-    "eslint-plugin-import": "2.28.1",
-    "eslint-plugin-jsx-a11y": "6.7.1",
-    "eslint-plugin-react": "^7.33.2",
-    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-import": "2.32.0",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.0",
     "eslint-plugin-vika": "0.0.1",
-    "git-format-staged": "^3.0.0",
-    "husky": "8.0.3",
-    "lint-staged": "14.0.1",
+    "git-format-staged": "^3.1.1",
+    "husky": "9.1.7",
+    "lint-staged": "16.2.6",
     "lodash": "^4.17.21",
-    "nx": "16.10.0",
-    "prettier": "^3.0.3",
-    "pretty-quick": "^3.1.3",
-    "quicktype": "^23.0.75",
-    "svgo": "^3.0.2",
-    "ts-node": "^10.9.1",
+    "nx": "22.0.1",
+    "prettier": "^3.6.2",
+    "pretty-quick": "^4.2.2",
+    "quicktype": "^23.2.6",
+    "svgo": "^4.0.0",
+    "ts-node": "^10.9.2",
     "ts-pnp": "1.2.0",
-    "typescript": "4.8.2"
+    "typescript": "5.9.3"
   },
   "resolutions": {
-    "node-gyp": "9.3.1",
+    "node-gyp": "10.2.0",
     "@nestjs/microservices@^8.1.1": "8.1.2"
   },
   "bin": "packages/room-server/dist/main.js",
@@ -124,7 +124,7 @@
       "packages/room-server/**/*.yaml"
     ]
   },
-  "packageManager": "pnpm@8.6.12",
+  "packageManager": "pnpm@10.19.0",
   "pnpm": {
     "packageExtensions": {
       "posix": {
@@ -136,10 +136,10 @@
     "patchedDependencies": {
       "mysql2@3.9.7": "patches/mysql2@3.9.7.patch"
     },
-    "allowNonAppliedPatches": true
+    "allowUnusedPatches": true
   },
   "dependencies": {
-    "glob-parent": "5.1.2",
-    "react": "18.2.0"
+    "glob-parent": "6.0.2",
+    "react": "19.2.0"
   }
 }

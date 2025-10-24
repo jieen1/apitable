@@ -79,27 +79,24 @@ const nextConfig = {
       }
     ]
   },
-  swcMinify: true,
+  // swcMinify: true,
   poweredByHeader: false,
-  publicRuntimeConfig: {
+  // publicRuntimeConfig: {
     // use local public folder for editions, e.g. apitable
-    staticFolder() {
-      if (process.env.USE_CUSTOM_PUBLIC_FILES === 'true') return '';
-
-      return isProd ? process.env.NEXT_PUBLIC_ASSET_PREFIX : '';
-    }
-  },
-  sentry: {
-    disableServerWebpackPlugin: false,
-    disableClientWebpackPlugin: false
-  },
+    // staticFolder() {
+      // if (process.env.USE_CUSTOM_PUBLIC_FILES === 'true') return '';
+// 
+      // return isProd ? process.env.NEXT_PUBLIC_ASSET_PREFIX : '';
+    // }
+  // },
   distDir: 'web_build',
   output: 'standalone',
+  outputFileTracingRoot: path.join(__dirname, '../../'),
+  // target: "https://jieen.site:9021",
   experimental: {
     // runtime: 'nodejs', // 'node.js' (default) | experimental-edge
     esmExternals: true,
     // this includes files from the monorepo base two directories up
-    outputFileTracingRoot: path.join(__dirname, '../../')
   }
 };
 
