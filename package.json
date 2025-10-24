@@ -139,8 +139,7 @@
     "allowNonAppliedPatches": true
   },
   "dependencies": {
-    "@tiptap/extension-collaboration-caret": "^3.7.2",
     "glob-parent": "5.1.2",
-    "react": "link:@udecode/plate/react"
+    "react": "18.2.0"
   }
 }
