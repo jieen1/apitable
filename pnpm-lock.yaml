@@ -19,6 +19,9 @@ importers:
 
   .:
     dependencies:
+      '@tiptap/extension-collaboration-caret':
+        specifier: ^3.7.2
+        version: 3.7.2(@tiptap/core@3.7.2)(@tiptap/pm@3.7.2)(@tiptap/y-tiptap@3.0.0)
       glob-parent:
         specifier: 5.1.2
         version: 5.1.2
@@ -1080,6 +1083,9 @@ importers:
       antd:
         specifier: 4.23.5
         version: 4.23.5(react-dom@18.2.0)(react@18.2.0)
+      antd-icons:
+        specifier: 0.1.0-alpha.1
+        version: 0.1.0-alpha.1
       antd-mobile:
         specifier: 5.32.4
         version: 5.32.4(react-dom@18.2.0)(react@18.2.0)
@@ -16923,6 +16929,10 @@ packages:
     dependencies:
       entities: 2.2.0
     dev: true
+
+  /antd-icons@0.1.0-alpha.1:
+    resolution: {integrity: sha512-+P+9ce1o7ShB72V7q1pvhnosEQNkN0MfIzHnsjFcLgT2Xv+eiQor907jf95mfEWQWPqkTU8a1tb4DBDe9KYI3Q==}
+    dev: false
 
   /antd-mobile-icons@0.3.0:
     resolution: {integrity: sha512-rqINQpJWZWrva9moCd1Ye695MZYWmqLPE+bY8d2xLRy7iSQwPsinCdZYjpUPp2zL/LnKYSyXxP2ut2A+DC+whQ==}
