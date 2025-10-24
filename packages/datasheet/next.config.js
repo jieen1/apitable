@@ -31,13 +31,13 @@ const sentryWebpackPluginOptions = {
   disableClientWebpackPlugin: false,
   org: process.env.SENTRY_ORG ??  'sentry',
   project: process.env.SENTRY_PROJECT  ?? 'web-server',
-  url: process.env.SENTRY_URL  ??  'https://sentry.vika.ltd',
+  // url: process.env.SENTRY_URL  ??  'https://sentry.vika.ltd',
   // An auth token is required for uploading source maps.
   dsn: process.env.SENTRY_CONFIG_DSN ?? 'https://51c44e606db14f34963bd4ba64d86410@sentry.vika.ltd/3',
   authToken: process.env.SENTRY_AUTH_TOKEN_VIKA ?? '',
   release: process.env.WEB_CLIENT_VERSION ?? '',
   silent: false, // Suppresses all logs
-  hideSourceMaps: true,
+  hideSourceMaps: false,
   debug: false
 
   // For all available options, see:
