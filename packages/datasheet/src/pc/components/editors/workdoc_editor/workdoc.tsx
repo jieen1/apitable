@@ -21,7 +21,7 @@ import { Input, InputRef, Drawer } from 'antd';
 import { ICellValue, Strings, t, IWorkDocValue } from '@apitable/core';
 import { EditOutlined } from '@apitable/icons';
 import { useAppSelector } from 'pc/store/react-redux';
-import { PlateCollaborativeEditor } from './plate_collaborative_editor';
+import { TiptapCollaborativeEditor } from './tiptap_editor';
 import { Status } from './interface';
 import styles from './workdoc.module.less';
 
@@ -224,7 +224,7 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
     >
       <div className={styles.editorContainer}>
         {userInfo?.uuid && recordId && (
-          <PlateCollaborativeEditor
+          <TiptapCollaborativeEditor
             documentId={documentMeta.documentId}
             userId={userInfo.uuid}
             userName={userInfo.nickName || userInfo.memberName || 'Anonymous'}
