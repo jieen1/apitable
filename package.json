@@ -139,7 +139,9 @@
     "allowNonAppliedPatches": true
   },
   "dependencies": {
+    "@platejs/basic-nodes": "^51.0.0",
     "glob-parent": "5.1.2",
+    "platejs": "^51.0.0",
     "react": "18.2.0"
   }
 }
