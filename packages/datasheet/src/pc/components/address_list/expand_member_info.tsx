@@ -48,7 +48,7 @@ export const expandMemberInfo = () => {
       root.render(
         <Provider store={store}>
           <div className={styles.memberInfoDrawer}>
-            <Drawer placement="right" height={'100%'} width={'100%'} visible closable={false}>
+            <Drawer placement="right" height={'100%'} width={'100%'} open closable={false}>
               <div className={styles.mobileBack} onClick={close}>
                 <ChevronLeftOutlined color="currentColor" />
                 <span>{t(Strings.back)}</span>

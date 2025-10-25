@@ -72,9 +72,9 @@ export const UploadModal: React.FC<React.PropsWithChildren<IUploadAttachment>> =
   );
 
   return (
-    <Modal
+    (<Modal
       title={t(Strings.list_of_attachments)}
-      visible={visible}
+      open={visible}
       closable
       width={696}
       footer={Footer}
@@ -96,6 +96,6 @@ export const UploadModal: React.FC<React.PropsWithChildren<IUploadAttachment>> =
           onSave={onSave}
         />
       </div>
-    </Modal>
+    </Modal>)
   );
 };

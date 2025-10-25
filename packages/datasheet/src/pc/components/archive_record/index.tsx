@@ -354,84 +354,82 @@ export const ArchivedRecords: React.FC<React.PropsWithChildren<IArchivedRecordsP
     );
   }, []);
 
-  return (
-    <>
-      <ToolItem
-        key="archivedRecords"
-        icon={<ArchiveOutlined size={16} />}
-        showLabel={isHide ?? showLabel}
-        className={classnames(className)}
-        text={t(Strings.archived_records)}
-        onClick={showDrawer}
-        id={DATASHEET_ID.ARCHIVED_RECORDS_BTN}
-        disabled={!permissions.editable}
+  return (<>
+    <ToolItem
+      key="archivedRecords"
+      icon={<ArchiveOutlined size={16} />}
+      showLabel={isHide ?? showLabel}
+      className={classnames(className)}
+      text={t(Strings.archived_records)}
+      onClick={showDrawer}
+      id={DATASHEET_ID.ARCHIVED_RECORDS_BTN}
+      disabled={!permissions.editable}
+    />
+    <Drawer
+      rootClassName="archiveDrawer"
+      title={<TitleComponents />}
+      placement="right"
+      onClose={onDrawerClose}
+      width={window.innerWidth * 0.9}
+      open={open}
+    >
+      <div className={styles.batchHandle}>
+        <Button
+          disabled={!hasSelected}
+          onClick={() => {
+            Modal.warning({
+              title: t(Strings.archived_undo),
+              content: t(Strings.unarchive_notice),
+              onOk: () => batchCancelArchived(),
+              closable: true,
+              hiddenCancelBtn: false,
+            });
+          }}
+          variant="fill"
+          size="small"
+          prefixIcon={<RestoreOutlined currentColor />}
+        >
+          {t(Strings.archived_undo)}
+        </Button>
+        <Button
+          disabled={!hasSelected}
+          variant="fill"
+          onClick={() => {
+            Modal.danger({
+              title: t(Strings.archive_delete_record),
+              content: t(Strings.delete_archived_records_warning_description),
+              onOk: () => batchDeleteRecord(),
+              closable: true,
+              hiddenCancelBtn: false,
+            });
+          }}
+          size="small"
+          prefixIcon={<DeleteOutlined currentColor />}
+        >
+          {t(Strings.delete_record)}
+        </Button>
+        {hasSelected && <p>{t(Strings.archived_select_info, { selected: selectedRowKeys.length })}</p>}
+      </div>
+      <Table
+        rowSelection={{
+          type: 'checkbox',
+          ...rowSelection,
+        }}
+        loading={archivedRecordsLoading}
+        columns={columns}
+        scroll={{ x: window.innerWidth * 0.9, y: window.innerHeight - 234 }}
+        dataSource={handleRecordsData(fastCloneDeep(recordData))}
+        pagination={{
+          total,
+          showQuickJumper: true,
+          showSizeChanger: true,
+          showTotal: (total, range) => `${range[0]}-${range[1]} / ${total} total`,
+          current: tableParams.pageNum,
+          pageSize: tableParams.pageSize,
+        }}
+        onChange={handleTableChange}
+        className="archivedRecordsTable"
       />
-      <Drawer
-        className="archiveDrawer"
-        title={<TitleComponents />}
-        placement="right"
-        onClose={onDrawerClose}
-        width={window.innerWidth * 0.9}
-        open={open}
-      >
-        <div className={styles.batchHandle}>
-          <Button
-            disabled={!hasSelected}
-            onClick={() => {
-              Modal.warning({
-                title: t(Strings.archived_undo),
-                content: t(Strings.unarchive_notice),
-                onOk: () => batchCancelArchived(),
-                closable: true,
-                hiddenCancelBtn: false,
-              });
-            }}
-            variant="fill"
-            size="small"
-            prefixIcon={<RestoreOutlined currentColor />}
-          >
-            {t(Strings.archived_undo)}
-          </Button>
-          <Button
-            disabled={!hasSelected}
-            variant="fill"
-            onClick={() => {
-              Modal.danger({
-                title: t(Strings.archive_delete_record),
-                content: t(Strings.delete_archived_records_warning_description),
-                onOk: () => batchDeleteRecord(),
-                closable: true,
-                hiddenCancelBtn: false,
-              });
-            }}
-            size="small"
-            prefixIcon={<DeleteOutlined currentColor />}
-          >
-            {t(Strings.delete_record)}
-          </Button>
-          {hasSelected && <p>{t(Strings.archived_select_info, { selected: selectedRowKeys.length })}</p>}
-        </div>
-        <Table
-          rowSelection={{
-            type: 'checkbox',
-            ...rowSelection,
-          }}
-          loading={archivedRecordsLoading}
-          columns={columns}
-          scroll={{ x: window.innerWidth * 0.9, y: window.innerHeight - 234 }}
-          dataSource={handleRecordsData(fastCloneDeep(recordData))}
-          pagination={{
-            total,
-            showQuickJumper: true,
-            showSizeChanger: true,
-            showTotal: (total, range) => `${range[0]}-${range[1]} / ${total} total`,
-            current: tableParams.pageNum,
-            pageSize: tableParams.pageSize,
-          }}
-          onChange={handleTableChange}
-          className="archivedRecordsTable"
-        />
-      </Drawer>
-    </>
-  );
+    </Drawer>
+  </>);
 };

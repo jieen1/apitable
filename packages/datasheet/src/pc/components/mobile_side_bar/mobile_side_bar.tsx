@@ -71,7 +71,7 @@ export const MobileSideBar: React.FC<React.PropsWithChildren<unknown>> = () => {
   }, [query, setSideBarVisible]);
 
   return (
-    <Drawer
+    (<Drawer
       width={'80%'}
       open={sideBarVisible}
       onClose={() => {
@@ -79,7 +79,7 @@ export const MobileSideBar: React.FC<React.PropsWithChildren<unknown>> = () => {
       }}
       placement="left"
       closable={false}
-      className={styles.mobileDrawer}
+      rootClassName={styles.mobileDrawer}
       push={{ distance: -800 }}
     >
       <div
@@ -92,6 +92,6 @@ export const MobileSideBar: React.FC<React.PropsWithChildren<unknown>> = () => {
           <CommonSide />
         </div>
       </div>
-    </Drawer>
+    </Drawer>)
   );
 };

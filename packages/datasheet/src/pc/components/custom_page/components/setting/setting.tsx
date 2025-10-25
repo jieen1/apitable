@@ -52,18 +52,18 @@ export const Setting: React.FC<ISettingProps> = ({ open, onClose }) => {
   }
 
   return (
-    <Drawer
+    (<Drawer
       zIndex={200}
       open={open}
       onClose={onClose}
       title={<Title onClose={onClose} />}
-      className={classnames(styles.drawerWrapper)}
+      rootClassName={classnames(styles.drawerWrapper)}
       destroyOnClose
       closable={false}
       width={'480px'}
       footer={null}
     >
       <SettingInner onClose={onClose} />
-    </Drawer>
+    </Drawer>)
   );
 };

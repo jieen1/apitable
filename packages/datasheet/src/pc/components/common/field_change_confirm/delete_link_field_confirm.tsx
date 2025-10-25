@@ -177,11 +177,11 @@ export const deleteLinkFieldConfirm = (props: { fieldId: string; datasheetId?: s
   const ConfirmModalWithTheme = () => {
     const cacheTheme = useAppSelector(Selectors.getTheme);
     return (
-      <ThemeProvider theme={cacheTheme}>
-        <Modal visible centered onCancel={() => onClose()} destroyOnClose footer={null} closable={false} width={400}>
+      (<ThemeProvider theme={cacheTheme}>
+        <Modal open centered onCancel={() => onClose()} destroyOnClose footer={null} closable={false} width={400}>
           <DeleteLinkField fieldId={fieldId} datasheetId={datasheetId} onClose={onClose} />
         </Modal>
-      </ThemeProvider>
+      </ThemeProvider>)
     );
   };
 

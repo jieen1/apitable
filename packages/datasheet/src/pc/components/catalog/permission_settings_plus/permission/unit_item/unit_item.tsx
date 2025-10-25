@@ -194,45 +194,43 @@ export const UnitItem: FC<React.PropsWithChildren<IUnitItemProps>> = (props) => 
     setMenuVisible(false);
     onRemove && onRemove(unitId);
   };
-  return (
-    <>
-      <ComponentDisplay minWidthCompatible={ScreenSize.md}>
-        <Dropdown
-          overlayStyle={{
-            minWidth: 'auto',
-            right: 0,
-          }}
-          placement={'bottomRight'}
-          trigger={['click']}
-          visible={menuVisible}
-          onVisibleChange={setMenuVisible}
-          disabled={disabled}
-          overlay={
-            <div style={{ maxWidth: '240px' }}>
-              <Menu>
-                {roleOptions.map((v) => (
-                  <MenuItem key={v.value} onClick={() => clickRole(unit.id, v.value)} active={role === v.value} item={v} />
-                ))}
-                <MenuItem
-                  className={styles.delete}
-                  item={{ label: t(Strings.remove_role), value: 'remove' }}
-                  option={{ labelColor: colors.textDangerDefault }}
-                  onClick={() => removeRole(unit.id)}
-                >
-                  {t(Strings.remove_role)}
-                </MenuItem>
-              </Menu>
-            </div>
-          }
-        >
-          {itemContent}
-        </Dropdown>
-      </ComponentDisplay>
-      <ComponentDisplay maxWidthCompatible={ScreenSize.md}>
-        <PermissionSelectMobile role={role} onChange={onChange} unitId={unit.id} onRemove={removeRole} roleOptions={roleOptions}>
-          {itemContent}
-        </PermissionSelectMobile>
-      </ComponentDisplay>
-    </>
-  );
+  return (<>
+    <ComponentDisplay minWidthCompatible={ScreenSize.md}>
+      <Dropdown
+        overlayStyle={{
+          minWidth: 'auto',
+          right: 0,
+        }}
+        placement={'bottomRight'}
+        trigger={['click']}
+        open={menuVisible}
+        onVisibleChange={setMenuVisible}
+        disabled={disabled}
+        overlay={
+          <div style={{ maxWidth: '240px' }}>
+            <Menu>
+              {roleOptions.map((v) => (
+                <MenuItem key={v.value} onClick={() => clickRole(unit.id, v.value)} active={role === v.value} item={v} />
+              ))}
+              <MenuItem
+                className={styles.delete}
+                item={{ label: t(Strings.remove_role), value: 'remove' }}
+                option={{ labelColor: colors.textDangerDefault }}
+                onClick={() => removeRole(unit.id)}
+              >
+                {t(Strings.remove_role)}
+              </MenuItem>
+            </Menu>
+          </div>
+        }
+      >
+        {itemContent}
+      </Dropdown>
+    </ComponentDisplay>
+    <ComponentDisplay maxWidthCompatible={ScreenSize.md}>
+      <PermissionSelectMobile role={role} onChange={onChange} unitId={unit.id} onRemove={removeRole} roleOptions={roleOptions}>
+        {itemContent}
+      </PermissionSelectMobile>
+    </ComponentDisplay>
+  </>);
 };

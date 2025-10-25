@@ -34,7 +34,7 @@ export const Popup: React.FC<React.PropsWithChildren<DrawerProps>> = (props) => 
   }, [headerStyle, props.title]);
 
   return (
-    <Drawer
+    (<Drawer
       closeIcon={
         <div className={style.closeIconWrapper}>
           <CloseOutlined color={colors.secondLevelText} size={16} />
@@ -43,10 +43,10 @@ export const Popup: React.FC<React.PropsWithChildren<DrawerProps>> = (props) => 
       push={{ distance: 0 }}
       placement="bottom"
       {...rest}
-      className={classNames(style.drawerPopup, className)}
+      rootClassName={classNames(style.drawerPopup, className)}
       headerStyle={_headerStyle}
     >
       {props.children}
-    </Drawer>
+    </Drawer>)
   );
 };

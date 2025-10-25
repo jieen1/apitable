@@ -402,7 +402,7 @@ export const Dashboard = () => {
   }
 
   return (
-    <div
+    (<div
       style={{
         padding: isMobile || templateId || shareId || embedId ? 0 : 16,
         height: '100%',
@@ -528,12 +528,12 @@ export const Dashboard = () => {
           onClose={() => {
             setVisibleRecommend(false);
           }}
-          visible={isMobile || !manageable ? false : visibleRecommend}
+          open={isMobile || !manageable ? false : visibleRecommend}
           key={'bottom'}
           getContainer={false}
           mask={false}
           height={312}
-          style={{
+          rootStyle={{
             position: 'absolute',
             borderRadius: '8px 8px 0 0',
             boxShadow: '0px 2px 12px rgba(38, 38, 38, 0.1)',
@@ -544,8 +544,7 @@ export const Dashboard = () => {
           <RecommendWidgetPanel setVisibleRecommend={setVisibleRecommend} visibleRecommend={visibleRecommend} readonly={!manageable} />
         </Drawer>
       )}
-
       <ContextMenu overlay={flatContextData(menuData, true)} menuId={WIDGET_MENU} onShown={({ props }) => setActiveMenuWidget(props?.widget)} />
-    </div>
+    </div>)
   );
 };

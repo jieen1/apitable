@@ -49,11 +49,11 @@ const RenameInputBase: ForwardRefRenderFunction<any, IRenameInputProps> = (props
     return classNames(customStyle);
   };
   return (
-    <div className={styles.viewItemInput}>
-      <Tooltip title={errorMsg} placement="top" visible={Boolean(errorMsg)}>
+    (<div className={styles.viewItemInput}>
+      <Tooltip title={errorMsg} placement="top" open={Boolean(errorMsg)}>
         <Input ref={inputRef} className={returnInputClass(errorMsg, customStyle)} {...rest} />
       </Tooltip>
-    </div>
+    </div>)
   );
 };
 

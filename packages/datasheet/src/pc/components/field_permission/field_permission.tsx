@@ -75,10 +75,10 @@ export const FieldPermission: React.FC<React.PropsWithChildren<IFieldPermissionP
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    (<ThemeProvider theme={theme}>
       <ComponentDisplay minWidthCompatible={ScreenSize.md}>
         <Modal
-          visible
+          open
           closeIcon={null}
           wrapClassName={styles.fieldPermissionModal}
           onCancel={onModalClose}
@@ -105,6 +105,6 @@ export const FieldPermission: React.FC<React.PropsWithChildren<IFieldPermissionP
           <Main />
         </Popup>
       </ComponentDisplay>
-    </ThemeProvider>
+    </ThemeProvider>)
   );
 };

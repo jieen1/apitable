@@ -51,8 +51,8 @@ export const ViewLock: React.FC<React.PropsWithChildren<IViewLockProps>> = (prop
   };
 
   return (
-    <Modal
-      visible
+    (<Modal
+      open
       closeIcon={null}
       wrapClassName={styles.viewLockModal}
       onCancel={onModalClose}
@@ -68,6 +68,6 @@ export const ViewLock: React.FC<React.PropsWithChildren<IViewLockProps>> = (prop
       ) : (
         <DisabledViewLock viewId={view.id} onModalClose={onModalClose} />
       )}
-    </Modal>
+    </Modal>)
   );
 };

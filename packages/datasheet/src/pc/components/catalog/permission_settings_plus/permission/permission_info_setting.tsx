@@ -152,7 +152,7 @@ const BatchSetting = (props: { defaultRole: IRoleOption[]; onClick?: (role: stri
   }
 
   return (
-    <Dropdown
+    (<Dropdown
       trigger={['click']}
       overlay={
         <div style={{ maxWidth: '240px' }}>
@@ -173,7 +173,7 @@ const BatchSetting = (props: { defaultRole: IRoleOption[]; onClick?: (role: stri
           </Menu>
         </div>
       }
-      visible={batchSelectVisible}
+      open={batchSelectVisible}
       onVisibleChange={setBatchSelectVisible}
     >
       <TextButton
@@ -185,6 +185,6 @@ const BatchSetting = (props: { defaultRole: IRoleOption[]; onClick?: (role: stri
       >
         {t(Strings.batch_edit_permission)}
       </TextButton>
-    </Dropdown>
+    </Dropdown>)
   );
 };

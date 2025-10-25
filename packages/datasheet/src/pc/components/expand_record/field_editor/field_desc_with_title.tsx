@@ -61,7 +61,7 @@ export const FieldDescWithTitle: FC<React.PropsWithChildren<IFieldDescWithTitleP
   });
 
   return (
-    <Tooltip
+    (<Tooltip
       openClassName={styles.tooltip}
       onVisibleChange={() => {
         setPressed(false);
@@ -82,7 +82,7 @@ export const FieldDescWithTitle: FC<React.PropsWithChildren<IFieldDescWithTitleP
       }
       placement="top"
       autoAdjustOverflow
-      visible={pressed && mobile}
+      open={pressed && mobile}
     >
       <div>
         <Clamp
@@ -127,6 +127,6 @@ export const FieldDescWithTitle: FC<React.PropsWithChildren<IFieldDescWithTitleP
           </pre>
         </Clamp>
       </div>
-    </Tooltip>
+    </Tooltip>)
   );
 };

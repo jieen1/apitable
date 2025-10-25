@@ -64,7 +64,7 @@ export function openFormulaModal(props: {
       <ComponentDisplay minWidthCompatible={ScreenSize.md}>
         <Modal
           className={styles.formulaModalWrapper}
-          visible
+          open
           onCancel={onModalClose}
           closable={false}
           mask={false}

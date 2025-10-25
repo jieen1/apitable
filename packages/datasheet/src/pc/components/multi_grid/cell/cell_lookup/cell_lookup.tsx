@@ -196,9 +196,9 @@ export const CellLookUp: React.FC<React.PropsWithChildren<ICellLookUpProps>> = (
   };
 
   return (
-    <div onDoubleClick={handleDbClick} style={{ width: '100%' }}>
+    (<div onDoubleClick={handleDbClick} style={{ width: '100%' }}>
       {showTip ? (
-        <Tooltip title={t(Strings.lookup_check_info)} visible={showTip} placement="top" autoAdjustOverflow>
+        <Tooltip title={t(Strings.lookup_check_info)} open={showTip} placement="top" autoAdjustOverflow>
           <div>
             <CellLookUpBase {...props} />
           </div>
@@ -206,6 +206,6 @@ export const CellLookUp: React.FC<React.PropsWithChildren<ICellLookUpProps>> = (
       ) : (
         <CellLookUpBase {...props} />
       )}
-    </div>
+    </div>)
   );
 };

@@ -176,14 +176,14 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
   }
 
   return (
-    <Drawer
+    (<Drawer
       open={editing}
       onClose={handleClose}
       width={800}
       placement="right"
       maskClosable={true}
       destroyOnClose={false}
-      className={styles.workdoc}
+      rootClassName={styles.workdoc}
       title={
         <div className={styles.header}>
           <div className={styles.status}>
@@ -239,6 +239,6 @@ export const Workdoc: React.FC<IWorkdocProps> = (props) => {
           />
         )}
       </div>
-    </Drawer>
+    </Drawer>)
   );
 };

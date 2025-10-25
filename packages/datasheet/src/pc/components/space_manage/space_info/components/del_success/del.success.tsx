@@ -47,8 +47,8 @@ export const DelSuccess: FC<React.PropsWithChildren<IResModal>> = ({ tip }) => {
   };
 
   return (
-    <Modal
-      visible
+    (<Modal
+      open
       footer={null}
       width={390}
       maskClosable={false}
@@ -62,6 +62,6 @@ export const DelSuccess: FC<React.PropsWithChildren<IResModal>> = ({ tip }) => {
         <div className={styles.title}>{t(Strings.delete_succeed)}</div>
         <div className={styles.tip}>{tip}</div>
       </div>
-    </Modal>
+    </Modal>)
   );
 };

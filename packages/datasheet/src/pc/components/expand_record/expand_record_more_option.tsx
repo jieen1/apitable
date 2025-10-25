@@ -254,7 +254,7 @@ export const ExpandRecordMoreOption: React.FC<React.PropsWithChildren<IExpandRec
 
   /* TODO: ContextMenu does not support non-String types, you need to upgrade ContextMenu to not use antd */
   return (
-    <Dropdown overlay={renderMenu()} visible={menuVisible} className={styles.moreOptionMenuDropdown}>
+    (<Dropdown overlay={renderMenu()} open={menuVisible} className={styles.moreOptionMenuDropdown}>
       <IconButton
         data-test-id={EXPAND_RECORD_OPERATE_BUTTON}
         component="button"
@@ -263,6 +263,6 @@ export const ExpandRecordMoreOption: React.FC<React.PropsWithChildren<IExpandRec
         icon={() => <MoreOutlined size={16} color={colors.thirdLevelText} />}
         onClick={() => toggleMenu()}
       />
-    </Dropdown>
+    </Dropdown>)
   );
 };

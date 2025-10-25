@@ -163,8 +163,8 @@ export const KanbanFieldSettingModal: React.FC<React.PropsWithChildren<IKanbanFi
   );
   const modalWidth = isMobile ? 330 : 480;
   return (
-    <Modal
-      visible
+    (<Modal
+      open
       title={null}
       closable={false}
       onCancel={() => {
@@ -297,7 +297,7 @@ export const KanbanFieldSettingModal: React.FC<React.PropsWithChildren<IKanbanFi
           </div>
         </div>
       </div>
-    </Modal>
+    </Modal>)
   );
 };
 

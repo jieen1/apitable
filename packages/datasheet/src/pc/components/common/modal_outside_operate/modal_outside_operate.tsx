@@ -36,8 +36,8 @@ interface IModalOutsideOperateProps {
 export const ModalOutsideOperate: React.FC<React.PropsWithChildren<IModalOutsideOperateProps>> = (props) => {
   const { pageTurn, onModalClose, children, modalClassName, modalWidth, showOutsideOperate = true, getContainer } = props;
   return (
-    <Modal
-      visible
+    (<Modal
+      open
       closeIcon={null}
       wrapClassName={classNames(styles.modalWrapper, modalClassName)}
       onCancel={() => onModalClose()}
@@ -65,6 +65,6 @@ export const ModalOutsideOperate: React.FC<React.PropsWithChildren<IModalOutside
         )}
         {children}
       </div>
-    </Modal>
+    </Modal>)
   );
 };

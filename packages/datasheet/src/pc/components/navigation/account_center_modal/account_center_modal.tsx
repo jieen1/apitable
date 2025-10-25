@@ -136,74 +136,71 @@ export const AccountCenterModal: FC<React.PropsWithChildren<IAccountCenterModalP
     );
   };
 
-  return (
-    <>
-      <ComponentDisplay minWidthCompatible={ScreenSize.md}>
-        <Modal
-          className={styles.accountCenter}
-          title={t(Strings.user_setting)}
-          footer={null}
-          onCancel={closeModal}
-          maskClosable
-          width={'90%'}
-          style={{ maxWidth: '1170px', minWidth: '800px' }}
-          centered
-          visible
-        >
-          <div className={styles.wrapper}>
-            <div className={styles.accountCenterWrapper}>
-              <div className={styles.left}>
-                <Nav activeItem={activeItem} setActiveItem={setActiveItem} navlist={listData} />
-              </div>
-              <div className={styles.right}>{listData[activeItem].component}</div>
+  return (<>
+    <ComponentDisplay minWidthCompatible={ScreenSize.md}>
+      <Modal
+        className={styles.accountCenter}
+        title={t(Strings.user_setting)}
+        footer={null}
+        onCancel={closeModal}
+        maskClosable
+        width={'90%'}
+        style={{ maxWidth: '1170px', minWidth: '800px' }}
+        centered
+        visible
+      >
+        <div className={styles.wrapper}>
+          <div className={styles.accountCenterWrapper}>
+            <div className={styles.left}>
+              <Nav activeItem={activeItem} setActiveItem={setActiveItem} navlist={listData} />
             </div>
+            <div className={styles.right}>{listData[activeItem].component}</div>
           </div>
-        </Modal>
-      </ComponentDisplay>
-
-      <ComponentDisplay maxWidthCompatible={ScreenSize.md}>
+        </div>
+      </Modal>
+    </ComponentDisplay>
+    <ComponentDisplay maxWidthCompatible={ScreenSize.md}>
+      <Drawer
+        title={
+          <CustomTitle
+            title={`${t(Strings.user_setting)} - ${listData[activeItem].name}`}
+            onClose={closeModal}
+            onClickNav={() => setShowNav(true)}
+          />
+        }
+        height={'100%'}
+        push={{
+          distance: 0,
+        }}
+        open
+        maskClosable
+        closable={false}
+        placement="bottom"
+        bodyStyle={{
+          padding: 16,
+        }}
+      >
+        {listData[activeItem].component}
         <Drawer
-          title={
-            <CustomTitle
-              title={`${t(Strings.user_setting)} - ${listData[activeItem].name}`}
-              onClose={closeModal}
-              onClickNav={() => setShowNav(true)}
-            />
-          }
-          height={'100%'}
-          push={{
-            distance: 0,
-          }}
-          open
-          maskClosable
+          open={showNav}
+          placement="left"
           closable={false}
-          placement="bottom"
+          title={<CustomTitle title={listData[activeItem].name} onClose={() => setShowNav(false)} />}
+          onClose={() => setShowNav(false)}
           bodyStyle={{
             padding: 16,
           }}
         >
-          {listData[activeItem].component}
-          <Drawer
-            visible={showNav}
-            placement="left"
-            closable={false}
-            title={<CustomTitle title={listData[activeItem].name} onClose={() => setShowNav(false)} />}
-            onClose={() => setShowNav(false)}
-            bodyStyle={{
-              padding: 16,
+          <Nav
+            activeItem={activeItem}
+            setActiveItem={(index) => {
+              setActiveItem(index);
+              setShowNav(false);
             }}
-          >
-            <Nav
-              activeItem={activeItem}
-              setActiveItem={(index) => {
-                setActiveItem(index);
-                setShowNav(false);
-              }}
-              navlist={listData}
-            />
-          </Drawer>
+            navlist={listData}
+          />
         </Drawer>
-      </ComponentDisplay>
-    </>
-  );
+      </Drawer>
+    </ComponentDisplay>
+  </>);
 };

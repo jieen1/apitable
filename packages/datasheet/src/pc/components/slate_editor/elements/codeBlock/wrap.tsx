@@ -110,7 +110,7 @@ export const CodeBlockWrap = ({ children, element }: IElementRenderProps<IElemen
   }, [copyResult, i18nText]);
 
   return (
-    <pre className={styles.codeWrap} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+    (<pre className={styles.codeWrap} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       {toolbarVisible && (
         <div className={styles.codeWrapToolbar} contentEditable={false}>
           {/* {LanguageSelect} */}
@@ -121,7 +121,7 @@ export const CodeBlockWrap = ({ children, element }: IElementRenderProps<IElemen
               </span>
             </Tooltip>
           )}
-          <Tooltip overlayClassName="editor-tooltip" title={resultTip} placement="top" visible={copyResult !== Result.Empty}>
+          <Tooltip overlayClassName="editor-tooltip" title={resultTip} placement="top" open={copyResult !== Result.Empty}>
             <span style={{ display: 'inline-flex' }} onMouseDown={handleCopy}>
               <CopyOutlined className={styles.operationBtn} />
             </span>
@@ -129,6 +129,6 @@ export const CodeBlockWrap = ({ children, element }: IElementRenderProps<IElemen
         </div>
       )}
       {children}
-    </pre>
+    </pre>)
   );
 };

@@ -125,8 +125,8 @@ export const CreateFieldModal = memo(() => {
   };
 
   return (
-    <Modal
-      visible
+    (<Modal
+      open
       title={null}
       closable={false}
       destroyOnClose
@@ -162,6 +162,6 @@ export const CreateFieldModal = memo(() => {
           {t(Strings.gantt_init_fields_button)}
         </Button>
       </div>
-    </Modal>
+    </Modal>)
   );
 });

@@ -111,15 +111,15 @@ export const ShareMobile: React.FC<React.PropsWithChildren<IShareMobileProps>> =
 
   function renderSide() {
     return (
-      <Drawer
+      (<Drawer
         width={'80%'}
-        visible={sideBarVisible}
+        open={sideBarVisible}
         onClose={() => {
           setSideBarVisible(false);
         }}
         placement="left"
         closable={false}
-        className={styles.mobileShareDrawer}
+        rootClassName={styles.mobileShareDrawer}
         push={{ distance: -800 }}
       >
         <div className={styles.side}>
@@ -131,7 +131,7 @@ export const ShareMobile: React.FC<React.PropsWithChildren<IShareMobileProps>> =
            </span> */}
           <ShareMenu {...props} />
         </div>
-      </Drawer>
+      </Drawer>)
     );
   }
 

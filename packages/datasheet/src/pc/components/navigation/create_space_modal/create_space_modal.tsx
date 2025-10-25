@@ -113,18 +113,18 @@ export const CreateSpaceModal: FC<React.PropsWithChildren<ICreateSpaceModalProps
 
   if (isMobile) {
     return (
-      <Drawer
+      (<Drawer
         title={t(Strings.new_space)}
         placement="bottom"
-        visible
+        open
         onClose={() => !loading && props.setShowCreateModal(false)}
         height={566}
-        className={cls(styles.createSpaceWrapper, { [styles.createSpaceWrapperMobile]: isMobile })}
+        rootClassName={cls(styles.createSpaceWrapper, { [styles.createSpaceWrapperMobile]: isMobile })}
         headerStyle={{ borderBottom: 'none' }}
         closeIcon={<CloseOutlined size={16} color={colors.thirdLevelText} />}
       >
         {renderContent()}
-      </Drawer>
+      </Drawer>)
     );
   }
 

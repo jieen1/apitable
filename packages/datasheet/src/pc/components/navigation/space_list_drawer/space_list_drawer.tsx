@@ -45,8 +45,8 @@ export const SpaceListDrawer: FC<React.PropsWithChildren<ISpaceListDrawerProps>>
   }, [visible]);
 
   return (
-    <Drawer
-      className={classnames(styles.spaceListDrawer, isMobile && styles.mobile)}
+    (<Drawer
+      rootClassName={classnames(styles.spaceListDrawer, isMobile && styles.mobile)}
       title={
         <div>
           <div className={styles.title}>{t(Strings.space_list)}</div>
@@ -63,6 +63,6 @@ export const SpaceListDrawer: FC<React.PropsWithChildren<ISpaceListDrawerProps>>
       onClose={() => onClose(false)}
     >
       <SpaceList />
-    </Drawer>
+    </Drawer>)
   );
 };

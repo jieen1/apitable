@@ -30,10 +30,10 @@ export const Reconnecting: React.FC<React.PropsWithChildren<unknown>> = () => {
     return state.space.reconnecting;
   });
   return (
-    <Modal
+    (<Modal
       wrapClassName={styles.modalWrapper}
       destroyOnClose
-      visible={reconnecting}
+      open={reconnecting}
       width={300}
       mask={false}
       closable={false}
@@ -49,6 +49,6 @@ export const Reconnecting: React.FC<React.PropsWithChildren<unknown>> = () => {
       }
     >
       {t(Strings.try_my_best_effort_to_reconnect)}
-    </Modal>
+    </Modal>)
   );
 };

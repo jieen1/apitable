@@ -45,8 +45,8 @@ export const CreateFieldModal: React.FC<React.PropsWithChildren<ICreateFieldModa
   const OrgChartCreationLink = themeName === ThemeName.Light ? OrgChartCreationLinkLight : OrgChartCreationLinkDark;
 
   return (
-    <Modal
-      visible
+    (<Modal
+      open
       title={null}
       closable={false}
       destroyOnClose
@@ -82,6 +82,6 @@ export const CreateFieldModal: React.FC<React.PropsWithChildren<ICreateFieldModa
           {t(Strings.org_chart_init_fields_button)}
         </Button>
       </div>
-    </Modal>
+    </Modal>)
   );
 };

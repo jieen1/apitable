@@ -256,9 +256,9 @@ export const ShareSave: React.FC<React.PropsWithChildren<IShareSave>> = (props) 
   }
 
   return (
-    <Modal
+    (<Modal
       destroyOnClose
-      visible={visible}
+      open={visible}
       mask
       maskClosable={false}
       footer={null}
@@ -274,6 +274,6 @@ export const ShareSave: React.FC<React.PropsWithChildren<IShareSave>> = (props) 
       {modalType === ModalType.SpaceList && renderSpaceList()}
       {modalType === ModalType.Tip && renderNoSpaceTip()}
       {modalType === ModalType.Create && <CreateSpace isShare submitCb={createSpace} />}
-    </Modal>
+    </Modal>)
   );
 };
