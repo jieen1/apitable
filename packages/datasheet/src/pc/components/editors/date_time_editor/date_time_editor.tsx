@@ -581,24 +581,24 @@ const DateTimeEditorHoc: React.ForwardRefRenderFunction<DateTimeEditorBase, IDat
   const previousAlarm = usePrevious(alarm);
   const [curAlarm, setCurAlarm] = useState<WithOptional<IRecordAlarmClient, 'id'> | undefined>();
 
-  useEffect(() => {
-    if (isEqual(previousAlarm, alarm)) {
-      return;
-    }
-    setCurAlarm(alarm);
-  }, [alarm, previousAlarm]);
+  // useEffect(() => {
+  //   if (isEqual(previousAlarm, alarm)) {
+  //     return;
+  //   }
+  //   setCurAlarm(alarm);
+  // }, [alarm, previousAlarm]);
 
-  useEffect(() => {
-    const viewTabBar = document.getElementById(DATASHEET_ID.VIEW_TAB_BAR);
-    if (viewTabBar) {
-      viewTabBar.style.zIndex = '0';
-    }
-    return () => {
-      if (viewTabBar) {
-        viewTabBar.style.zIndex = '';
-      }
-    };
-  }, []);
+  // useEffect(() => {
+  //   const viewTabBar = document.getElementById(DATASHEET_ID.VIEW_TAB_BAR);
+  //   if (viewTabBar) {
+  //     viewTabBar.style.zIndex = '0';
+  //   }
+  //   return () => {
+  //     if (viewTabBar) {
+  //       viewTabBar.style.zIndex = '';
+  //     }
+  //   };
+  // }, []);
 
   return (
     <div style={{ flex: 1, width: '100%' }}>
