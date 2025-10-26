@@ -256,6 +256,7 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
       dispatch(StoreActions.setEditStatus(datasheetId, { recordId, fieldId }));
       editorRefCurrent.onStartEdit && editorRefCurrent.onStartEdit(keepValue ? cellValue : undefined);
       focus();
+      console.log('editorRefCurrent end startEdit', editorRefCurrent);
     }
   };
 
@@ -317,6 +318,7 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
   };
 
   useEffect(() => {
+    console.log('focus useEffect', selection);
     if (selection?.ranges || selection?.recordRanges) {
       focus();
     }
@@ -329,7 +331,7 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
      * sendCursor > room-server > broadcast ENGAGEMENT_CURSOR >
      * client on ENGAGEMENT_CURSOR > handleCursor > dispatch(cursorMove)
      */
-
+    console.log('useEffect selection', field, record);
     if (!field || !record) {
       return;
     }
@@ -389,14 +391,12 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
       return;
     }
     if (editing) {
-      console.log('toggleEditing', next);
       endEdit();
       if (next) {
         activeCellRef.current = null;
         cellMove(CellDirection.Down, true);
       }
     } else {
-      console.log('startEdit', next);
       startEdit(true);
     }
   };
@@ -795,6 +795,7 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
     [editing, activeCell, editorX, editorY, field],
   );
   useEffect(() => {
+    console.log('useEffect cellValue, record', cellValue, record);
     setTimeout(() => {
       calcEditorRect();
     }, 0);
@@ -802,6 +803,7 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
   }, [cellValue, record]);
 
   useEffect(() => {
+    console.log('useEffect beforeunload');
     const onUnload = () => endEdit();
     window.addEventListener('beforeunload', onUnload);
     return () => window.removeEventListener('beforeunload', onUnload);
