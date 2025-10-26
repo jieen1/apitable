@@ -795,25 +795,12 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
     // eslint-disable-next-line
   }, [cellValue, record]);
 
-  // 使用ref跟踪组件挂载状态
-  const isMountedRef = useRef(true);
-  
   useEffect(() => {
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    const onUnload = () => {
-      // 检查组件是否仍然挂载，避免在组件卸载后调用endEdit
-      if (isMountedRef.current && editing) {
-        endEdit();
-      }
-    };
+    console.log('useEffect beforeunload', editing, endEdit);
+    const onUnload = () => endEdit();
     window.addEventListener('beforeunload', onUnload);
     return () => window.removeEventListener('beforeunload', onUnload);
-  }, [endEdit, editing]);
+  }, [endEdit]);
 
   const { x, y, width, height } = editPositionInfo;
   const editorRect = useCellEditorVisibleStyle({ editing, width, height });
