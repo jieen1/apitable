@@ -70,8 +70,6 @@ import { isLegalDateKey } from '../../../utils/keycode';
 import { IBaseEditorProps, IEditor } from '../interface';
 import { DatePickerMobile } from './mobile';
 import { TimePicker } from './time_picker_only';
-// @ts-ignore
-import DateTimeAlarm from 'enterprise/alarm/date_time_alarm/date_time_alarm';
 import style from './style.module.less';
 
 dayjs.extend(customParseFormat);
@@ -516,34 +514,6 @@ export class DateTimeEditorBase extends React.PureComponent<IDateTimeEditorProps
                   disabledDate={this.disabledDate}
                   disabled={Boolean(this.props.disabled)}
                   onKeyDown={this.keyDown}
-                  renderFooter={() => {
-                    console.log('renderFooter被调用');
-                    // 临时注释掉DateTimeAlarm来测试Hook问题
-                    return null;
-                    /*
-                    showAlarm &&
-                    getEnvVariables().RECORD_TASK_REMINDER_VISIBLE &&
-                    DateTimeAlarm &&
-                    dateValue && (
-                      <DateTimeAlarm
-                        datasheetId={datasheetId}
-                        recordId={recordId || ''}
-                        fieldId={field.id}
-                        includeTime={field.property.includeTime}
-                        timeZone={timeZone}
-                        dateValue={dateValue}
-                        timeValue={timeValue}
-                        curAlarm={this.props.curAlarm}
-                        handleDateTimeChange={(value: dayjs.Dayjs, isSetTime?: boolean) =>
-                          this.onDateValueChange(value, value && value.format(DateFormat[1]), value && value.format(dateFormat), isSetTime)
-                        }
-                        handleDateAlarm={(curAlarm?: WithOptional<IRecordAlarmClient, 'id'>) => {
-                          this.props.setCurAlarm?.(curAlarm);
-                        }}
-                      />
-                    )
-                    */
-                  }}
                 />
               </React.Suspense>
               {field.property.includeTime && (
