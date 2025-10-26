@@ -516,7 +516,11 @@ export class DateTimeEditorBase extends React.PureComponent<IDateTimeEditorProps
                   disabledDate={this.disabledDate}
                   disabled={Boolean(this.props.disabled)}
                   onKeyDown={this.keyDown}
-                  renderFooter={() =>
+                  renderFooter={() => {
+                    console.log('renderFooter被调用');
+                    // 临时注释掉DateTimeAlarm来测试Hook问题
+                    return null;
+                    /*
                     showAlarm &&
                     getEnvVariables().RECORD_TASK_REMINDER_VISIBLE &&
                     DateTimeAlarm &&
@@ -538,7 +542,8 @@ export class DateTimeEditorBase extends React.PureComponent<IDateTimeEditorProps
                         }}
                       />
                     )
-                  }
+                    */
+                  }}
                 />
               </React.Suspense>
               {field.property.includeTime && (
@@ -581,24 +586,24 @@ const DateTimeEditorHoc: React.ForwardRefRenderFunction<DateTimeEditorBase, IDat
   const previousAlarm = usePrevious(alarm);
   const [curAlarm, setCurAlarm] = useState<WithOptional<IRecordAlarmClient, 'id'> | undefined>();
 
-  // useEffect(() => {
-  //   if (isEqual(previousAlarm, alarm)) {
-  //     return;
-  //   }
-  //   setCurAlarm(alarm);
-  // }, [alarm, previousAlarm]);
+  useEffect(() => {
+    if (isEqual(previousAlarm, alarm)) {
+      return;
+    }
+    setCurAlarm(alarm);
+  }, [alarm, previousAlarm]);
 
-  // useEffect(() => {
-  //   const viewTabBar = document.getElementById(DATASHEET_ID.VIEW_TAB_BAR);
-  //   if (viewTabBar) {
-  //     viewTabBar.style.zIndex = '0';
-  //   }
-  //   return () => {
-  //     if (viewTabBar) {
-  //       viewTabBar.style.zIndex = '';
-  //     }
-  //   };
-  // }, []);
+  useEffect(() => {
+    const viewTabBar = document.getElementById(DATASHEET_ID.VIEW_TAB_BAR);
+    if (viewTabBar) {
+      viewTabBar.style.zIndex = '0';
+    }
+    return () => {
+      if (viewTabBar) {
+        viewTabBar.style.zIndex = '';
+      }
+    };
+  }, []);
 
   return (
     <div style={{ flex: 1, width: '100%' }}>
