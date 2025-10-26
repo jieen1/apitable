@@ -68,7 +68,7 @@ import { AttachmentEditor } from './attachment_editor';
 import { CascaderEditor } from './cascader_editor';
 import { CheckboxEditor } from './checkbox_editor';
 import { DateTimeEditor } from './date_time_editor';
-import { setEndEditCell } from './end_edit_cell';
+import { setEndEditCell, endEditCell } from './end_edit_cell';
 import { EnhanceTextEditor } from './enhance_text_editor';
 import { useCellEditorVisibleStyle } from './hooks';
 import { IContainerEdit, IEditor } from './interface';
@@ -796,11 +796,18 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
   }, [cellValue, record]);
 
   useEffect(() => {
-    console.log('useEffect beforeunload', editing, endEdit);
-    const onUnload = () => endEdit();
+    console.log('useEffect beforeunload', editing);
+    const onUnload = () => {
+      // 在beforeunload事件中，避免调用可能访问已销毁组件状态的函数
+      // 直接调用全局的endEditCell函数，而不是组件内的endEdit
+      if (editing) {
+        // 使用全局的endEditCell函数，避免React错误#130
+        endEditCell();
+      }
+    };
     window.addEventListener('beforeunload', onUnload);
     return () => window.removeEventListener('beforeunload', onUnload);
-  }, [endEdit]);
+  }, [editing]); // 只依赖editing状态
 
   const { x, y, width, height } = editPositionInfo;
   const editorRect = useCellEditorVisibleStyle({ editing, width, height });
