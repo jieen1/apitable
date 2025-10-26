@@ -232,7 +232,6 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
    *
    */
   const startEdit = (keepValue = false) => {
-    console.log('startEdit', keepValue);
     if (!recordEditable && !isWorkdoc) {
       fieldPermissionMap &&
         fieldPermissionMap[field.id] &&
@@ -247,7 +246,6 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
     }
     const editorRefCurrent = editorRef.current!;
     if (editorRefCurrent) {
-      console.log('editorRefCurrent', editorRefCurrent);
       const { recordId, fieldId } = activeCell!;
       const state = store.getState();
       const cellUIIndex = Selectors.getCellUIIndex(state, activeCell!);
@@ -256,7 +254,6 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
       dispatch(StoreActions.setEditStatus(datasheetId, { recordId, fieldId }));
       editorRefCurrent.onStartEdit && editorRefCurrent.onStartEdit(keepValue ? cellValue : undefined);
       focus();
-      console.log('editorRefCurrent end startEdit', editorRefCurrent);
     }
   };
 
@@ -294,7 +291,6 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
       if (!editing) {
         return;
       }
-      console.log('endEdit', cancel);
       const editorRefCurrent = editorRef.current!;
       editorRefCurrent.onEndEdit && editorRefCurrent.onEndEdit(cancel);
       setEditing(false);
@@ -318,7 +314,6 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
   };
 
   useEffect(() => {
-    console.log('focus useEffect', selection);
     if (selection?.ranges || selection?.recordRanges) {
       focus();
     }
@@ -331,7 +326,6 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
      * sendCursor > room-server > broadcast ENGAGEMENT_CURSOR >
      * client on ENGAGEMENT_CURSOR > handleCursor > dispatch(cursorMove)
      */
-    console.log('useEffect selection', field, record);
     if (!field || !record) {
       return;
     }
@@ -795,19 +789,31 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
     [editing, activeCell, editorX, editorY, field],
   );
   useEffect(() => {
-    console.log('useEffect cellValue, record', cellValue, record);
     setTimeout(() => {
       calcEditorRect();
     }, 0);
     // eslint-disable-next-line
   }, [cellValue, record]);
 
+  // 使用ref跟踪组件挂载状态
+  const isMountedRef = useRef(true);
+  
   useEffect(() => {
-    console.log('useEffect beforeunload');
-    const onUnload = () => endEdit();
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const onUnload = () => {
+      // 检查组件是否仍然挂载，避免在组件卸载后调用endEdit
+      if (isMountedRef.current && editing) {
+        endEdit();
+      }
+    };
     window.addEventListener('beforeunload', onUnload);
     return () => window.removeEventListener('beforeunload', onUnload);
-  }, [endEdit]);
+  }, [endEdit, editing]);
 
   const { x, y, width, height } = editPositionInfo;
   const editorRect = useCellEditorVisibleStyle({ editing, width, height });
