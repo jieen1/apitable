@@ -232,6 +232,7 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
    *
    */
   const startEdit = (keepValue = false) => {
+    console.log('startEdit', keepValue);
     if (!recordEditable && !isWorkdoc) {
       fieldPermissionMap &&
         fieldPermissionMap[field.id] &&
@@ -246,6 +247,7 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
     }
     const editorRefCurrent = editorRef.current!;
     if (editorRefCurrent) {
+      console.log('editorRefCurrent', editorRefCurrent);
       const { recordId, fieldId } = activeCell!;
       const state = store.getState();
       const cellUIIndex = Selectors.getCellUIIndex(state, activeCell!);
@@ -291,6 +293,7 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
       if (!editing) {
         return;
       }
+      console.log('endEdit', cancel);
       const editorRefCurrent = editorRef.current!;
       editorRefCurrent.onEndEdit && editorRefCurrent.onEndEdit(cancel);
       setEditing(false);
@@ -386,12 +389,14 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
       return;
     }
     if (editing) {
+      console.log('toggleEditing', next);
       endEdit();
       if (next) {
         activeCellRef.current = null;
         cellMove(CellDirection.Down, true);
       }
     } else {
+      console.log('startEdit', next);
       startEdit(true);
     }
   };
