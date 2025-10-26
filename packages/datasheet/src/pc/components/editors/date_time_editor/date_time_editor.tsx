@@ -84,7 +84,7 @@ const formatDateNoYear = (dateFormat?: string) => {
   return dateFormat === DateFormat[4] || dateFormat === DateFormat[6] || dateFormat === DateFormat[7];
 };
 
-const DatePicker = React.lazy(() => import('./date_picker'));
+import DatePicker from './date_picker';
 
 export interface IDateTimeEditorState {
   dateValue: string;

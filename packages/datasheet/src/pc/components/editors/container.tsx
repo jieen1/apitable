@@ -321,6 +321,12 @@ const EditorContainerBase: React.ForwardRefRenderFunction<IContainerEdit, Editor
   }, [selection]);
 
   useEffect(() => {
+    const onUnload = () => endEdit();
+    window.addEventListener('beforeunload', onUnload);
+    return () => window.removeEventListener('beforeunload', onUnload);
+  }, [endEdit]);
+
+  useEffect(() => {
     /**
      *
      * sendCursor > room-server > broadcast ENGAGEMENT_CURSOR >
