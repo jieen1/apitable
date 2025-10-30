@@ -36,7 +36,8 @@ interface IProps {
 
 type RuleDraft = {
   id: string;
-  scope: 'row' | 'cell';
+  // 是否整行填色；为 true 则保存为 scope:'row'，否则为 'cell'
+  fillWholeRow: boolean;
   targetFieldId?: string;
   filterInfo: IFilterInfo;
   color: string;
@@ -58,7 +59,7 @@ export const ConditionalFormatPanel: React.FC<IProps> = () => {
     const newOperate = acceptFilterOperators[0];
     const newDraft: RuleDraft = {
       id: getNewId(IDPrefix.Condition),
-      scope: 'row',
+      fillWholeRow: false,
       targetFieldId: firstFieldId,
       color: 'rgba(255, 247, 198, 1)',
       filterInfo: {
@@ -88,7 +89,13 @@ export const ConditionalFormatPanel: React.FC<IProps> = () => {
   }, []);
 
   const save = useCallback(() => {
-    const payload = drafts.map(({ id, scope, targetFieldId, filterInfo, color }) => ({ id, scope, targetFieldId, filterInfo, color }));
+    const payload = drafts.map(({ id, fillWholeRow, targetFieldId, filterInfo, color }) => ({
+      id,
+      scope: fillWholeRow ? 'row' : 'cell',
+      targetFieldId: fillWholeRow ? undefined : targetFieldId,
+      filterInfo,
+      color,
+    }));
     executeCommandWithMirror(
       () => {
         return resourceService.instance!.commandManager.execute({
@@ -113,15 +120,18 @@ export const ConditionalFormatPanel: React.FC<IProps> = () => {
           return (
             <div key={rule.id} className={styles.ruleItem}>
               <div className={styles.line}>
-                <RadioGroup
-                  value={rule.scope}
-                  onChange={(v) => updateRule(rule.id, { scope: v as any })}
-                  options={[
-                    { label: '按行', value: 'row' },
-                    { label: '按列', value: 'cell' },
-                  ]}
-                />
-                {rule.scope === 'cell' && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={rule.fillWholeRow}
+                      onChange={(e) => updateRule(rule.id, { fillWholeRow: e.target.checked })}
+                      style={{ marginRight: 6 }}
+                    />
+                    整行填色
+                  </label>
+                </div>
+                {!rule.fillWholeRow && (
                   <DropdownSelect
                     triggerStyle={{ width: 200 }}
                     value={rule.targetFieldId}
