@@ -1,12 +1,14 @@
-import { ICollaCommandDef,  } from '../../command_manager';
+import { ICollaCommandDef } from '../../command_manager';
 import { ExecuteResult } from '../../command_manager/types';
 import { DatasheetActions } from '../../commands_actions/datasheet';
 import { ResourceType } from 'types';
 import { getActiveDatasheetId, getDatasheet, getSnapshot } from '../../modules/database/store/selectors/resource/datasheet';
 import { IConditionalFormatRule } from 'modules/database/store/interfaces/resource/datasheet';
 import { IReduxState } from 'exports/store/interfaces';
+import { CollaCommandName } from 'commands';
 
 export interface ISetViewConditionalFormatOptions {
+  cmd: CollaCommandName.SetViewConditionalFormat;
   viewId: string;
   rules?: IConditionalFormatRule[];
 }
