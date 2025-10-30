@@ -246,6 +246,7 @@ export enum ToolBarMenuCardOpenState {
   RowHeight = 'RowHeight',
   GallerySetting = 'GallerySetting',
   OrgChartSetting = 'OrgChartSetting',
+  ConditionalFormat = 'ConditionalFormat',
 
   // special: this is a component in the toolbar, just clean for "display" component, so place it here to control.by @mayne
   ViewSwitcher = 'ViewSwitcher',
