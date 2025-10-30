@@ -40,7 +40,7 @@ type RuleDraft = {
   fillWholeRow: boolean;
   targetFieldId?: string;
   filterInfo: IFilterInfo;
-  color: string;
+  color: number;
 };
 
 export const ConditionalFormatPanel: React.FC<IProps> = () => {
@@ -61,9 +61,9 @@ export const ConditionalFormatPanel: React.FC<IProps> = () => {
       id: getNewId(IDPrefix.Condition),
       fillWholeRow: false,
       targetFieldId: firstFieldId,
-      color: 'rgba(255, 247, 198, 1)',
+      color: 0,
       filterInfo: {
-        conjunction: FilterConjunction.And,
+        conjunction: FilterConjunction.Or,
         conditions: field
           ? [
             {
@@ -131,27 +131,13 @@ export const ConditionalFormatPanel: React.FC<IProps> = () => {
                     整行填色
                   </label>
                 </div>
-                {!rule.fillWholeRow && (
-                  <DropdownSelect
-                    triggerStyle={{ width: 200 }}
-                    value={rule.targetFieldId}
-                    onSelected={(opt) => updateRule(rule.id, { targetFieldId: opt.value as string })}
-                  >
-                    {columns.map((c, index) => (
-                      <Option key={c.fieldId} value={c.fieldId} currentIndex={index} />
-                    ))}
-                  </DropdownSelect>
-                )}
                 <div className={styles.color}>
                   <ColorPicker
-                    option={{ id: rule.id, name: '', color: 0 }}
-                    onChange={(_type, _id, value) => updateRule(rule.id, { color: String(value) })}
+                    option={{ id: rule.id, name: '', color: rule.color as number || 0 }}
+                    onChange={(_type, _id, value) => updateRule(rule.id, { color: value as number})}
                     triggerComponent={<div className={styles.colorBlock} style={{ background: rule.color }} />}
                   />
                 </div>
-                <TextButton onClick={() => deleteRule(rule.id)} style={{ marginLeft: 8 }}>
-                  {t(Strings.delete)}
-                </TextButton>
               </div>
               <div className={classNames(styles.filter)}>
                 <ConditionList
@@ -166,6 +152,7 @@ export const ConditionalFormatPanel: React.FC<IProps> = () => {
                   deleteFilter={(idx: number) => {
                     const f = { ...rule.filterInfo, conditions: rule.filterInfo.conditions.filter((_c, i) => i !== idx) };
                     updateRule(rule.id, { filterInfo: f });
+                    deleteRule(rule.id);
                   }}
                   datasheetId={datasheetId}
                   field={field}
