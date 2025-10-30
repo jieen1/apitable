@@ -5,6 +5,43 @@
   padding: 8px 12px;
   background: var(--highBg);
   width: 100%;
+
+  z-index: var(--viewFilterBox);
+  border-radius: 4px;
+  cursor: default;
+  padding: 24px;
+  box-shadow: var(--shadowCommonHigh);
+
+  @media (any-hover: hover) {
+    &:hover {
+      color: var(--primaryColor);
+
+      svg {
+        fill: var(--primaryColor);
+      }
+    }
+  }
+}
+
+.condition {
+  padding-top: 2px;
+
+  .conditionItem {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .conditionWarn {
+    position: absolute;
+    left: 8px;
+
+    svg {
+      cursor: pointer;
+      display: block;
+    }
+  }
 }
 
 .header {
@@ -40,43 +77,6 @@
 }
 .filter {
   padding-top: 6px;
-  background: var(--highBg);
-  z-index: var(--viewFilterBox);
-  border-radius: 4px;
-  cursor: default;
-  padding: 24px;
-  box-shadow: var(--shadowCommonHigh);
-
-  @media (any-hover: hover) {
-    &:hover {
-      color: var(--primaryColor);
-
-      svg {
-        fill: var(--primaryColor);
-      }
-    }
-  }
-
-  .condition {
-    padding-top: 2px;
-
-    .conditionItem {
-      display: flex;
-      align-items: center;
-      font-size: 13px;
-      margin-bottom: 16px;
-    }
-
-    .conditionWarn {
-      position: absolute;
-      left: 8px;
-
-      svg {
-        cursor: pointer;
-        display: block;
-      }
-    }
-  }
 }
 .footer {
   display: flex;

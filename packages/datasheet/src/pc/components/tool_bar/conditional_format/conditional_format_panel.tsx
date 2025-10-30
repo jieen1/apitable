@@ -4,13 +4,14 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 import classNames from 'classnames';
-import { TextButton, DropdownSelect, RadioGroup } from '@apitable/components';
+import { TextButton, DropdownSelect, RadioGroup, useThemeColors } from '@apitable/components';
 import { useAppSelector } from 'pc/store/react-redux';
 import { useDispatch } from 'react-redux';
 import { ColorPicker } from 'pc/components/common/color_picker';
 import styles from './style.module.less';
 import ConditionList from '../view_filter/condition_list';
 import { ExecuteFilterFn } from '../view_filter/interface';
+import { setColor } from 'pc/components/multi_grid/format';
 import {
   getNewId,
   IDPrefix,
@@ -44,6 +45,7 @@ type RuleDraft = {
 };
 
 export const ConditionalFormatPanel: React.FC<IProps> = () => {
+  const colors = useThemeColors();
   const dispatch = useDispatch();
   const view = useAppSelector((s) => Selectors.getCurrentView(s)!);
   const datasheetId = useAppSelector((s) => s.pageParams.datasheetId!);
@@ -51,6 +53,7 @@ export const ConditionalFormatPanel: React.FC<IProps> = () => {
   const columns = useAppSelector((s) => Selectors.getVisibleColumns(s));
   const rules = useAppSelector((s) => (Selectors as any).getConditionalFormatRules(s)) as any[];
   const [drafts, setDrafts] = useState<RuleDraft[]>(() => (rules && rules.length ? rules : []));
+  const cacheTheme = useAppSelector(Selectors.getTheme);
 
   const addRule = useCallback(() => {
     const firstFieldId = columns[0]?.fieldId;
@@ -132,6 +135,14 @@ export const ConditionalFormatPanel: React.FC<IProps> = () => {
                   </label>
                 </div>
                 <div className={styles.color}>
+                <div className={styles.outer}>
+                  <div
+                    className={styles.inner}
+                    style={{
+                      backgroundColor: rule.color === -1 ? colors.defaultBg : setColor(rule.color, cacheTheme),
+                    }}
+                  />
+                </div>
                   <ColorPicker
                     option={{ id: rule.id, name: '', color: rule.color as number || 0 }}
                     onChange={(_type, _id, value) => updateRule(rule.id, { color: value as number})}
