@@ -4,7 +4,7 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 import classNames from 'classnames';
-import { useThemeColors, TextButton, Select, Option, Radio } from '@apitable/components';
+import { useThemeColors, TextButton, Select, Radio } from '@apitable/components';
 import { useAppSelector } from 'pc/store/react-redux';
 import { useDispatch } from 'react-redux';
 import { ColorPicker } from 'pc/components/common/color_picker';
@@ -24,6 +24,8 @@ import {
 } from '@apitable/core';
 import { resourceService } from 'pc/resource_service';
 import { executeCommandWithMirror } from 'pc/utils/execute_command_with_mirror';
+
+const Option = Select.Option!;
 
 interface IProps {
   triggerInfo?: any;
