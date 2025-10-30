@@ -713,9 +713,7 @@ const ToolbarBase = () => {
               id={'toolConditionalFormat'}
               showLabel={showIconBarLabel}
               disabled={!visualizationEditable || disabledWithMirror}
-              className={classNames({
-                [styles.toolbarItem]: true,
-              })}
+              className={styles.toolbarItem}
               icon={<StyleOutlined size={16} color={colors.secondLevelText} className={styles.toolIcon} />}
               text={'填色'}
             />

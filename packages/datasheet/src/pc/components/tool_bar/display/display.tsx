@@ -99,7 +99,7 @@ export const Display: React.FC<React.PropsWithChildren<IDisplay>> = (props) => {
     const visibleRows = Selectors.getVisibleRows(state);
     const recordId = state.pageParams.recordId;
     const hasCurrentRecordId = visibleRows.find((row) => row.recordId === recordId);
-    if (!popupVisible && type === ToolHandleType.ViewFilter && !hasCurrentRecordId) {
+    if (!popupVisible && (type === ToolHandleType.ViewFilter || type === ToolHandleType.ConditionalFormat) && !hasCurrentRecordId) {
       await closeAllExpandRecord();
     }
 
@@ -232,7 +232,7 @@ export const Display: React.FC<React.PropsWithChildren<IDisplay>> = (props) => {
   };
 
   const getWidthByType = () => {
-    if (type === ToolHandleType.ViewFilter) {
+    if (type === ToolHandleType.ViewFilter || type === ToolHandleType.ConditionalFormat) {
       return 720;
     }
     if (type === ToolHandleType.HideField || type === ToolHandleType.ChangeRowHeight) {
