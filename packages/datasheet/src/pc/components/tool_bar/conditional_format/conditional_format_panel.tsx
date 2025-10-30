@@ -4,7 +4,7 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 import classNames from 'classnames';
-import { useThemeColors, TextButton, Select, Radio } from '@apitable/components';
+import { TextButton, DropdownSelect, RadioGroup } from '@apitable/components';
 import { useAppSelector } from 'pc/store/react-redux';
 import { useDispatch } from 'react-redux';
 import { ColorPicker } from 'pc/components/common/color_picker';
@@ -25,7 +25,7 @@ import {
 import { resourceService } from 'pc/resource_service';
 import { executeCommandWithMirror } from 'pc/utils/execute_command_with_mirror';
 
-const Option = Select.Option!;
+const Option = DropdownSelect.Option;
 
 interface IProps {
   triggerInfo?: any;
@@ -40,7 +40,6 @@ type RuleDraft = {
 };
 
 export const ConditionalFormatPanel: React.FC<IProps> = () => {
-  const colors = useThemeColors();
   const dispatch = useDispatch();
   const view = useAppSelector((s) => Selectors.getCurrentView(s)!);
   const datasheetId = useAppSelector((s) => s.pageParams.datasheetId!);
@@ -96,7 +95,6 @@ export const ConditionalFormatPanel: React.FC<IProps> = () => {
         }).result;
       },
       {
-        conditionalFormatRules: payload as any,
       },
     );
     dispatch(StoreActions.triggerViewDerivationComputed(datasheetId!, view.id));
@@ -112,7 +110,7 @@ export const ConditionalFormatPanel: React.FC<IProps> = () => {
           return (
             <div key={rule.id} className={styles.ruleItem}>
               <div className={styles.line}>
-                <Radio.Group
+                <RadioGroup
                   value={rule.scope}
                   onChange={(v) => updateRule(rule.id, { scope: v as any })}
                   options={[
@@ -121,15 +119,15 @@ export const ConditionalFormatPanel: React.FC<IProps> = () => {
                   ]}
                 />
                 {rule.scope === 'cell' && (
-                  <Select
-                    style={{ width: 200 }}
+                  <DropdownSelect
+                    triggerStyle={{ width: 200 }}
                     value={rule.targetFieldId}
-                    onSelected={(opt: Option) => updateRule(rule.id, { targetFieldId: opt.value as string })}
+                    onSelected={(opt) => updateRule(rule.id, { targetFieldId: opt.value as string })}
                   >
                     {columns.map((c) => (
                       <Option key={c.fieldId} value={c.fieldId} label={fieldMap[c.fieldId]?.name} />
                     ))}
-                  </Select>
+                  </DropdownSelect>
                 )}
                 <div className={styles.color}>
                   <ColorPicker
