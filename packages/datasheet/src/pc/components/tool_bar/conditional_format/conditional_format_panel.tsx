@@ -105,14 +105,14 @@ export const ConditionalFormatPanel: React.FC<IProps> = () => {
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.header}>{t(Strings.advanced_features) /* 复用已有文案占位 */}</div>
+      <div className={styles.header}>配置填色规则</div>
       <div className={styles.list}>
         {drafts.map((rule) => {
           const fId = rule.targetFieldId || columns[0]?.fieldId;
           const field = fId ? fieldMap[fId] as unknown as ILookUpField : undefined;
           return (
             <div key={rule.id} className={styles.ruleItem}>
-              <div className={styles.line}>
+              {/* <div className={styles.line}>
                 <RadioGroup
                   value={rule.scope}
                   onChange={(v) => updateRule(rule.id, { scope: v as any })}
@@ -142,7 +142,7 @@ export const ConditionalFormatPanel: React.FC<IProps> = () => {
                 <TextButton onClick={() => deleteRule(rule.id)} style={{ marginLeft: 8 }}>
                   {t(Strings.delete)}
                 </TextButton>
-              </div>
+              </div> */}
               <div className={classNames(styles.filter)}>
                 <ConditionList
                   filterInfo={rule.filterInfo}

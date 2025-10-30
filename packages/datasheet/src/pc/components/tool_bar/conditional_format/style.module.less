@@ -1,10 +1,17 @@
+@import "~pc/styles/lib_var.less";
+@import "~pc/styles/lib_mixins.less";
+
 .wrapper {
   padding: 8px 12px;
+  background: var(--highBg);
+  width: 400px;
 }
+
 .header {
   font-size: 14px;
   margin-bottom: 8px;
 }
+
 .list {
   max-height: 360px;
   overflow: auto;
@@ -33,6 +40,8 @@
 }
 .filter {
   padding-top: 6px;
+  max-height: 350px;
+  overflow: auto;
 }
 .footer {
   display: flex;
