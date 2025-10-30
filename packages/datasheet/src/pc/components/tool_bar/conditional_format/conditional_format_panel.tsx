@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import { ColorPicker } from 'pc/components/common/color_picker';
 import styles from './style.module.less';
 import ConditionList from '../view_filter/condition_list';
+import { ExecuteFilterFn } from '../view_filter/interface';
 import {
   getNewId,
   IDPrefix,
@@ -20,7 +21,9 @@ import {
   t, 
   Selectors, 
   CollaCommandName, 
-  StoreActions
+  StoreActions,
+  IFieldMap,
+  ILookUpField
 } from '@apitable/core';
 import { resourceService } from 'pc/resource_service';
 import { executeCommandWithMirror } from 'pc/utils/execute_command_with_mirror';
@@ -43,7 +46,7 @@ export const ConditionalFormatPanel: React.FC<IProps> = () => {
   const dispatch = useDispatch();
   const view = useAppSelector((s) => Selectors.getCurrentView(s)!);
   const datasheetId = useAppSelector((s) => s.pageParams.datasheetId!);
-  const fieldMap = useAppSelector((s) => Selectors.getFieldMap(s, datasheetId))!;
+  const fieldMap = useAppSelector((s) => Selectors.getFieldMap(s, datasheetId)) as IFieldMap;
   const columns = useAppSelector((s) => Selectors.getVisibleColumns(s));
   const rules = useAppSelector((s) => (Selectors as any).getConditionalFormatRules(s)) as any[];
   const [drafts, setDrafts] = useState<RuleDraft[]>(() => (rules && rules.length ? rules : []));
@@ -106,7 +109,7 @@ export const ConditionalFormatPanel: React.FC<IProps> = () => {
       <div className={styles.list}>
         {drafts.map((rule) => {
           const fId = rule.targetFieldId || columns[0]?.fieldId;
-          const field = fId ? fieldMap[fId] : undefined;
+          const field = fId ? fieldMap[fId] as unknown as ILookUpField : undefined;
           return (
             <div key={rule.id} className={styles.ruleItem}>
               <div className={styles.line}>
@@ -144,7 +147,12 @@ export const ConditionalFormatPanel: React.FC<IProps> = () => {
                 <ConditionList
                   filterInfo={rule.filterInfo}
                   fieldMap={fieldMap}
-                  changeFilter={(fn: (cur: IFilterInfo) => IFilterInfo) => updateRule(rule.id, { filterInfo: fn(rule.filterInfo) })}
+                  changeFilter={(fn: ExecuteFilterFn) => {
+                    const next = fn(rule.filterInfo);
+                    updateRule(rule.id, {
+                      filterInfo: next || { conjunction: rule.filterInfo.conjunction, conditions: [] },
+                    });
+                  }}
                   deleteFilter={(idx: number) => {
                     const f = { ...rule.filterInfo, conditions: rule.filterInfo.conditions.filter((_c, i) => i !== idx) };
                     updateRule(rule.id, { filterInfo: f });
