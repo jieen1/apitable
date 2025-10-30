@@ -30,6 +30,7 @@ export enum ToolHandleType {
   OrgChartSetting = 'OrgChartSetting',
   HiddenKanbanGroup = 'HiddenKanbanGroup',
   Share = 'Share',
+  ConditionalFormat = 'ConditionalFormat',
 }
 
 export enum HideFieldType {

@@ -59,6 +59,7 @@ import {
   IPasteSetRecordsOptions,
   IRollbackOptions,
   ISetCalendarStyleOptions,
+  ISetViewConditionalFormatOptions,
   ISetColumnsPropertyOptions,
   ISetFieldAttrOptions,
   ISetGalleryStyleOptions,
@@ -98,6 +99,7 @@ import {
   setSortInfo,
   setViewFilter,
   setViewLockInfo,
+  setViewConditionalFormat,
   updateComment,
   fixOneWayLinkDstId,
   setDateTimeCellAlarm,
@@ -160,6 +162,7 @@ export const COLLA_COMMAND_MAP: { [name: string]: ICollaCommandDef } = {
   [CollaCommandName.SetGanttStyle]: setGanttStyle,
   [CollaCommandName.SetCalendarStyle]: setCalendarStyle,
   [CollaCommandName.SetOrgChartStyle]: setOrgChartStyle,
+  [CollaCommandName.SetViewConditionalFormat]: setViewConditionalFormat,
   [CollaCommandName.FillDataToCells]: fillDataToCell,
   [CollaCommandName.SetKanbanStyle]: setKanbanStyle,
   [CollaCommandName.InsertComment]: insertComment,
@@ -217,6 +220,7 @@ export type ICollaCommandOptions =
   | ISetGanttStyleOptions
   | ISetCalendarStyleOptions
   | ISetOrgChartStyleOptions
+  | ISetViewConditionalFormatOptions
   | IFillDataToCellOptions
   | ISetKanbanStyleOptions
   | IInsertComment

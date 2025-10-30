@@ -28,6 +28,7 @@ export enum CollaCommandName {
   SetGanttStyle = 'SetGanttStyle',
   SetOrgChartStyle = 'SetOrgChartStyle',
   SetCalendarStyle = 'SetCalendarStyle',
+  SetViewConditionalFormat = 'SetViewConditionalFormat',
   FillDataToCells = 'FillDataToCells',
   FixConsistency = 'FixConsistency', // special command to fix data consistency issues
   // special command, used for some special records to set data only in the middle layer to fix the data consistency problem

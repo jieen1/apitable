@@ -215,6 +215,17 @@ export const useCells = (props: IUseGridBaseProps) => {
             const commentCount = Selectors.getRecord(state, recordId, datasheetId)?.commentCount || 0;
             const commentVisible = allowShowCommentPane && Boolean(commentCount);
 
+            // 条件填色（优先级低于活动/拖拽/选中等状态，仅在无这些状态时应用）
+            if (!isActive && !isDraggingRow && !isCellInSelection && !isCellInFillSelection && !isCheckedRow && !hasFoundMark && !isHoverRow && !isActiveRow) {
+              try {
+                const { getConditionalFillColor } = require('pc/utils/conditional_format');
+                const fill = getConditionalFillColor(state as any, recordId, fieldId);
+                if (fill) {
+                  background = fill;
+                }
+              } catch {}
+            }
+
             if (isCurrentSearchCell) {
               background = colors.warnLight;
             } else if (isDraggingRow) {

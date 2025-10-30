@@ -226,6 +226,13 @@ export const CellValueContainerFC: React.FC<React.PropsWithChildren<ICellValueCo
   const isThisCellWillMove = recordMoveType && recordMoveType !== RecordMoveType.NotMove && isActiveRow;
   const preOrderingStyle = isThisCellWillMove ? { background: '#FFF6E5' } : {};
 
+  // 条件填色：计算当前单元格背景色
+  const conditionalBg = useAppSelector((state) => {
+    // lazy import to avoid cycle
+    const { getConditionalFillColor } = require('pc/utils/conditional_format');
+    return getConditionalFillColor(state as any, recordId, field?.id);
+  });
+
   const customStyle: React.CSSProperties = {
     ...style,
     width,
@@ -274,6 +281,7 @@ export const CellValueContainerFC: React.FC<React.PropsWithChildren<ICellValueCo
           borderBottom: !collaboratorCell.length && groupInfo.length ? ' 1px solid ' + (isActive ? 'transparent' : colors.shadowColor) : '',
           boxSizing: groupInfo.length ? 'content-box' : 'inherit',
           fontWeight: actualColumnIndex === 0 ? 'bold' : 'normal',
+          background: conditionalBg || (preOrderingStyle as any).background,
           ...preOrderingStyle,
         }}
       >

@@ -21,7 +21,7 @@ import { IJOTAction, IObjectInsertAction, IObjectReplaceAction, OTActionName } f
 import { ViewPropertyFilter } from 'engine/view_property_filter';
 import { findIndex, isEqual, omit, unionWith } from 'lodash';
 import { getMaxViewCountPerSheet } from 'model/utils';
-import { IComments, IMirrorSnapshot, IRecordAlarm, IReduxState, ITemporaryView, IUserInfo, IViewLockInfo } from '../exports/store/interfaces';
+import { IComments, IConditionalFormatRule, IMirrorSnapshot, IRecordAlarm, IReduxState, ITemporaryView, IUserInfo, IViewLockInfo } from '../exports/store/interfaces';
 import { RowHeightLevel } from 'modules/shared/store/constants';
 import { ViewType } from 'modules/shared/store/constants';
 import { getDateTimeCellAlarm } from 'modules/database/store/selectors/resource/datasheet/calc';
@@ -1169,6 +1169,44 @@ export class DatasheetActions {
       p: ['meta', 'views', viewIndex, 'filterInfo'],
       oi: filterInfo,
       od: view.filterInfo,
+    };
+  };
+
+  /**
+   * set view conditional format rules
+   */
+  static setConditionalFormatRules2Action = (
+    snapshot: ISnapshot,
+    payload: { viewId: string; rules?: IConditionalFormatRule[] }
+  ): IJOTAction | null => {
+    const viewId = payload.viewId;
+    const rules = payload.rules;
+    const viewIndex = getViewIndex(snapshot, viewId);
+    if (viewIndex < 0) {
+      return null;
+    }
+    const view = snapshot.meta.views[viewIndex]! as any;
+
+    if (!rules) {
+      if (!('conditionalFormatRules' in view)) {
+        return null;
+      }
+      return {
+        n: OTActionName.ObjectDelete,
+        p: ['meta', 'views', viewIndex, 'conditionalFormatRules'],
+        od: view.conditionalFormatRules,
+      };
+    }
+
+    if (isEqual(view.conditionalFormatRules, rules)) {
+      return null;
+    }
+
+    return {
+      n: OTActionName.ObjectReplace,
+      p: ['meta', 'views', viewIndex, 'conditionalFormatRules'],
+      oi: rules,
+      od: view.conditionalFormatRules,
     };
   };
 

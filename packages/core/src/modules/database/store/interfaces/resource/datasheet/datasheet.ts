@@ -640,6 +640,22 @@ export interface IViewLockInfo {
   unitId: string;
 }
 
+/**
+ * 条件填色规则
+ */
+export interface IConditionalFormatRule {
+  /** 规则唯一ID */
+  id: string;
+  /** 作用范围：row 或 cell */
+  scope: 'row' | 'cell';
+  /** 当 scope 为 cell 时，目标列ID；row 时可为空 */
+  targetFieldId?: string;
+  /** 条件（沿用视图过滤结构） */
+  filterInfo: IFilterInfo;
+  /** 背景色（CSS 颜色字符串，如 rgba/#hex） */
+  color: string;
+}
+
 export interface IViewPropertyBase {
   id: string;
   name: string;
@@ -663,6 +679,11 @@ export interface IViewPropertyBase {
    * @default false
    */
   displayHiddenColumnWithinMirror?: boolean;
+
+  /**
+   * 条件填色规则集合（可选）
+   */
+  conditionalFormatRules?: IConditionalFormatRule[];
 }
 
 export interface IGridViewColumn extends IViewColumn {

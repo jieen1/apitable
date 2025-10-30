@@ -40,6 +40,7 @@ import { HideFieldType, ToolHandleType } from '../interface';
 import { SetCalendarLayout } from '../set_calendar_layout';
 import { SetGalleryLayout } from '../set_gallery_layout';
 import { ViewFilter } from '../view_filter';
+import { ConditionalFormatPanel } from '../conditional_format/conditional_format_panel';
 import { ViewGroup, ViewSort } from '../view_sort_and_group';
 import { ViewSwitcher } from '../view_switcher';
 import styles from './style.module.less';
@@ -168,6 +169,9 @@ export const Display: React.FC<React.PropsWithChildren<IDisplay>> = (props) => {
         break;
       case ToolHandleType.ViewGroup:
         renderNode = <ViewGroup close={close} triggerInfo={triggerInfo} />;
+        break;
+      case ToolHandleType.ConditionalFormat:
+        renderNode = <ConditionalFormatPanel triggerInfo={triggerInfo} />;
         break;
       case ToolHandleType.GallerySetting:
         renderNode = <SetGalleryLayout triggerInfo={triggerInfo} />;

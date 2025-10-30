@@ -707,6 +707,20 @@ const ToolbarBase = () => {
             />
           </Display>
         )}
+        {!isOrgView && !isCalendarView && !isKanbanView && embedSetting.basicTools && (
+          <Display type={ToolHandleType.ConditionalFormat}>
+            <ToolItem
+              id={'toolConditionalFormat'}
+              showLabel={showIconBarLabel}
+              disabled={!visualizationEditable || disabledWithMirror}
+              className={classNames({
+                [styles.toolbarItem]: true,
+              })}
+              icon={<StyleOutlined size={16} color={colors.secondLevelText} className={styles.toolIcon} />}
+              text={'填色'}
+            />
+          </Display>
+        )}
         {!isOrgView && !isCalendarView && !isKanbanView && !isGalleryView && !isMobile && embedSetting.basicTools && (
           <Display type={ToolHandleType.ChangeRowHeight}>
             <ToolItem
