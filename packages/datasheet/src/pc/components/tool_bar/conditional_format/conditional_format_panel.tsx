@@ -124,8 +124,8 @@ export const ConditionalFormatPanel: React.FC<IProps> = () => {
                     value={rule.targetFieldId}
                     onSelected={(opt) => updateRule(rule.id, { targetFieldId: opt.value as string })}
                   >
-                    {columns.map((c) => (
-                      <Option key={c.fieldId} value={c.fieldId} label={fieldMap[c.fieldId]?.name} />
+                    {columns.map((c, index) => (
+                      <Option key={c.fieldId} value={c.fieldId} currentIndex={index} />
                     ))}
                   </DropdownSelect>
                 )}
