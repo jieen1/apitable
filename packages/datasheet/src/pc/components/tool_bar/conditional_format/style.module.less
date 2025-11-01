@@ -62,29 +62,6 @@
 }
 .filter {
   padding-top: 6px;
-
-  // 使用 :global() 来覆盖 ConditionList 组件内部的样式类
-  // ConditionList 使用的是 view_filter/style.module.less 中的样式
-  :global(.condition) {
-    padding-top: 2px;
-
-    :global(.conditionItem) {
-      display: flex;
-      align-items: center;
-      font-size: 13px;
-      margin-bottom: 16px;
-    }
-
-    :global(.conditionWarn) {
-      position: absolute;
-      left: 8px;
-
-      svg {
-        cursor: pointer;
-        display: block;
-      }
-    }
-  }
 }
 .footer {
   display: flex;

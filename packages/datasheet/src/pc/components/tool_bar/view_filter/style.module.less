@@ -65,27 +65,6 @@
       }
     }
   }
-
-  .condition {
-    padding-top: 2px;
-
-    .conditionItem {
-      display: flex;
-      align-items: center;
-      font-size: 13px;
-      margin-bottom: 16px;
-    }
-
-    .conditionWarn {
-      position: absolute;
-      left: 8px;
-
-      svg {
-        cursor: pointer;
-        display: block;
-      }
-    }
-  }
 }
 
 :global {
@@ -164,4 +143,25 @@
   height: 20px;
   background: var(--bgGradientVertical);
   pointer-events: none;
+}
+
+.condition {
+  padding-top: 2px;
+
+  .conditionItem {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .conditionWarn {
+    position: absolute;
+    left: 8px;
+
+    svg {
+      cursor: pointer;
+      display: block;
+    }
+  }
 }
