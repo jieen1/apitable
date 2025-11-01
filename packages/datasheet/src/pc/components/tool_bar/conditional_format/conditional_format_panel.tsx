@@ -41,7 +41,7 @@ interface ConditionalFormatPanelProps {
 
 const MIN_HEIGHT = 70;
 const MAX_HEIGHT = 260;
-export const ConditionalFormatPanel: React.FC = (props: ConditionalFormatPanelProps) => {
+export const ConditionalFormatPanel: React.FC<ConditionalFormatPanelProps> = (props: ConditionalFormatPanelProps) => {
   const { triggerInfo } = props;
   const colors = useThemeColors();
   const dispatch = useDispatch();
