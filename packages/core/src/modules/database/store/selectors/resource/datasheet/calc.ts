@@ -438,7 +438,7 @@ export const getActiveViewGroupInfo = createSelector([getCurrentView], (view: IV
 
 // get current active view's conditional format rules
 export const getConditionalFormatRules = createSelector([getCurrentView], (view: IViewProperty | undefined) => {
-  return (view as any)?.conditionalFormatRules || [];
+  return view?.conditionalFormatRules || [];
 });
 
 export const getRangeFields = (state: IReduxState, range: IRange, datasheetId: string): IField[] | null => {

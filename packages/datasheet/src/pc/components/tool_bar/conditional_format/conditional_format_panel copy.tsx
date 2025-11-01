@@ -2,10 +2,9 @@
  * 条件填色面板
  */
 import * as React from 'react';
-import { useCallback, useState, useEffect, useRef } from 'react';
+import { useCallback, useState } from 'react';
 import classNames from 'classnames';
-import { TextButton, DropdownSelect, RadioGroup, useThemeColors, ScreenSize, useResponsive } from '@apitable/components';
-import { IUseListenTriggerInfo, useListenVisualHeight, WrapperTooltip } from '@apitable/components';
+import { TextButton, DropdownSelect, RadioGroup, useThemeColors } from '@apitable/components';
 import { useAppSelector } from 'pc/store/react-redux';
 import { useDispatch } from 'react-redux';
 import { ColorPicker } from 'pc/components/common/color_picker';
@@ -25,72 +24,45 @@ import {
   CollaCommandName, 
   StoreActions,
   IFieldMap,
-  ILookUpField,
-  IConditionalFormatRule,
-  BasicValueType,
-  FilterDuration
+  ILookUpField
 } from '@apitable/core';
 import { resourceService } from 'pc/resource_service';
 import { executeCommandWithMirror } from 'pc/utils/execute_command_with_mirror';
 
 const Option = DropdownSelect.Option;
 
-interface ConditionalFormatPanelProps {
-  triggerInfo?: IUseListenTriggerInfo;
+interface IProps {
+  triggerInfo?: any;
 }
 
-const MIN_HEIGHT = 70;
-const MAX_HEIGHT = 260;
-export const ConditionalFormatPanel: React.FC = (props: ConditionalFormatPanelProps) => {
-  const { triggerInfo } = props;
+type RuleDraft = {
+  id: string;
+  // 是否整行填色；为 true 则保存为 scope:'row'，否则为 'cell'
+  fillWholeRow: boolean;
+  targetFieldId?: string;
+  filterInfo: IFilterInfo;
+  color: number;
+};
+
+export const ConditionalFormatPanel: React.FC<IProps> = () => {
   const colors = useThemeColors();
   const dispatch = useDispatch();
   const view = useAppSelector((s) => Selectors.getCurrentView(s)!);
   const datasheetId = useAppSelector((s) => s.pageParams.datasheetId!);
   const fieldMap = useAppSelector((s) => Selectors.getFieldMap(s, datasheetId)) as IFieldMap;
   const columns = useAppSelector((s) => Selectors.getVisibleColumns(s));
-  const rules = useAppSelector((s) => Selectors.getConditionalFormatRules(s));
-  const [drafts, setDrafts] = useState<IConditionalFormatRule[]>(rules || []);
+  const rules = useAppSelector((s) => (Selectors as any).getConditionalFormatRules(s)) as any[];
+  const [drafts, setDrafts] = useState<RuleDraft[]>(() => (rules && rules.length ? rules : []));
   const cacheTheme = useAppSelector(Selectors.getTheme);
-
-  const { screenIsAtMost } = useResponsive();
-  const isMobile = screenIsAtMost(ScreenSize.md);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const childRef = useRef<HTMLDivElement>(null);
-  const scrollShadowRef = useRef<HTMLDivElement>(null);
-
-  const { style, onListenResize } = useListenVisualHeight({
-    listenNode: containerRef,
-    childNode: childRef,
-    minHeight: MIN_HEIGHT,
-    maxHeight: MAX_HEIGHT,
-    triggerInfo,
-    position: 'sticky',
-    showOnParent: false,
-    onScroll: ({ height, scrollHeight, scrollTop }) => {
-      const ele = scrollShadowRef.current;
-      if (!ele) return;
-      if (scrollTop + height > scrollHeight - 10) {
-        // Masked scrollable styles.
-        ele.style.display = 'none';
-        return;
-      }
-      // Display scrollable style.
-      if (ele.style.display === 'block') {
-        return;
-      }
-      ele.style.display = 'block';
-    },
-  });
 
   const addRule = useCallback(() => {
     const firstFieldId = columns[0]?.fieldId;
     const field = firstFieldId ? fieldMap[firstFieldId] : undefined;
     const acceptFilterOperators = field ? Field.bindModel(field).acceptFilterOperators : [];
     const newOperate = acceptFilterOperators[0];
-    const newDraft: IConditionalFormatRule = {
+    const newDraft: RuleDraft = {
       id: getNewId(IDPrefix.Condition),
-      scope: 'cell',
+      fillWholeRow: false,
       targetFieldId: firstFieldId,
       color: 0,
       filterInfo: {
@@ -102,7 +74,7 @@ export const ConditionalFormatPanel: React.FC = (props: ConditionalFormatPanelPr
               fieldId: firstFieldId,
               operator: newOperate,
               fieldType: field.type as any,
-              value: Field.bindModel(field).valueType === BasicValueType.DateTime ? [FilterDuration.ExactDate, null] : null,
+              value: null,
             },
           ]
           : [],
@@ -110,8 +82,8 @@ export const ConditionalFormatPanel: React.FC = (props: ConditionalFormatPanelPr
     };
     setDrafts((prev) => [...prev, newDraft]);
   }, [columns, fieldMap]);
-``
-  const updateRule = useCallback((id: string, patch: Partial<IConditionalFormatRule>) => {
+
+  const updateRule = useCallback((id: string, patch: Partial<RuleDraft>) => {
     setDrafts((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
   }, []);
 
@@ -120,10 +92,10 @@ export const ConditionalFormatPanel: React.FC = (props: ConditionalFormatPanelPr
   }, []);
 
   const save = useCallback(() => {
-    const payload = drafts.map(({ id, scope, targetFieldId, filterInfo, color }) => ({
+    const payload = drafts.map(({ id, fillWholeRow, targetFieldId, filterInfo, color }) => ({
       id,
-      scope: scope,
-      targetFieldId: scope === 'cell' ? targetFieldId : undefined,
+      scope: fillWholeRow ? 'row' : 'cell',
+      targetFieldId: fillWholeRow ? undefined : targetFieldId,
       filterInfo,
       color,
     }));
@@ -142,7 +114,7 @@ export const ConditionalFormatPanel: React.FC = (props: ConditionalFormatPanelPr
   }, [drafts, view, datasheetId, dispatch]);
 
   return (
-    <div className={classNames(styles.wrapper, styles.shadow)} ref={containerRef}>
+    <div className={styles.wrapper}>
       <div className={styles.header}>配置填色规则</div>
       <div className={styles.list}>
         {drafts.map((rule) => {
@@ -155,30 +127,30 @@ export const ConditionalFormatPanel: React.FC = (props: ConditionalFormatPanelPr
                   <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                     <input
                       type="checkbox"
-                      checked={rule.scope === 'row'}
-                      onChange={(e) => updateRule(rule.id, { scope: e.target.checked ? 'row' : 'cell' })}
+                      checked={rule.fillWholeRow}
+                      onChange={(e) => updateRule(rule.id, { fillWholeRow: e.target.checked })}
                       style={{ marginRight: 6 }}
                     />
                     整行填色
                   </label>
                 </div>
                 <div className={styles.color}>
-                  <div className={styles.outer}>
-                    <div
-                      className={styles.inner}
-                      style={{
-                        backgroundColor: rule.color === -1 ? colors.defaultBg : setColor(rule.color, cacheTheme),
-                      }}
-                    />
-                  </div>
+                <div className={styles.outer}>
+                  <div
+                    className={styles.inner}
+                    style={{
+                      backgroundColor: rule.color === -1 ? colors.defaultBg : setColor(rule.color, cacheTheme),
+                    }}
+                  />
+                </div>
                   <ColorPicker
-                    option={{ id: rule.id, name: '', color: rule.color || 0 }}
+                    option={{ id: rule.id, name: '', color: rule.color as number || 0 }}
                     onChange={(_type, _id, value) => updateRule(rule.id, { color: value as number})}
-                    triggerComponent={<div className={styles.colorBlock} style={{ background: setColor(rule.color, cacheTheme) }} />}
+                    triggerComponent={<div className={styles.colorBlock} style={{ background: rule.color }} />}
                   />
                 </div>
               </div>
-              <div className={classNames(styles.filter)} ref={childRef} style={{ ...style, overflow: 'auto' }}>
+              <div className={classNames(styles.filter)}>
                 <ConditionList
                   filterInfo={rule.filterInfo}
                   fieldMap={fieldMap}
@@ -196,7 +168,6 @@ export const ConditionalFormatPanel: React.FC = (props: ConditionalFormatPanelPr
                   datasheetId={datasheetId}
                   field={field}
                 />
-                <div ref={scrollShadowRef} className={classNames(!isMobile && styles.scrollShadow)} />
               </div>
             </div>
           );

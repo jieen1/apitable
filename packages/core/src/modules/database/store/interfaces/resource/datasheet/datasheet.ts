@@ -653,7 +653,7 @@ export interface IConditionalFormatRule {
   /** 条件（沿用视图过滤结构） */
   filterInfo: IFilterInfo;
   /** 背景色（CSS 颜色字符串，如 rgba/#hex） */
-  color: string;
+  color: number;
 }
 
 export interface IViewPropertyBase {
