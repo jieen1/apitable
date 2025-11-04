@@ -89,7 +89,7 @@ export const ConditionalFormatPanel: React.FC<ConditionalFormatPanelProps> = (pr
       id: getNewId(IDPrefix.Condition),
       scope: 'cell',
       targetFieldId: firstFieldId,
-      color: 0,
+      color: 26,
       filterInfo: {
         conjunction: FilterConjunction.Or,
         conditions: field
@@ -120,7 +120,7 @@ export const ConditionalFormatPanel: React.FC<ConditionalFormatPanelProps> = (pr
     const payload = drafts.map(({ id, scope, targetFieldId, filterInfo, color }) => ({
       id,
       scope: scope,
-      targetFieldId: scope === 'cell' ? targetFieldId : undefined,
+      targetFieldId: targetFieldId,
       filterInfo,
       color,
     }));
@@ -153,7 +153,7 @@ export const ConditionalFormatPanel: React.FC<ConditionalFormatPanelProps> = (pr
                     <input
                       type="checkbox"
                       checked={rule.scope === 'row'}
-                      onChange={(e) => updateRule(rule.id, { scope: e.target.checked ? 'row' : 'cell', targetFieldId: e.target.checked ? undefined : rule.targetFieldId })}
+                      onChange={(e) => updateRule(rule.id, { scope: e.target.checked ? 'row' : 'cell' })}
                       style={{ marginRight: 6 }}
                     />
                     整行填色

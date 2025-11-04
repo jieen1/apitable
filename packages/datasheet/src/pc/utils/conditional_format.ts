@@ -12,7 +12,6 @@ export function getConditionalFillColor(state: IReduxState, recordId: string, fi
     }
     const rows = derivate.getFilterRowsBase({ filterInfo: rule.filterInfo, rows: [{ recordId } as any], recordMap: snapshot.recordMap });
     if (rows && rows.length) {
-      console.log('get fill color ', rule, fieldId);
       return rule.color;
     }
   }
