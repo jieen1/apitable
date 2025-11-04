@@ -216,14 +216,18 @@ export const useCells = (props: IUseGridBaseProps) => {
             const commentVisible = allowShowCommentPane && Boolean(commentCount);
 
             // 条件填色（优先级低于活动/拖拽/选中等状态，仅在无这些状态时应用）
-            if (!isActive && !isDraggingRow && !isCellInSelection && !isCellInFillSelection && !isCheckedRow && !hasFoundMark && !isHoverRow && !isActiveRow) {
+            if (!isDraggingRow && !hasFoundMark) {
               try {
+                console.log('before get fill color ', recordId, fieldId);
                 const { getConditionalFillColor } = require('pc/utils/conditional_format');
                 const fill = getConditionalFillColor(state as any, recordId, fieldId);
+                console.log('get fill color ', fill);
                 if (fill) {
                   background = fill;
                 }
-              } catch {}
+              } catch (e) {
+                console.error(e);
+              }
             }
 
             if (isCurrentSearchCell) {
