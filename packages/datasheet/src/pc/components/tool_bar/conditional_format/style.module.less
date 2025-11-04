@@ -10,23 +10,6 @@
   z-index: var(--viewFilterBox);
   border-radius: 4px;
   cursor: default;
-  @media screen and(min-width: @w-md) {
-    &.shadow {
-      padding: 24px;
-      box-shadow: var(--shadowCommonHigh);
-    }
-  }
-  .noSelect();
-
-  @media (any-hover: hover) {
-    &:hover {
-      color: var(--primaryColor);
-
-      svg {
-        fill: var(--primaryColor);
-      }
-    }
-  }
 }
 
 .header {

@@ -2,10 +2,10 @@
  * 条件填色面板
  */
 import * as React from 'react';
-import { useCallback, useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import classNames from 'classnames';
-import { TextButton, DropdownSelect, RadioGroup, useThemeColors, ScreenSize, useResponsive } from '@apitable/components';
-import { IUseListenTriggerInfo, useListenVisualHeight, WrapperTooltip } from '@apitable/components';
+import { TextButton, useThemeColors, ScreenSize, useResponsive } from '@apitable/components';
+import { IUseListenTriggerInfo, useListenVisualHeight } from '@apitable/components';
 import { useAppSelector } from 'pc/store/react-redux';
 import { useDispatch } from 'react-redux';
 import { ColorPicker } from 'pc/components/common/color_picker';
@@ -17,7 +17,6 @@ import {
   getNewId,
   IDPrefix,
   FilterConjunction, 
-  IFilterInfo,
   Field,
   Strings, 
   t, 
@@ -32,8 +31,6 @@ import {
 } from '@apitable/core';
 import { resourceService } from 'pc/resource_service';
 import { executeCommandWithMirror } from 'pc/utils/execute_command_with_mirror';
-
-const Option = DropdownSelect.Option;
 
 interface ConditionalFormatPanelProps {
   triggerInfo?: IUseListenTriggerInfo;
