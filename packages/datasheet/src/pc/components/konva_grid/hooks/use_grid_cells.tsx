@@ -217,20 +217,6 @@ export const useCells = (props: IUseGridBaseProps) => {
             const commentCount = Selectors.getRecord(state, recordId, datasheetId)?.commentCount || 0;
             const commentVisible = allowShowCommentPane && Boolean(commentCount);
 
-            // 条件填色（优先级低于活动/拖拽/选中等状态，仅在无这些状态时应用）
-            if (!isDraggingRow && !hasFoundMark) {
-              try {
-                console.log('before get fill color ', recordId, fieldId);
-                const fill = getConditionalFillColor(state as any, recordId, fieldId);
-                console.log('get fill color ', fill);
-                if (fill) {
-                  background = setColor(fill, cacheTheme);
-                }
-              } catch (e) {
-                console.error(e);
-              }
-            }
-
             if (isCurrentSearchCell) {
               background = colors.warnLight;
             } else if (isDraggingRow) {
@@ -251,6 +237,18 @@ export const useCells = (props: IUseGridBaseProps) => {
               background = colors.bgBrandLightDefaultSolid;
             } else if (isHoverRow) {
               background = colors.bgBglessHoverSolid;
+            }
+
+            // 条件填色
+            if (!isDraggingRow && !hasFoundMark) {
+              try {
+                const fill = getConditionalFillColor(state as any, recordId, fieldId);
+                if (fill) {
+                  background = setColor(fill, cacheTheme);
+                }
+              } catch (e) {
+                console.error(e);
+              }
             }
 
             recordRowLayout.init({
