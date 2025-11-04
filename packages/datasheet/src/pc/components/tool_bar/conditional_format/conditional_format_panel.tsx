@@ -183,6 +183,7 @@ export const ConditionalFormatPanel: React.FC<ConditionalFormatPanelProps> = (pr
                     const next = fn(rule.filterInfo);
                     updateRule(rule.id, {
                       filterInfo: next || { conjunction: rule.filterInfo.conjunction, conditions: [] },
+                      targetFieldId: next?.conditions[0]?.fieldId || undefined,
                     });
                   }}
                   deleteFilter={(idx: number) => {
