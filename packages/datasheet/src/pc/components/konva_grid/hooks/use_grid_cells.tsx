@@ -30,6 +30,8 @@ import {
 } from 'pc/components/konva_grid';
 import { store } from 'pc/store';
 import { addRowLayout, blankRowLayout, groupTabLayout, recordRowLayout } from '../model';
+import { setColor } from 'pc/components/multi_grid/format';
+import { getConditionalFillColor } from 'pc/utils/conditional_format';
 
 const Shape = dynamic(() => import('pc/components/gantt_view/hooks/use_gantt_timeline/shape'), { ssr: false });
 
@@ -219,11 +221,10 @@ export const useCells = (props: IUseGridBaseProps) => {
             if (!isDraggingRow && !hasFoundMark) {
               try {
                 console.log('before get fill color ', recordId, fieldId);
-                const { getConditionalFillColor } = require('pc/utils/conditional_format');
                 const fill = getConditionalFillColor(state as any, recordId, fieldId);
                 console.log('get fill color ', fill);
                 if (fill) {
-                  background = fill;
+                  background = setColor(fill, cacheTheme);
                 }
               } catch (e) {
                 console.error(e);
