@@ -23,10 +23,11 @@ interface IDingtalkMessageRequest {
   type: 'text' | 'markdown';
   content: string;
   webhookUrl: string;
+  title?: string;
 }
 
 export async function sendDingtalkMsg(request: IDingtalkMessageRequest): Promise<IActionResponse<string>> {
-  const { type, content, webhookUrl } = request;
+  const { type, content, webhookUrl, title } = request;
   let body: any = {};
   switch (type) {
     case 'text':
@@ -41,6 +42,7 @@ export async function sendDingtalkMsg(request: IDingtalkMessageRequest): Promise
       body = {
         msgtype: 'markdown',
         markdown: {
+          title: title,
           text: content,
         },
       };
