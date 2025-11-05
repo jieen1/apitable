@@ -54,7 +54,7 @@ export async function sendDingtalkMsg(request: IDingtalkMessageRequest): Promise
       headers: {
         'content-type': 'application/json',
       },
-      body,
+      body: JSON.stringify(body),
     });
     const responseBody = response.clone();
     const result = await responseBody.json();
