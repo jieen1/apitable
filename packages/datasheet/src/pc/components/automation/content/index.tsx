@@ -166,19 +166,11 @@ export const AutomationPanelContent: FunctionComponent<{}> = memo(() => {
 
                       <TabPane
                         tab={
-                          <Box display={'inline-flex'} alignItems={'center'}>
-                            <Typography variant="body2" color={colors.textCommonTertiary}>
-                              {t(Strings.ai_chat)}
-                            </Typography>
-                            <Box height={'20px'} border={'1px'} backgroundColor={colors.bgTagDefault} marginLeft={'8px'} padding={'0 4px'}>
-                              <Typography variant="body4" color={colors.textCommonTertiary}>
-                                {t(Strings.automation_stay_tuned)}
-                              </Typography>
-                            </Box>
-                          </Box>
+                          <Typography variant="body2" color={colors.textCommonTertiary}>
+                            {t(Strings.ai_chat)}
+                          </Typography>
                         }
-                        key={t(Strings.automation_stay_tuned)}
-                        disabled
+                        key={t(Strings.ai_chat)}
                       />
                     </Tabs>
                   </Box>
