@@ -52,8 +52,9 @@ import {
 import { QueueSenderBaseService } from 'shared/services/queue/queue.sender.base.service';
 import { RestService } from 'shared/services/rest/rest.service';
 import { In } from 'typeorm';
+import { ModuleRef } from '@nestjs/core';
 import * as services from '../actions';
-import { customActionMap } from '../actions/decorators/automation.action.decorator';
+import { customActionMap, customActionClassMap } from '../actions/decorators/automation.action.decorator';
 import { IActionResponse } from '../actions/interface/action.response';
 import { AutomationActionEntity } from '../entities/automation.action.entity';
 import { AutomationRobotEntity } from '../entities/automation.robot.entity';
@@ -90,6 +91,7 @@ export class AutomationService {
     private readonly redisService: RedisService,
     @Inject(forwardRef(() => TriggerEventHelper))
     private readonly triggerEventHelper: TriggerEventHelper,
+    private readonly moduleRef: ModuleRef,
   ) {
     this.robotRunner = new AutomationRobotRunner({
       requestActionOutput: this.getActionOutput.bind(this),
@@ -238,7 +240,36 @@ export class AutomationService {
       }
       case 'action:': {
         const connectorKey = url.hostname;
-        const connector = customActionMap.get(connectorKey)!;
+        // 优先尝试从customActionMap获取实例（向后兼容）
+        let connector = customActionMap.get(connectorKey);
+        
+        // 如果customActionMap中没有实例，尝试从NestJS容器获取（支持依赖注入）
+        if (!connector) {
+          const ActionClass = customActionClassMap.get(connectorKey);
+          if (ActionClass) {
+            try {
+              connector = this.moduleRef.get(ActionClass, { strict: false });
+            } catch (error) {
+              this.logger.error(`Failed to get action instance from container: ${connectorKey}`, error);
+              return {
+                success: false,
+                data: {
+                  errors: [{ message: `Action not found: ${connectorKey}` }],
+                },
+              };
+            }
+          }
+        }
+        
+        if (!connector) {
+          return {
+            success: false,
+            data: {
+              errors: [{ message: `Action not found: ${connectorKey}` }],
+            },
+          };
+        }
+        
         const resp = await connector.endpoint(actionRuntimeInput);
         return {
           success: resp.success,

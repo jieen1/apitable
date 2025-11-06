@@ -26,6 +26,11 @@ export * as ruliu from './ruliu';
 export * as slack from './slack';
 export * as sms from './sms';
 export * as dingtalk from './dingtalk';
+// 导入datasheet actions以触发装饰器注册
+import './datasheet';
+import { AddRecordAction } from './datasheet/add-record.action';
+import { UpdateRecordAction } from './datasheet/update-record.action';
+import { FindRecordAction } from './datasheet/find-record.action';
 
 const actionEnterpriseModulePath = path.join(__dirname, '../../enterprise/automation/action');
 const isEnterpriseLevel: boolean = fs.existsSync(actionEnterpriseModulePath);
@@ -44,5 +49,15 @@ if (isEnterpriseLevel) {
 
 @Module({
   imports: [],
+  providers: [
+    AddRecordAction,
+    UpdateRecordAction,
+    FindRecordAction,
+  ],
+  exports: [
+    AddRecordAction,
+    UpdateRecordAction,
+    FindRecordAction,
+  ],
 })
 export class AutomationActionModule {}

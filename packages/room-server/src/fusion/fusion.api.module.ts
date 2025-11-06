@@ -101,6 +101,12 @@ import { OneWayLinkField } from './field/one_way_link.field';
     FusionApiTransformer,
     FusionApiFilter,
   ],
+  exports: [
+    DataBusService,
+    FusionApiTransformer,
+    FusionApiFilter,
+    FusionApiRecordService,
+  ],
 })
 export class FusionApiModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

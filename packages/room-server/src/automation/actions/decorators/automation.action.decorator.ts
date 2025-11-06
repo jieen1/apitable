@@ -23,6 +23,8 @@ import { IBaseAction, IUiSchema } from '../interface/base.action';
 export const customActionMap = new Map<string, IBaseAction>();
 export const customActionTypeMetas = new Map<string, IActionTypeMeta>();
 export const customActionTypeMap = new Map<string, IActionType>();
+// 保存类引用，用于依赖注入
+export const customActionClassMap = new Map<string, new (...args: any[]) => IBaseAction>();
 
 interface IAutomationActionOption {
   themeLogo?: { light: string, dark?: string };
@@ -73,8 +75,16 @@ export function AutomationAction(name: string, option?: IAutomationActionOption)
           slug: nameHash
         }
       });
+      // 保存类引用，用于依赖注入
+      customActionClassMap.set(nameHash, target as any);
+      // 为了向后兼容，仍然创建实例（如果不需要依赖注入的话）
+      try {
       const instance = new target.prototype.constructor();
       customActionMap.set(nameHash, instance);
+      } catch (error) {
+        // 如果构造函数需要参数，则无法直接实例化，需要从容器获取
+        // 这种情况下，customActionMap中不会有实例，需要在AutomationService中从容器获取
+      }
     }
     return target;
   };

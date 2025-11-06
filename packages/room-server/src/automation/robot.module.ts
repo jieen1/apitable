@@ -23,6 +23,9 @@ import { ButtonClickedListener } from 'automation/events/listeners/button.clicke
 import { NodeModule } from 'node/node.module';
 import { UserModule } from 'user/user.module';
 import { DocumentServiceDynamicModule } from 'workdoc/services/document.service.dynamic.module';
+import { DatabaseModule } from 'database/database.module';
+import { FusionApiModule } from 'fusion/fusion.api.module';
+import { AutomationActionModule } from './actions';
 import { RobotActionController } from './controller/action.controller';
 import { RobotActionTypeController } from './controller/action.type.controller';
 import { RobotController } from './controller/robot.controller';
@@ -61,6 +64,9 @@ import { RobotTriggerTypeService } from './services/robot.trigger.type.service';
     ]),
     NodeModule,
     UserModule,
+    DatabaseModule,
+    FusionApiModule,
+    AutomationActionModule,
     RobotServiceDynamicModule.forRoot(),
     DocumentServiceDynamicModule.forRoot(),
   ],

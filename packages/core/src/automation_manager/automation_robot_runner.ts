@@ -184,7 +184,13 @@ export class AutomationRobotRunner extends IAutomationRobotRunner {
     // }
   }
   getRuntimeActionInput(actionId: string, globalContext: IRobotTaskRuntimeContext): any {
-    return this.inputParser.render(globalContext.robot.actionsById[actionId]!.input, globalContext);
+    const renderedInput = this.inputParser.render(globalContext.robot.actionsById[actionId]!.input, globalContext);
+    // 将 robotId 自动注入到 action 的运行时输入中，供后续依赖权限与审计
+    // IRobot.id 为当前机器人的唯一标识
+    return {
+      ...(renderedInput || {}),
+      robotId: globalContext.robot.id,
+    };
   }
   async reportResult(taskId: string, globalContext: IRobotTaskRuntimeContext) {
     await this.reqMethods.reportResult(taskId, globalContext.success, {
